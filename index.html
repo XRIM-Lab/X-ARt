@@ -1,132 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>「X-ARt」</title>
+    <title>「X-ARt」- Art, Technology, Nature</title>
+    <!-- Bootstrap is used for the grid system, but our custom styles will override most of its look -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="style.css">
-  </head>
-  <body>
-    <main>
-        <div class="container">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style2.css">
+<script async src="https://ga.jspm.io/npm:es-module-shims@1.7.1/dist/es-module-shims.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@^0.172.0/build/three.module.min.js"
+  }
+}
+</script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer/dist/model-viewer-module.min.js"></script>
 
-                
+                  <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer-effects/dist/model-viewer-effects.min.js"></script>
+</head>
+<body>
 
-        <h1>「X-ARt」</h1>
+    <main class="site-container">
 
-        <div class="container mt-5">
-          <div id="carouselExample" class="carousel slide">
-            <!-- Indicators -->
-            <div class="carousel-indicators">
-              <button type="button" data-bs-target="#carouselExample" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-              <button type="button" data-bs-target="#carouselExample" data-bs-slide-to="1" aria-label="Slide 2"></button>
-              <button type="button" data-bs-target="#carouselExample" data-bs-slide-to="2" aria-label="Slide 3"></button>
-              <button type="button" data-bs-target="#carouselExample" data-bs-slide-to="3" aria-label="Slide 4"></button>
-              <button type="button" data-bs-target="#carouselExample" data-bs-slide-to="4" aria-label="Slide 5"></button>
-            </div>
-        
-            <!-- Carousel Inner -->
-            <div class="carousel-inner">
-              <div class="carousel-item">
-                <img src="images/Teaser.jpg" class="d-block w-100" alt="Slide 1">
-              </div>
-              <div class="carousel-item">
-                <img src="images/TTY.jpeg" class="d-block w-100" alt="Slide 2">
-              </div>
-              <div class="carousel-item">
-                <img src="images/Fringe.jpeg" class="d-block w-100" alt="Slide 2">
-              </div>
-              <div class="carousel-item">
-                <img src="images/ecorotunda.png" class="d-block w-100" alt="Slide 3">
-              </div>
-              <div class="carousel-item">
-                <img src="images/sharpisland.png" class="d-block w-100" alt="Slide 3">
-              </div>
-              <div class="carousel-item active">
-                <img src="images/YTTPAF.png" class="d-block w-100" alt="Slide 3">
-              </div>
-            </div>
-        
-            <!-- Left and Right Controls -->
-            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
-              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
-              <span class="carousel-control-next-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Next</span>
-            </button>
-          </div>
-        
-        
-        </div>
+        <header class="site-header">
+            <h1>「X-ARt」</h1>
+        </header>
 
 
-        <p>「X-ARt」 explores the interstices of Man and Nature, Art and Technology. Using augmented reality technologies, we metaphorically reveal the ‘fields of force’ and ‘flows of materials’ of Nature, to arouse a greater appreciation of Nature and its invisible forces that affect every aspect of our lives.&nbsp;</p>
+            <!-- Add this 3D model viewer -->
+    <model-viewer 
+        id="artwork-viewer"
+        src="mesh.glb"
+        alt="A 3D model of an astronaut"
+        ar
+        auto-rotate
+        shadow-intensity="1"
+        camera-orbit="45deg 45deg 6m"
+        rotation-per-second="30deg"
+        auto-rotate-delay="0"
+        >
+         <effect-composer>
+                    <bloom-effect strength="5" radius="0.3" threshold="0.1" smoothing="0" bloom-color="#00ff00"></bloom-effect>
+        </effect-composer>
+    </model-viewer>
 
-        <div class="align-items-center">
 
-          <div class="container text-center" style="width: 600px">
-          <iframe class="embed-responsive-item" width="600" height="400" src="https://www.youtube.com/embed/EOr5efQqT-E?si=SX8RVaddGVAQMQTi" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-</div>
-      </div>
-        
-        <h2>Performances and Experimentations</h2>
-        <p>「X-ARt」 conducts performances and experimentations that are specifically designed around a physical site. Videos of the performances are available on our <a href="https://www.youtube.com/watch?v=G7kq82vVii0&list=PLQ1V17CJMKhXPL7nyAnrpQ-Mlpc6VbRbe">Youtube Channel</a></p>
-        <ul>
-             <li>October 11, 2025 - Yim Tin Tsai Performing Arts Festival, Yim Tin Tsai, Hong Kong</li>
-             <li>May 28, 2025 - Tsung Lun Shoe Company, Kowloon City, Hong Kong - <a href="https://demo.xrim.org/tsunglun/">Demo</a></li>
-            <li>March 24, 2025  - Art Fringe, Fringe Club, Central, Hong Kong</li>
-            <li>January 11, 2025 (2 performances) - Sai Kung Hoi Arts Festival, Yim Tin Tsai, Hong Kong</li>
-            <li>January 10, 2025 - Fringe Festival, Fringe Club, Central, Hong Kong</li>
-            <li>November 17, 2024  (3 performances) - Sai Kung Hoi Arts Festival, Yim Tin Tsai, Hong Kong</li>
-            <li>November 8, 2024 - Sai Kung Hoi Arts Festival, Yim Tin Tsai, Hong Kong</li>
-            <li>August 1, 2024 - The Altitude, Gaia Hotel Bandung, Yogjakarta, Indonesia</li>
-            <li>July 29, 2024 - Borobodur, Panambaran, Yogjakarta, Indonesia</li>
-            <li>July 27, 2024 - Yim Tin Tsai Old Pier, Hong Kong</li>
-            <li>May 2024 - Tew Falls, Hamilton, Ontario, Canada</li>
-            <li>May 2024 - Nordlingen Woods, Markham, Ontario, Canada</li>
-            <li>April 25, 2024 - Sharp Island beach, Hong Kong</li>
-            <li>February 10, 2024 - Shaw Auditorium, HKUST, Hong Kong</li>
-            <li>December 2, 2023 - Heath, Tsim Sha Tsui, Hong Kong</li>
-        </ul>
-
-        <h2>Engagement Activities</h2>
-        <p>「X-ARt」 also conducts engagement workshops around AR art.</p>
-        <ul>
-            <li>December 8, 2024 (3 workshops) - Sai Kung Hoi Arts Festival, Yim Tin Tsai, Hong Kong</li>
-        </ul>
-
-        <h2>Artists</h2>
-        <p>「X-ARt」 is a collaboration between four artists:</p>
-        <ul>
-            <li><a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/blyhn_art.design.music/">bLYHn</a></li>
-            <li><a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/dominie_n_art/">Dominie CHAN</a></li>
-            <li><a target="_blank" rel="noopener noreferrer" href="https://braudt.people.ust.hk/">Tristan BRAUD</a> <a target="_blank" rel="noopener noreferrer" href="https://xrim.org">XRIM-Lab</a></li>
-            <li><a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/blyhn_art.design.music/">Christopher CS CHAN</a></li>
-        </ul>
-        <p>With support from <a href="https://xrim.hkust.edu.hk/">XRIM-Lab</a></p>
-
-        <p>Technical team (past and present, in alphabetical order):</p>
-        <ul>
-            <li>CHAN Ho Ching Carson</li>
-            <li>Kirill SHATILOV</li>
-            <li>WU Chun Ming Jimmy</li>
-            <li>WU Zhen</li>
-            <li>YONG Vi Jun Sean</li>
-            <li>ZHUO Yuchao</li>
-
-        </ul>
-        <h2>Contact</h2>
-        <p>For any enquiries, please contact <a href="mailto:braudt@ust.hk">braudt@ust.hk</a></p>
+        <!-- ==== About & Gallery Section ==== -->
+        <section id="about" class="about-grid">
+            <div class="gallery-container">
+                <div id="projectCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3500">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <img src="images/YTTPAF.png" class="d-block w-100" alt="Yim Tin Tsai Performing Arts Festival">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="images/Teaser.jpg" class="d-block w-100" alt="Teaser Image">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="images/TTY.jpeg" class="d-block w-100" alt="TTY Location">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="images/Fringe.jpeg" class="d-block w-100" alt="Fringe Club">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="images/ecorotunda.png" class="d-block w-100" alt="Ecorotunda">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="images/sharpisland.png" class="d-block w-100" alt="Sharp Island">
+                        </div>
+                    </div>
                 </div>
+
+
+
+            </div>
+            <div class="description-container">
+                <p class="lead"> 
+「X-ARt」 explores the interstices of Man and Nature, Art and Technology. Using augmented reality technologies, we metaphorically reveal the ‘fields of force’ and ‘flows of materials’ of Nature, to arouse a greater appreciation of Nature and its invisible forces that affect every aspect of our lives. </p>
+                <!--<div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/EOr5efQqT-E?si=SX8RVaddGVAQMQTi" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>-->
+            </div>
+        </section>
+
+        <!-- ==== Performances ==== -->
+        <section id="performances" class="detail-section">
+            <h2>Performances & Experimentations</h2>
+<ul>
+    <li><span class="mono-label">2025.10.11</span> Yim Tin Tsai Performing Arts Festival, Yim Tin Tsai, HK</li>
+    <li><span class="mono-label">2025.05.28</span> Tsung Lun Shoe Company, Kowloon City, HK <a href="https://demo.xrim.org/tsunglun/">Demo</a></li>
+    <li><span class="mono-label">2025.03.24</span> Art Fringe, Fringe Club, Central, HK</li>
+    <li><span class="mono-label">2025.01.11</span> Sai Kung Hoi Arts Festival, Yim Tin Tsai, HK <span class="annotation">(2 performances)</span></li>
+    <li><span class="mono-label">2025.01.10</span> Fringe Festival, Fringe Club, Central, HK</li>
+    <li><span class="mono-label">2024.11.17</span> Sai Kung Hoi Arts Festival, Yim Tin Tsai, HK <span class="annotation">(3 performances)</span></li>
+    <li><span class="mono-label">2024.11.08</span> Sai Kung Hoi Arts Festival, Yim Tin Tsai, HK</li>
+    <li><span class="mono-label">2024.08.01</span> The Altitude, Gaia Hotel Bandung, Yogjakarta, Indonesia</li>
+    <li><span class="mono-label">2024.07.29</span> Borobodur, Panambaran, Yogjakarta, Indonesia</li>
+    <li><span class="mono-label">2024.07.27</span> Yim Tin Tsai Old Pier, HK</li>
+    <li><span class="mono-label">2024.05&nbsp;&nbsp;&nbsp;</span> Tew Falls, Hamilton, Ontario, Canada</li>
+    <li><span class="mono-label">2024.05&nbsp;&nbsp;&nbsp;</span> Nordlingen Woods, Markham, Ontario, Canada</li>
+    <li><span class="mono-label">2024.04.25</span> Sharp Island beach, HK</li>
+    <li><span class="mono-label">2024.02.10</span> Shaw Auditorium, HKUST, HK</li>
+    <li><span class="mono-label">2023.12.02</span> Heath, Tsim Sha Tsui, HK</li>
+</ul>
+        </section>
+
+        <section id="engagement" class="detail-section">
+             <h2>Engagement</h2>
+             <ul>
+                 <li><span class="mono-label">2024.12.08</span> Sai Kung Hoi Arts Festival, Yim Tin Tsai, HK <span class="annotation">(3 workshops)</span></li>
+             </ul>
+        </section>
+
+        <!-- ==== Artists and Team ==== -->
+        <section id="artists" class="credits-grid">
+            <div class="artists-list">
+                <h2>Artists</h2>
+                <ul>
+                    <li><a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/blyhn_art.design.music/">bLYHn</a></li>
+                    <li><a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/dominie_n_art/">Dominie CHAN</a></li>
+                    <li><a target="_blank" rel="noopener noreferrer" href="https://braudt.people.ust.hk/">Tristan BRAUD</a></li>
+                    <li><a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/blyhn_art.design.music/">Christopher CS CHAN</a></li>
+                </ul>
+                <p class="support">With support from <a href="https://xrim.hkust.edu.hk/">XRIM-Lab</a></p>
+            </div>
+            <div class="team-list">
+                <h2>Technical Team</h2>
+                <ul>
+                    <li>CHAN Ho Ching Carson</li>
+                    <li>Kirill SHATILOV</li>
+                    <li>WU Chun Ming Jimmy</li>
+                    <li>WU Zhen</li>
+                    <li>YONG Vi Jun Sean</li>
+                    <li>ZHUO Yuchao</li>
+                </ul>
+            </div>
+        </section>
+
     </main>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    
+    <footer id="contact" class="site-footer">
+        <h2>Contact</h2>
+        <p>For enquiries, please contact <a href="mailto:braudt@ust.hk">braudt@ust.hk</a></p>
+        <small>&copy; 2024 「X-ARt」</small>
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-  </body>
+</body>
 </html>
-
-
-

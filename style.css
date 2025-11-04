@@ -1,51 +1,187 @@
-/* Custom CSS for the carousel */
-.carousel {
-    max-width: 600px;
+/*
+  X-ARt Custom "Art-Tech" Stylesheet
+*/
+
+:root {
+    --bg-color: #0A0A0A;         /* Near black */
+    --text-color: #EFEFEF;       /* Off-white */
+    --text-secondary: #888888;   /* Gray for secondary info */
+    --accent-color: #FFFFFF;     /* Pure white for links */
+    --hover-bg: #1A1A1A;         /* Slight glow background on hover */
+    --border-color: rgba(255, 255, 255, 0.1);
+
+    --font-main: 'Inter', sans-serif;
+    --font-mono: 'Space Mono', monospace;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-main);
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/* ==== Layout ==== */
+.site-container {
+    max-width: 1200px;
     margin: 0 auto;
-    position: relative;
-  }
-  
-  .carousel-inner {
-    height: 400px; /* Fixed height */
-    display: flex;
-    align-items: center; /* Vertically center the image */
-   /* justify-content: center; /* Horizontally center the image */
-    /*background-color: #f0f0f0; /* Fallback background color */
-  }
-  
-  .carousel-inner img {
-    max-width: 600px;
-    max-height: 400px;
-    width: auto;
-    height: auto;
-    object-fit: contain; /* Ensures the image scales properly */
-  }
-  
-  .carousel-control-prev,
-  .carousel-control-next {
-    width: 50px;
-    height: 50px;
-    background-color: rgba(0, 0, 0, 0.5);
-    border-radius: 50%;
-    top: 50%;
-    transform: translateY(-50%);
-    position: absolute;
-  }
-  
-  .carousel-control-prev {
-    left: -70px; /* 50px outside the image */
-  }
-  
-  .carousel-control-next {
-    right: -70px; /* 50px outside the image */
-  }
-  
-  
- 
-  
-  .carousel-caption {
-    width:auto;
+    padding: 0 2rem;
+}
+
+section {
+    padding: 4rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+section:last-of-type {
+    border-bottom: none;
+}
+
+/* ==== Typography ==== */
+h1, h2 {
+    font-family: var(--font-main);
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--accent-color);
+}
+
+.site-header h1 {
+    font-size: 2rem;
+    padding: 2rem 0;
     text-align: center;
-    background-color: rgba(0, 0, 0, 0.5);
-    justify-content: center;
-  }
+}
+
+h2 {
+    font-size: 1.25rem;
+    letter-spacing: 0.2em; /* Architectural spacing */
+    margin-bottom: 2rem;
+}
+
+p.lead {
+    font-size: 1.5rem;
+    line-height: 1.5;
+    margin-bottom: 3rem;
+    font-weight: 600;
+}
+
+a {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: var(--text-secondary);
+}
+
+/* ==== Content Grids ==== */
+.about-grid, .credits-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+}
+
+@media (min-width: 992px) {
+    .about-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+    }
+    .credits-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Order swap for visual flow on desktop */
+@media (min-width: 992px) {
+    .description-container {
+        order: -1;
+    }
+}
+
+/* ==== Floating Content (Image & Video) ==== */
+.carousel, .video-container {
+    background-color: var(--bg-color);
+}
+
+.carousel-control-prev, .carousel-control-next, .carousel-indicators {
+    display: none; /* Hide default Bootstrap controls for a cleaner look */
+}
+
+.video-container {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 */
+    height: 0;
+}
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* ==== Detail Lists ==== */
+.detail-section ul, .credits-grid ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.detail-section li, .credits-grid li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.2s ease-in-out;
+}
+.detail-section ul, .credits-grid ul {
+    border-top: 1px solid var(--border-color);
+}
+.detail-section li:hover, .credits-grid li:hover {
+    background-color: var(--hover-bg);
+}
+
+.mono-label {
+    font-family: var(--font-mono);
+    color: var(--text-secondary);
+    flex-shrink: 0; /* Prevents the date from shrinking */
+}
+
+span.annotation {
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.credits-grid li { padding-left: 0; }
+
+p.support {
+    margin-top: 1.5rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* ==== Footer ==== */
+.site-footer {
+    text-align: center;
+    padding: 4rem 1rem;
+}
+.site-footer small {
+    display: block;
+    margin-top: 2rem;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+}
+
+/* ==== 3D Viewer Styling ==== */
+#artwork-viewer {
+    display: block; /* Make it a block element */
+    width: 100%;
+    /* The height is crucial for the viewer to be visible */
+    height: 300px; 
+    margin-top: 2rem; /* Add some space above it */
+    background-color: var(--bg-color); /* Match page background */
+    --poster-color: transparent; /* Makes the loading screen background transparent */
+    border-radius: 4px; /* Optional: adds slightly rounded corners */
+}
