@@ -141,11 +141,29 @@
     a:hover { color: var(--text-secondary); }
 
     /* Two-column section */
-    .two-col { display: grid; grid-template-columns: 1fr; gap: 3rem; }
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
     @media (min-width: 992px) {
-      .two-col { grid-template-columns: 1fr 1fr; align-items: start; gap: 4rem; }
+      .two-col {
+        grid-template-columns: 1fr 1fr;
+        align-items: start;
+        gap: 4rem;
+      }
     }
     .two-col .col { min-width: 0; }
+
+    /* === NEW RULE ADDED HERE === */
+    /* Remove vertical padding between stacked columns on mobile */
+    @media (max-width: 991.98px) {
+      .two-col > .col:first-child {
+        padding-bottom: 0;
+      }
+      .two-col > .col:last-child {
+        padding-top: 0;
+      }
+    }
 
     .raised {
       /*background: rgba(10, 10, 10, 0.4);*/
@@ -443,14 +461,13 @@ This project offers a site-specific multi sensory experience, at the intersectio
   <footer id="contact" class="site-footer">
     <h2>Contact</h2>
     <p>For enquiries, please contact <a href="mailto:braudt@ust.hk">braudt@ust.hk</a></p>
-    <small>&copy; 2024 「X-ARt」</small>
+    <small>&copy; 2025 「X-ARt」</small>
   </footer>
 
   <!-- Bootstrap JS (optional for carousel) -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Scroll-driven rotation logic (slower) -->
-<!-- Scroll-driven rotation logic + loading management -->
+  <!-- Scroll-driven rotation logic + loading management -->
 <script type="module">
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const viewer = document.getElementById('bgViewer');
