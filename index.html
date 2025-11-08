@@ -1,154 +1,330 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>「X-ARt」- Art, Technology, Nature</title>
-    <!-- Bootstrap is used for the grid system, but our custom styles will override most of its look -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-<script async src="https://ga.jspm.io/npm:es-module-shims@1.7.1/dist/es-module-shims.js"></script>
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@^0.172.0/build/three.module.min.js"
-  }
-}
-</script>
-<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer/dist/model-viewer-module.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>「X-ARt」- Man, Nature, Technology, Art</title>
 
-                  <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer-effects/dist/model-viewer-effects.min.js"></script>
+  <!-- ES Module shims + import map -->
+  <script async src="https://ga.jspm.io/npm:es-module-shims@1.7.1/dist/es-module-shims.js"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.module.min.js"
+    }
+  }
+  </script>
+
+  <!-- Bootstrap (for grid + carousel) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+  <!-- Google fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Our Common Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- model-viewer + effects -->
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer/dist/model-viewer-module.min.js"></script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer-effects/dist/model-viewer-effects.min.js"></script>
+
+    <style>
+    :root {
+      --bg-gradient: 
+        radial-gradient(120% 120% at 50% 50%, rgba(0,0,0,0.55), rgba(0,0,0,0.75));
+    }
+  </style>
+
 </head>
+
 <body>
 
-    <main class="site-container">
-
-        <header class="site-header">
-            <h1>「X-ARt」</h1>
-        </header>
-
-
-            <!-- Add this 3D model viewer -->
-    <model-viewer 
-        id="artwork-viewer"
-        src="mesh.glb"
-        alt="A 3D model of an astronaut"
-        ar
-        auto-rotate
-        shadow-intensity="1"
-        camera-orbit="45deg 45deg 6m"
-        rotation-per-second="30deg"
-        auto-rotate-delay="0"
-        >
-         <effect-composer>
-                    <bloom-effect strength="5" radius="0.3" threshold="0.1" smoothing="0" bloom-color="#00ff00"></bloom-effect>
-        </effect-composer>
-    </model-viewer>
-
-
-        <!-- ==== About & Gallery Section ==== -->
-        <section id="about" class="about-grid">
-            <div class="gallery-container">
-                <div id="projectCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3500">
-                    <div class="carousel-inner">
-                        <div class="carousel-item active">
-                            <img src="images/YTTPAF.png" class="d-block w-100" alt="Yim Tin Tsai Performing Arts Festival">
-                        </div>
-                        <div class="carousel-item">
-                            <img src="images/Teaser.jpg" class="d-block w-100" alt="Teaser Image">
-                        </div>
-                        <div class="carousel-item">
-                            <img src="images/TTY.jpeg" class="d-block w-100" alt="TTY Location">
-                        </div>
-                        <div class="carousel-item">
-                            <img src="images/Fringe.jpeg" class="d-block w-100" alt="Fringe Club">
-                        </div>
-                        <div class="carousel-item">
-                            <img src="images/ecorotunda.png" class="d-block w-100" alt="Ecorotunda">
-                        </div>
-                        <div class="carousel-item">
-                            <img src="images/sharpisland.png" class="d-block w-100" alt="Sharp Island">
-                        </div>
-                    </div>
-                </div>
-
-
-
-            </div>
-            <div class="description-container">
-                <p class="lead"> 
-「X-ARt」 explores the interstices of Man and Nature, Art and Technology. Using augmented reality technologies, we metaphorically reveal the ‘fields of force’ and ‘flows of materials’ of Nature, to arouse a greater appreciation of Nature and its invisible forces that affect every aspect of our lives. </p>
-                <!--<div class="video-container">
-                    <iframe src="https://www.youtube.com/embed/EOr5efQqT-E?si=SX8RVaddGVAQMQTi" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-                </div>-->
-            </div>
-        </section>
-
-        <!-- ==== Performances ==== -->
-        <section id="performances" class="detail-section">
-            <h2>Performances & Experimentations</h2>
-<ul>
-    <li><span class="mono-label">2025.10.11</span> Yim Tin Tsai Performing Arts Festival, Yim Tin Tsai, HK</li>
-    <li><span class="mono-label">2025.05.28</span> Tsung Lun Shoe Company, Kowloon City, HK <a href="https://demo.xrim.org/tsunglun/">Demo</a></li>
-    <li><span class="mono-label">2025.03.24</span> Art Fringe, Fringe Club, Central, HK</li>
-    <li><span class="mono-label">2025.01.11</span> Sai Kung Hoi Arts Festival, Yim Tin Tsai, HK <span class="annotation">(2 performances)</span></li>
-    <li><span class="mono-label">2025.01.10</span> Fringe Festival, Fringe Club, Central, HK</li>
-    <li><span class="mono-label">2024.11.17</span> Sai Kung Hoi Arts Festival, Yim Tin Tsai, HK <span class="annotation">(3 performances)</span></li>
-    <li><span class="mono-label">2024.11.08</span> Sai Kung Hoi Arts Festival, Yim Tin Tsai, HK</li>
-    <li><span class="mono-label">2024.08.01</span> The Altitude, Gaia Hotel Bandung, Yogjakarta, Indonesia</li>
-    <li><span class="mono-label">2024.07.29</span> Borobodur, Panambaran, Yogjakarta, Indonesia</li>
-    <li><span class="mono-label">2024.07.27</span> Yim Tin Tsai Old Pier, HK</li>
-    <li><span class="mono-label">2024.05&nbsp;&nbsp;&nbsp;</span> Tew Falls, Hamilton, Ontario, Canada</li>
-    <li><span class="mono-label">2024.05&nbsp;&nbsp;&nbsp;</span> Nordlingen Woods, Markham, Ontario, Canada</li>
-    <li><span class="mono-label">2024.04.25</span> Sharp Island beach, HK</li>
-    <li><span class="mono-label">2024.02.10</span> Shaw Auditorium, HKUST, HK</li>
-    <li><span class="mono-label">2023.12.02</span> Heath, Tsim Sha Tsui, HK</li>
-</ul>
-        </section>
-
-        <section id="engagement" class="detail-section">
-             <h2>Engagement</h2>
-             <ul>
-                 <li><span class="mono-label">2024.12.08</span> Sai Kung Hoi Arts Festival, Yim Tin Tsai, HK <span class="annotation">(3 workshops)</span></li>
-             </ul>
-        </section>
-
-        <!-- ==== Artists and Team ==== -->
-        <section id="artists" class="credits-grid">
-            <div class="artists-list">
-                <h2>Artists</h2>
-                <ul>
-                    <li><a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/blyhn_art.design.music/">bLYHn</a></li>
-                    <li><a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/dominie_n_art/">Dominie CHAN</a></li>
-                    <li><a target="_blank" rel="noopener noreferrer" href="https://braudt.people.ust.hk/">Tristan BRAUD</a></li>
-                    <li><a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/blyhn_art.design.music/">Christopher CS CHAN</a></li>
-                </ul>
-                <p class="support">With support from <a href="https://xrim.hkust.edu.hk/">XRIM-Lab</a></p>
-            </div>
-            <div class="team-list">
-                <h2>Technical Team</h2>
-                <ul>
-                    <li>CHAN Ho Ching Carson</li>
-                    <li>Kirill SHATILOV</li>
-                    <li>WU Chun Ming Jimmy</li>
-                    <li>WU Zhen</li>
-                    <li>YONG Vi Jun Sean</li>
-                    <li>ZHUO Yuchao</li>
-                </ul>
-            </div>
-        </section>
-
-    </main>
+     <header id="siteHeader" class="site-header">
+    <div class="header-container site-container">
+        <a href="#intro" class="header-brand">「X-ARt」</a>
+        
+        <button class="menu-toggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="main-nav">
+            <span class="hamburger"></span>
+        </button>
+        
+        <!-- The NAV is now a SIBLING to the toggle button, not inside the desktop flow -->
+    </div>
     
-    <footer id="contact" class="site-footer">
-        <h2>Contact</h2>
-        <p>For enquiries, please contact <a href="mailto:braudt@ust.hk">braudt@ust.hk</a></p>
-        <small>&copy; 2024 「X-ARt」</small>
-    </footer>
+    <!-- MOVE THE NAV HERE: Outside the flex container but inside the header -->
+    <nav id="main-nav" class="main-navigation">
+        <ul>
+            <li class="has-dropdown">
+                <a class="dropdown-toggle" role="button">Projects</a>
+                <ul class="dropdown-menu">
+                    <li><a href="TTY2/">Through The Years, To Touch You</a></li>
+                </ul>
+            </li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+</header>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <!-- Loading screen -->
+  <div id="loadingScreen" class="loading-screen">
+    <div class="loading-content">
+      <h1 class="loading-title">「X-ARt」</h1>
+      <div class="subtitle" style="letter-spacing:0.25em; margin-top:0.5rem;">
+        Man, Nature, Technology, Art
+      </div>
+      <div class="loading-spinner">
+        <div class="spinner-ring"></div>
+      </div>
+      <p class="loading-text">Loading experience...</p>
+    </div>
+  </div>
+
+  <!-- Fixed 3D background layer behind all content -->
+  <div class="bg-3d" aria-hidden="true">
+    <model-viewer
+      id="bgViewer"
+      src="mesh.glb"
+      alt="X-ARt background 3D model"
+      shadow-intensity="1"
+      environment-image="neutral"
+      camera-orbit="90deg 90deg 6m"
+      interaction-prompt="none"
+      loading="eager"
+    >
+      <effect-composer>
+        <bloom-effect strength="5" radius="0.3" threshold="0.1" smoothing="0" bloom-color="#00ff00"></bloom-effect>
+      </effect-composer>
+    </model-viewer>
+  </div>
+
+  <main class="site-container content-hidden">
+    <!-- 1) Intro screen with title -->
+    <section class="intro-hero" id="intro">
+      <div class="intro-title" aria-label="Site Title">
+        <h1>「X-ARt」</h1>
+        <div class="subtitle">
+          Man, Nature, Technology, Art
+        </div>
+        <div class="intro-hint" aria-hidden="true">Scroll to enter</div>
+      </div>
+    </section>
+
+    <!-- 2) About & Gallery Section -->
+    <section id="about" class="two-col">
+      <div class="col text raised">
+        <h2>About X-ARt</h2>
+        <p class="lead">
+          Using augmented reality technologies, we metaphorically reveal the ‘fields of force’ and ‘flows of materials’ of Nature, to arouse a greater appreciation of Nature and its invisible forces that affect every aspect of our lives.
+        </p>
+        <p>
+            Our work is a blend of site-specific installations, performance art, and technological experimentation, always aiming to bridge the gap between the digital and the natural world.
+        </p>
+      </div>
+
+      <div class="col gallery raised">
+        <div id="projectCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3500">
+          <div class="carousel-inner">
+            <div class="carousel-item active"><img src="images/YTTPAF.png" alt="Yim Tin Tsai Performing Arts Festival"></div>
+            <div class="carousel-item"><img src="images/Teaser.jpg" alt="Teaser Image"></div>
+            <div class="carousel-item"><img src="images/TTY.jpeg" alt="TTY Location"></div>
+            <div class="carousel-item"><img src="images/Fringe.jpeg" alt="Fringe Club"></div>
+            <div class="carousel-item"><img src="images/ecorotunda.png" alt="Ecorotunda"></div>
+            <div class="carousel-item"><img src="images/sharpisland.png" alt="Sharp Island"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3) Performances & Experimentations -->
+    <section id="performances" class="detail-section">
+      <h2>Performances & Experimentations</h2>
+      <ul>
+        <li><span class="mono-label">2025.10.11</span> Yim Tin Tsai Performing Arts Festival, Yim Tin Tsai, HK</li>
+        <li><span class="mono-label">2025.05.28</span> Tsung Lun Shoe Company, Kowloon City, HK <a href="https://demo.xrim.org/tsunglun/">Demo</a></li>
+        <li><span class="mono-label">2025.03.24</span> Art Fringe, Fringe Club, Central, HK</li>
+        <li><span class="mono-label">2025.01.11</span> Sai Kung Hoi Arts Festival, Yim Tin Tsai, HK <span class="annotation">(2 performances)</span></li>
+        <li><span class="mono-label">2025.01.10</span> Fringe Festival, Fringe Club, Central, HK</li>
+        <li><span class="mono-label">2024.11.17</span> Sai Kung Hoi Arts Festival, Yim Tin Tsai, HK <span class="annotation">(3 performances)</span></li>
+        <li><span class="mono-label">2024.11.08</span> Sai Kung Hoi Arts Festival, Yim Tin Tsai, HK</li>
+        <li><span class="mono-label">2024.08.01</span> The Altitude, Gaia Hotel Bandung, Yogjakarta, Indonesia</li>
+        <li><span class="mono-label">2024.07.29</span> Borobodur, Panambaran, Yogjakarta, Indonesia</li>
+        <li><span class="mono-label">2024.07.27</span> Yim Tin Tsai Old Pier, HK</li>
+        <li><span class="mono-label">2024.05&nbsp;&nbsp;&nbsp;</span> Tew Falls, Hamilton, Ontario, Canada</li>
+        <li><span class="mono-label">2024.05&nbsp;&nbsp;&nbsp;</span> Nordlingen Woods, Markham, Ontario, Canada</li>
+        <li><span class="mono-label">2024.04.25</span> Sharp Island beach, HK</li>
+        <li><span class="mono-label">2024.02.10</span> Shaw Auditorium, HKUST, HK</li>
+        <li><span class="mono-label">2023.12.02</span> Heath, Tsim Sha Tsui, HK</li>
+      </ul>
+    </section>
+
+    <!-- 4) Engagement -->
+    <section id="engagement" class="detail-section">
+         <h2>Engagement</h2>
+         <ul>
+             <li><span class="mono-label">2024.12.08</span> Sai Kung Hoi Arts Festival, Yim Tin Tsai, HK <span class="annotation">(3 workshops)</span></li>
+         </ul>
+    </section>
+
+    <!-- 5) Team -->
+    <section id="team" class="two-col">
+      <div class="col raised">
+        <h2>Artists</h2>
+        <ul class="styled-list">
+            <li><a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/blyhn_art.design.music/">bLYHn</a></li>
+            <li><a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/dominie_n_art/">Dominie CHAN</a></li>
+            <li><a target="_blank" rel="noopener noreferrer" href="https://braudt.people.ust.hk/">Tristan BRAUD</a></li>
+            <li><a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/blyhn_art.design.music/">Christopher CS CHAN</a></li>
+        </ul>
+        <p class="support">With support from <a href="https://xrim.hkust.edu.hk/">XRIM-Lab</a></p>
+      </div>
+
+      <div class="col raised">
+        <h2>Technical Team</h2>
+        <ul class="styled-list">
+            <li>CHAN Ho Ching Carson</li>
+            <li>Kirill SHATILOV</li>
+            <li>WU Chun Ming Jimmy</li>
+            <li>WU Zhen</li>
+            <li>YONG Vi Jun Sean</li>
+            <li>ZHUO Yuchao</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer id="contact" class="site-footer">
+    <h2>Contact</h2>
+    <p>For enquiries, please contact <a href="mailto:braudt@ust.hk">braudt@ust.hk</a></p>
+    <small>&copy; 2025 「X-ARt」</small>
+  </footer>
+
+  <!-- Bootstrap JS (optional for carousel) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Scroll-driven rotation logic + loading management -->
+<script type="module">
+  // ============================
+  // === MENU LOGIC           ===
+  // ============================
+  const siteHeader = document.getElementById('siteHeader');
+  const menuToggle = document.querySelector('.menu-toggle');
+  const mainNav = document.getElementById('main-nav');
+  const navLinks = mainNav.querySelectorAll('a:not(.dropdown-toggle)');
+  let autoCloseTimer = null; // Timer for auto-closing mobile nav
+
+  // Helper function to close the mobile nav
+  function closeMobileNav() {
+    if (document.body.classList.contains('nav-open')) {
+      document.body.classList.remove('nav-open');
+      menuToggle.setAttribute('aria-expanded', 'false');
+      if (autoCloseTimer) {
+        clearTimeout(autoCloseTimer);
+      }
+    }
+  }
+
+  // --- Show header on scroll (for ALL screen sizes) ---
+  function onScrollMenu() {
+    // MODIFIED: This now runs on all screen sizes again
+    if (window.scrollY > window.innerHeight * 0.5) {
+      siteHeader.classList.add('is-visible');
+    } else {
+      siteHeader.classList.remove('is-visible');
+    }
+  }
+
+  // --- Mobile menu toggle (with auto-close) ---
+  menuToggle.addEventListener('click', () => {
+    const isNavOpen = document.body.classList.contains('nav-open');
+    if (isNavOpen) {
+      closeMobileNav();
+    } else {
+      document.body.classList.add('nav-open');
+      menuToggle.setAttribute('aria-expanded', 'true');
+      if (autoCloseTimer) clearTimeout(autoCloseTimer);
+      autoCloseTimer = setTimeout(closeMobileNav, 5000); // 5 seconds
+    }
+  });
+
+  // --- Close mobile menu when a nav link is clicked ---
+  navLinks.forEach(link => {
+    link.addEventListener('click', closeMobileNav);
+  });
+
+  // --- Dropdown Menu Logic (for mobile tap) ---
+  const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+  dropdownToggles.forEach(toggle => {
+    toggle.addEventListener('click', (event) => {
+      // Only run this logic on mobile view for tap-to-expand
+      if (window.innerWidth < 768) {
+        event.preventDefault();
+        const dropdownParent = toggle.parentElement;
+        dropdownParent.classList.toggle('is-open');
+      }
+    });
+  });
+
+  // ============================
+  // === 3D & SCROLL LOGIC    ===
+  // ============================
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const viewer = document.getElementById('bgViewer');
+  const loadingScreen = document.getElementById('loadingScreen');
+  const mainContent = document.querySelector('main');
+  const docEl = document.documentElement;
+
+  mainContent.classList.add('content-hidden');
+
+  function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+  function getPageProgress() {
+    const max = docEl.scrollHeight - window.innerHeight;
+    if (max <= 0) return 0;
+    return clamp(window.scrollY / max, 0, 1);
+  }
+
+  let ticking = false;
+  function update() {
+    const p = getPageProgress();
+    const baseAz = 45;
+    const turns = 0.5;
+    const az = baseAz + p * 360 * turns;
+    const elev = 50;
+    const radius = '6m';
+
+    if (!prefersReduced) {
+      viewer.setAttribute('camera-orbit', `${az}deg ${elev}deg ${radius}`);
+      viewer.style.opacity = String(0.9 - p * 0.2);
+    }
+    ticking = false;
+  }
+
+  function onScroll() {
+    onScrollMenu(); // Add the menu scroll handler
+    if (prefersReduced) return;
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(update);
+    }
+  }
+
+  function hideLoadingScreen() {
+    if (!loadingScreen.classList.contains('fade-out')) {
+      loadingScreen.classList.add('fade-out');
+      mainContent.classList.remove('content-hidden');
+      setTimeout(() => {
+        loadingScreen.style.display = 'none';
+      }, 800);
+    }
+  }
+
+  viewer.addEventListener('load', () => { setTimeout(hideLoadingScreen, 500); });
+  setTimeout(hideLoadingScreen, 10000);
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', () => { if (!prefersReduced) update(); });
+  document.addEventListener('DOMContentLoaded', () => { if (!prefersReduced) update(); });
+</script>
 </body>
 </html>

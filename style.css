@@ -1,187 +1,607 @@
 /*
-  X-ARt Custom "Art-Tech" Stylesheet
+  X-ARt Unified Stylesheet
+  Combines styles for a consistent look across the main site and project pages.
 */
 
+/* ============================ */
+/* === ROOT & GLOBAL STYLES === */
+/* ============================ */
 :root {
-    --bg-color: #0A0A0A;         /* Near black */
-    --text-color: #EFEFEF;       /* Off-white */
-    --text-secondary: #888888;   /* Gray for secondary info */
-    --accent-color: #FFFFFF;     /* Pure white for links */
-    --hover-bg: #1A1A1A;         /* Slight glow background on hover */
-    --border-color: rgba(255, 255, 255, 0.1);
+  --bg-color: #0A0A0A;
+  --text-color: #EFEFEF;
+  --text-secondary: #CCCCCC;
+  --accent-color: #FFFFFF;
+  --hover-bg: rgba(26, 26, 26, 0.6);
+  --border-color: rgba(255, 255, 255, 0.1);
 
-    --font-main: 'Inter', sans-serif;
-    --font-mono: 'Space Mono', monospace;
+  --font-main: 'Inter', sans-serif;
+  --font-mono: 'Space Mono', monospace;
+
+  --bg-gradient: 
+    radial-gradient(120% 120% at 50% 50%, rgba(0,0,0,0.1), rgba(0,0,0,0.25) 70%),
+    rgba(0,0,0,0.15);
 }
 
+html, body {
+  height: 100%;
+}
 body {
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    font-family: var(--font-main);
-    font-size: 16px;
-    line-height: 1.6;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: var(--font-main);
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0;
 }
 
-/* ==== Layout ==== */
+
+/* ============================ */
+/* ===     CORE LAYOUT      === */
+/* ============================ */
 .site-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+@media (min-width: 768px) {
+  .site-container { padding: 0 2rem; }
+}
+
+main, .site-footer {
+  position: relative;
+  z-index: 1; /* Sits above the background */
 }
 
 section {
-    padding: 4rem 0;
-    border-bottom: 1px solid var(--border-color);
+  padding: 4rem 0;
+  border-bottom: 1px solid var(--border-color);
 }
 section:last-of-type {
-    border-bottom: none;
+  border-bottom: none;
 }
 
-/* ==== Typography ==== */
-h1, h2 {
-    font-family: var(--font-main);
-    font-weight: 700;
-    text-transform: uppercase;
-    color: var(--accent-color);
+
+/* ============================ */
+/* ===   FIXED BACKGROUND   === */
+/* ============================ */
+.bg-3d {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+#bgViewer {
+  width: 100vw;
+  height: 100vh;
+  display: block;
+  background-color: var(--bg-color);
+  --poster-color: transparent;
+  will-change: transform, opacity;
+}
+.bg-3d::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--bg-gradient); 
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  #bgViewer { opacity: 1 !important; }
 }
 
-.site-header h1 {
-    font-size: 2rem;
-    padding: 2rem 0;
-    text-align: center;
+
+/* ============================ */
+/* ===     HERO SECTION     === */
+/* ============================ */
+.intro-hero {
+  height: 100vh;
+  display: grid;
+  place-items: center;
+  z-index: 1;
+}
+.intro-title {
+  text-align: center;
+  color: var(--text-color);
+  text-shadow: 0 2px 12px rgba(0,0,0,0.6);
+}
+.intro-title h1 {
+  font-family: var(--font-main);
+  font-weight: 700;
+  font-size: clamp(2.5rem, 6vw, 6rem);
+  margin: 0;
+  text-transform: none;
+}
+.intro-title .subtitle {
+  font-family: var(--font-mono);
+  font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+  letter-spacing: 0.2em;
+  margin-top: 0.75rem;
+  color: var(--text-secondary);
+  max-width: 60ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+.intro-hint {
+  margin-top: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  color: var(--text-secondary);
 }
 
+
+/* ============================ */
+/* ===     TYPOGRAPHY       === */
+/* ============================ */
+h1, h2, h3 {
+  font-family: var(--font-main);
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--accent-color);
+}
 h2 {
-    font-size: 1.25rem;
-    letter-spacing: 0.2em; /* Architectural spacing */
-    margin-bottom: 2rem;
+  font-size: 1.25rem;
+  letter-spacing: 0.2em;
+  margin-bottom: 2rem;
+  margin-top: 2rem;
 }
+h2:first-child { margin-top: 0; }
 
 p.lead {
-    font-size: 1.5rem;
-    line-height: 1.5;
-    margin-bottom: 3rem;
-    font-weight: 600;
+  font-size: 1.25rem;
+  line-height: 1.5;
+  margin-bottom: 2rem;
+  font-weight: 600;
 }
 
-a {
-    color: var(--accent-color);
-    text-decoration: none;
-    transition: color 0.2s ease;
+a { 
+  color: var(--accent-color); 
+  text-decoration: none; 
+  transition: color 0.2s ease; 
+}
+a:hover { 
+  color: var(--text-secondary); 
 }
 
-a:hover {
-    color: var(--text-secondary);
+.mono-label { 
+  font-family: var(--font-mono); 
+  color: var(--text-secondary); 
 }
 
-/* ==== Content Grids ==== */
-.about-grid, .credits-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 3rem;
-}
 
+/* ============================ */
+/* ===   GRID & CONTENT     === */
+/* ============================ */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
 @media (min-width: 992px) {
-    .about-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 4rem;
-        align-items: center;
-    }
-    .credits-grid {
-        grid-template-columns: 1fr 1fr;
-    }
+  .two-col {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+    gap: 4rem;
+  }
 }
 
-/* Order swap for visual flow on desktop */
-@media (min-width: 992px) {
-    .description-container {
-        order: -1;
-    }
+.raised {
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  padding: 1.5rem 2rem;
 }
 
-/* ==== Floating Content (Image & Video) ==== */
-.carousel, .video-container {
-    background-color: var(--bg-color);
-}
 
-.carousel-control-prev, .carousel-control-next, .carousel-indicators {
-    display: none; /* Hide default Bootstrap controls for a cleaner look */
+/* ============================ */
+/* ===      COMPONENTS      === */
+/* ============================ */
+.carousel, .carousel-inner, .carousel-item {
+  border-radius: 8px;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background-color: transparent;
+}
+.carousel img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
 }
 
 .video-container {
-    position: relative;
-    padding-bottom: 56.25%; /* 16:9 */
-    height: 0;
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 */
+  height: 0;
+  border-radius: 8px;
+  overflow: hidden;
 }
 .video-container iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  border: 0;
 }
 
-/* ==== Detail Lists ==== */
-.detail-section ul, .credits-grid ul {
+.detail-section ul, ul.styled-list {
     list-style: none;
     padding-left: 0;
     margin: 0;
+    border-top: 1px solid var(--border-color);
 }
-
-.detail-section li, .credits-grid li {
+.detail-section li, ul.styled-list li {
     display: flex;
     flex-wrap: wrap;
     gap: 1rem 2rem;
     padding: 1rem;
     border-bottom: 1px solid var(--border-color);
     transition: background-color 0.2s ease-in-out;
+    align-items: baseline;
 }
-.detail-section ul, .credits-grid ul {
-    border-top: 1px solid var(--border-color);
-}
-.detail-section li:hover, .credits-grid li:hover {
+.detail-section li:hover, ul.styled-list li:hover {
     background-color: var(--hover-bg);
 }
+.detail-section .mono-label { flex-shrink: 0; }
+span.annotation { color: var(--text-secondary); font-style: italic; }
+p.support { margin-top: 1.5rem; color: var(--text-secondary); font-size: 0.9rem; }
 
-.mono-label {
-    font-family: var(--font-mono);
-    color: var(--text-secondary);
-    flex-shrink: 0; /* Prevents the date from shrinking */
+
+/* ============================ */
+/* ===   HEADER & MENU      === */
+/* ============================ */
+
+/* --- Main Header Bar --- */
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  padding: 0rem 0;
+  
+  background-color: rgba(10, 10, 10, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-color);
+
+  transform: translateY(-100%);
+  opacity: 0;
+  transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+}
+.site-header.is-visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-header { transition: none; }
 }
 
-span.annotation {
-    color: var(--text-secondary);
-    font-style: italic;
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.credits-grid li { padding-left: 0; }
-
-p.support {
-    margin-top: 1.5rem;
-    color: var(--text-secondary);
-    font-size: 0.9rem;
+.header-brand {
+  font-family: var(--font-main);
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
-/* ==== Footer ==== */
+/* --- Desktop Navigation --- */
+.main-navigation > ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+}
+
+/* 
+  FIXED: This rule was the source of the mobile bug. 
+  Conflicting properties like `display:flex` and `height:100%` have been removed.
+  The <li> is now a simple block element, and padding is left to the <a> tag.
+*/
+.main-navigation > ul > li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.main-navigation a {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  /* UPDATED: Padding is now consistent on the link itself */
+  padding: 1rem; 
+  position: relative;
+  display: block;
+}
+
+
+/* 
+  FIXED: The selector was changed from `.main-navigation > a::after` 
+  to `.main-navigation > ul > li > a::after` to correctly target the links
+  and apply the hover underline effect.
+*/
+.main-navigation > ul > li > a::after {
+  content: '';
+  position: absolute;
+  bottom: 0.5rem; /* Adjusted for new padding */
+  left: 1rem;     /* Adjusted for new padding */
+  width: calc(100% - 2rem); /* Adjusted for new padding */
+  height: 1px;
+  background-color: var(--accent-color);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s ease-out;
+}
+
+.main-navigation a:hover::after,
+.main-navigation a:focus::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* --- Desktop Dropdown Menu --- */
+.has-dropdown {
+  position: relative;
+  
+}
+@media (min-width: 768px) {
+  /* This new rule positions the nav on desktop */
+  .main-navigation {
+    position: absolute;
+    top: 50%;
+    right: 2rem; /* Matches your site-container padding */
+    transform: translateY(-50%);
+  }
+}
+
+
+.dropdown-menu {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+  
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 10;
+  
+  /* This default block behavior stacks <li> items vertically */
+  list-style: none;
+  margin: 0rem 0 0 0;
+  padding: 0rem 0;
+  min-width: 200px;
+  background-color: #111;
+  border-radius: 6px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+  background-color: rgba(10, 10, 10, 0.6);
+    list-style: none;
+  display: block;
+  gap: 2rem;
+}
+.has-dropdown:hover .dropdown-menu,
+.has-dropdown:focus-within .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-menu li {
+  display: block; /* This makes each link take its own line */
+  padding: 0;
+  padding-top: 0;
+}
+.dropdown-menu a {
+
+  padding: 0.6rem 1.2rem;
+  font-size: 0.9rem !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  white-space: nowrap;
+}
+.dropdown-menu a::after {
+  content: none !important;
+}
+
+/* --- Mobile Navigation --- */
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  z-index: 101;
+  cursor: pointer;
+}
+.hamburger,
+.hamburger::before,
+.hamburger::after {
+  content: '';
+  display: block;
+  background-color: var(--text-color);
+  height: 2px;
+  width: 24px;
+  border-radius: 2px;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+.hamburger::before {
+  transform: translateY(-8px);
+}
+.hamburger::after {
+  transform: translateY(8px);
+}
+
+@media (max-width: 767.98px) {
+  /* Show hamburger */
+  .menu-toggle {
+    display: block;
+  }
+
+  
+  /* Fullscreen menu container */
+/* Unchanged styles for context */
+.main-navigation {
+  position: fixed;
+  /* CHANGE #1: Define the start position with 'top', not 'inset' */
+  top: -100vh; /* Start 1 full screen-height above the viewport */
+  left: 0;
+  width: 100%;
+  height: 100vh; /* Explicitly set height to fill the screen */
+
+  background-color: var(--bg-color);
+  display: grid;
+
+  /* --- FIX #1: Align content to the START (top) of the container --- */
+  align-content: start; 
+  
+  justify-content: center;
+  padding-top: 20vh;
+  text-align: center;
+  
+  /* CHANGE #2: Transition the 'top' property, not 'transform' */
+  transition: top 0.4s cubic-bezier(0.76, 0, 0.24, 1);
+
+}
+  .main-navigation ul {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .main-navigation a {
+    font-size: 1.5rem;
+  }
+
+/* Active state for mobile menu */
+body.nav-open .main-navigation {
+  /* This brings the container's top edge from -100vh down to the top of the screen */
+  top: 0;
+
+}
+
+/* Hamburger icon styles remain the same */
+body.nav-open .hamburger {
+  background-color: transparent;
+}
+body.nav-open .hamburger::before {
+  transform: translateY(0) rotate(45deg); /* Adjusted transform for more reliable centering */
+}
+body.nav-open .hamburger::after {
+  transform: translateY(0) rotate(-45deg); /* Adjusted transform for more reliable centering */
+}
+
+/* Mobile Dropdown Styling */
+.dropdown-menu {
+  position: static;
+  transform: none;
+  box-shadow: none;
+  border: none;
+  border-top: 1px solid var(--border-color);
+  border-radius: 0;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  min-width: 100%;
+  background: transparent;
+
+  /* Your animation code is perfect for this! */
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease-out, margin-top 0.4s ease-out, padding-top 0.4s ease-out;
+}
+
+/* You will also need an "open" state for the dropdown itself */
+/* This is typically added via JS to the parent <li> or <a> */
+li.dropdown-open .dropdown-menu {
+  max-height: 500px; /* Animate to a height larger than its content */
+}
+  .dropdown-menu a {
+    padding-left: 2rem;
+  }
+  .has-dropdown.is-open .dropdown-menu {
+    /* This rule now works correctly because opacity is already 1 */
+    max-height: 300px;
+  }
+  .dropdown-toggle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+
+}
+
+
+/* ============================ */
+/* ===        FOOTER        === */
+/* ============================ */
 .site-footer {
-    text-align: center;
-    padding: 4rem 1rem;
+  text-align: center;
+  padding: 4rem 1rem;
 }
 .site-footer small {
-    display: block;
-    margin-top: 2rem;
-    color: var(--text-secondary);
-    font-family: var(--font-mono);
+  display: block;
+  margin-top: 2rem;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
 }
 
-/* ==== 3D Viewer Styling ==== */
-#artwork-viewer {
-    display: block; /* Make it a block element */
-    width: 100%;
-    /* The height is crucial for the viewer to be visible */
-    height: 300px; 
-    margin-top: 2rem; /* Add some space above it */
-    background-color: var(--bg-color); /* Match page background */
-    --poster-color: transparent; /* Makes the loading screen background transparent */
-    border-radius: 4px; /* Optional: adds slightly rounded corners */
+
+/* ============================ */
+/* ===    LOADING SCREEN    === */
+/* ============================ */
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  background-color: var(--bg-color);
+  display: grid;
+  place-items: center;
+  z-index: 999;
+  opacity: 1;
+  transition: opacity 0.8s ease-out;
+  padding: 1rem;
+}
+.loading-screen.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+.loading-content { 
+  text-align: center; 
+  color: var(--text-color); 
+}
+.loading-title {
+  font-family: var(--font-main);
+  font-weight: 700;
+  font-size: clamp(2rem, 5vw, 4rem);
+  margin: 0;
+  text-transform: none;
+}
+.loading-spinner {
+  margin: 2rem auto;
+  width: 60px;
+  height: 60px;
+}
+.spinner-ring {
+  width: 100%;
+  height: 100%;
+  border: 3px solid var(--border-color);
+  border-top: 3px solid var(--accent-color);
+  border-radius: 50%;
+  animation: spin 1.2s linear infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.loading-text {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  margin: 1rem 0 0 0;
+}
+.content-hidden {
+  opacity: 0;
+  pointer-events: none;
 }
