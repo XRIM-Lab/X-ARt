@@ -145,6 +145,12 @@ h2 {
   margin-top: 2rem;
 }
 h2:first-child { margin-top: 0; }
+h3 {
+  font-size: 1.1rem;
+  letter-spacing: 0.2em;
+  margin-bottom: 2rem;
+  margin-top: 2rem;
+}
 
 p.lead {
   font-size: 1.25rem;
