@@ -166,6 +166,7 @@ a {
 }
 a:hover { 
   color: var(--text-secondary); 
+  text-decoration: underline;
 }
 
 .mono-label { 
