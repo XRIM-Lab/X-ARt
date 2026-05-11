@@ -27,36 +27,15 @@
   <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer/dist/model-viewer-module.min.js"></script>
   <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer-effects/dist/model-viewer-effects.min.js"></script>
 
-  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="../style.css">
+
+  <!-- Shared Web Components (header, footer) -->
+  <script src="/components.js"></script>
 </head>
 
 <body>
 
- <header id="siteHeader" class="site-header">
-    <div class="header-container site-container">
-        <a href="https://artrio.org" class="header-brand">「ARtrio」</a>
-        
-        <button class="menu-toggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="main-nav">
-            <span class="hamburger"></span>
-        </button>
-        
-        <!-- The NAV is now a SIBLING to the toggle button, not inside the desktop flow -->
-    </div>
-    
-    <!-- MOVE THE NAV HERE: Outside the flex container but inside the header -->
-    <nav id="main-nav" class="main-navigation site-container">
-        <ul>
-            <li class="has-dropdown">
-                <a class="dropdown-toggle" role="button">Projects</a>
-                <ul class="dropdown-menu">
-                    <li><a href="#">Through The Years, To Touch You</a></li>
-                                        <li><a href="/EFV/">EQUUS: FORM + VOID</a></li>
-                </ul>
-            </li>
-            <li><a href="#contact">Contact</a></li>
-        </ul>
-    </nav>
-</header>
+<site-header page="tty2"></site-header>
 
 
     <!-- Loading screen -->
@@ -231,78 +210,13 @@ This project offers a site-specific multi sensory experience, at the intersectio
     </section>
   </main>
 
-  <footer id="contact" class="site-footer">
-    <h2>Contact</h2>
-    <p>For enquiries, please contact <a href="mailto:braudt@ust.hk">braudt@ust.hk</a></p>
-    <small>&copy; 2025 「X-ARt」</small>
-  </footer>
+<site-footer year="2026" name="「ARtrio」"></site-footer>
 
   <!-- Bootstrap JS (optional for carousel) -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <!-- Scroll-driven rotation logic + loading management -->
 <script type="module">
-  // ============================
-  // === MENU LOGIC           ===
-  // ============================
-  const siteHeader = document.getElementById('siteHeader');
-  const menuToggle = document.querySelector('.menu-toggle');
-  const mainNav = document.getElementById('main-nav');
-  const navLinks = mainNav.querySelectorAll('a:not(.dropdown-toggle)');
-  let autoCloseTimer = null; // Timer for auto-closing mobile nav
-
-  // Helper function to close the mobile nav
-  function closeMobileNav() {
-    if (document.body.classList.contains('nav-open')) {
-      document.body.classList.remove('nav-open');
-      menuToggle.setAttribute('aria-expanded', 'false');
-      if (autoCloseTimer) {
-        clearTimeout(autoCloseTimer);
-      }
-    }
-  }
-
-  // --- Show header on scroll (for ALL screen sizes) ---
-  function onScrollMenu() {
-    // MODIFIED: This now runs on all screen sizes again
-    if (window.scrollY > window.innerHeight * 0.5) {
-      siteHeader.classList.add('is-visible');
-    } else {
-      siteHeader.classList.remove('is-visible');
-    }
-  }
-
-  // --- Mobile menu toggle (with auto-close) ---
-  menuToggle.addEventListener('click', () => {
-    const isNavOpen = document.body.classList.contains('nav-open');
-    if (isNavOpen) {
-      closeMobileNav();
-    } else {
-      document.body.classList.add('nav-open');
-      menuToggle.setAttribute('aria-expanded', 'true');
-      if (autoCloseTimer) clearTimeout(autoCloseTimer);
-      autoCloseTimer = setTimeout(closeMobileNav, 5000); // 5 seconds
-    }
-  });
-
-  // --- Close mobile menu when a nav link is clicked ---
-  navLinks.forEach(link => {
-    link.addEventListener('click', closeMobileNav);
-  });
-
-  // --- Dropdown Menu Logic (for mobile tap) ---
-  const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
-  dropdownToggles.forEach(toggle => {
-    toggle.addEventListener('click', (event) => {
-      // Only run this logic on mobile view for tap-to-expand
-      if (window.innerWidth < 768) {
-        event.preventDefault();
-        const dropdownParent = toggle.parentElement;
-        dropdownParent.classList.toggle('is-open');
-      }
-    });
-  });
-
   // ============================
   // === 3D & SCROLL LOGIC    ===
   // ============================
@@ -339,7 +253,7 @@ This project offers a site-specific multi sensory experience, at the intersectio
   }
 
   function onScroll() {
-    onScrollMenu(); // Add the menu scroll handler
+    if (window._onScrollMenu) window._onScrollMenu();
     if (prefersReduced) return;
     if (!ticking) {
       ticking = true;

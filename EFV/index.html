@@ -16,6 +16,9 @@
   <!-- Link to the shared stylesheet -->
   <link rel="stylesheet" href="../style.css">
 
+  <!-- Shared Web Components (header, footer) -->
+  <script src="/components.js"></script>
+
   <style>
     /* Page specific overrides for the "Simple" layout */
     body {
@@ -86,30 +89,7 @@
 
 <body>
 
- <!-- Header / Nav -->
- <header id="siteHeader" class="site-header is-visible">
-    <div class="header-container site-container">
-        <a href="../index.html" class="header-brand">「X-ARt」</a>
-        
-        <button class="menu-toggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="main-nav">
-            <span class="hamburger"></span>
-        </button>
-    </div>
-    
-    <nav id="main-nav" class="main-navigation site-container">
-        <ul>
-             <li class="has-dropdown">
-                <a class="dropdown-toggle" role="button">Projects</a>
-                <ul class="dropdown-menu">
-                    <!-- Update these links relative to your file structure -->
-                    <li><a href="../TTY2/">Through The Years...</a></li>
-                    <li><a href="#">EQUUS: FORM + VOID</a></li>
-                </ul>
-            </li>
-            <li><a href="#contact">Contact</a></li>
-        </ul>
-    </nav>
-</header>
+<site-header page="efv"></site-header>
 
   <main class="site-container">
     <div class="simple-content-wrapper">
@@ -223,52 +203,7 @@ Fringe Festival 2026 | Fringe Underground</p>
     </div>
   </main>
 
-  <footer id="contact" class="site-footer">
-    <h2>Contact</h2>
-    <p>For enquiries, please contact <a href="mailto:braudt@ust.hk">braudt@ust.hk</a></p>
-    <small>&copy; 2026 「ARtrio」</small>
-  </footer>
+<site-footer year="2026" name="「ARtrio」"></site-footer>
 
-  <!-- Basic Mobile Menu Logic (Stripped down) -->
-<script>
-  // ============================
-  // === MENU LOGIC           ===
-  // ============================
-  const menuToggle = document.querySelector('.menu-toggle');
-  let autoCloseTimer = null; 
-
-  function closeMobileNav() {
-    if (document.body.classList.contains('nav-open')) {
-      document.body.classList.remove('nav-open');
-      menuToggle.setAttribute('aria-expanded', 'false');
-      if (autoCloseTimer) clearTimeout(autoCloseTimer);
-    }
-  }
-
-  // Toggle Menu
-  menuToggle.addEventListener('click', () => {
-    const isNavOpen = document.body.classList.contains('nav-open');
-    if (isNavOpen) {
-      closeMobileNav();
-    } else {
-      document.body.classList.add('nav-open');
-      menuToggle.setAttribute('aria-expanded', 'true');
-      if (autoCloseTimer) clearTimeout(autoCloseTimer);
-      autoCloseTimer = setTimeout(closeMobileNav, 5000); 
-    }
-  });
-
-  // Mobile Dropdown logic
-  const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
-  dropdownToggles.forEach(toggle => {
-    toggle.addEventListener('click', (event) => {
-      if (window.innerWidth < 768) {
-        event.preventDefault();
-        const dropdownParent = toggle.parentElement;
-        dropdownParent.classList.toggle('is-open');
-      }
-    });
-  });
-</script>
 </body>
 </html>
