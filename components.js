@@ -6,13 +6,19 @@
 //   <site-header page="home|tty2|efv"></site-header>
 //   <site-footer year="2026" name="「ARtrio」"></site-footer>
 //
-// Canonical <head> block to include on every page:
+// Canonical <head> block to include on every page (adjust paths for depth):
+//   <!-- ES Module shims + import map (required for model-viewer-module + effects) -->
+//   <script async src="https://ga.jspm.io/npm:es-module-shims@1.7.1/dist/es-module-shims.js"></script>
+//   <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.174.0/build/three.module.min.js" } }</script>
 //   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
 //   <link rel="preconnect" href="https://fonts.googleapis.com">
 //   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 //   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-//   <link rel="stylesheet" href="../style.css">   <!-- adjust depth as needed -->
-//   <script src="/components.js"></script>
+//   <link rel="stylesheet" href="../style.css">   <!-- adjust depth: style.css or ../style.css -->
+//   <script src="../components.js"></script>       <!-- adjust depth: components.js or ../components.js -->
+//   <!-- model-viewer@4.1.0 + effects (pinned — 4.2.0+ requires three@^0.182.0 which breaks effects@1.5.0) -->
+//   <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer-module.min.js"></script>
+//   <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer-effects/dist/model-viewer-effects.min.js"></script>
 // =============================================================================
 
 // ---------------------------------------------------------------------------
@@ -23,18 +29,17 @@ class SiteHeader extends HTMLElement {
     const page = this.getAttribute('page') || 'home';
 
     // Resolve paths relative to the current page's depth
-    const depth = this._depth();
-    const root  = depth === 0 ? '.' : '..';
+    // page="home" → root level; page="tty2"|"efv" → one level deep
+    const isRoot = page === 'home';
+    const root   = isRoot ? '.' : '..';
 
-    const logoSrc   = `${root}/images/ARtrio_logo_white-01.png`;
-    const homeHref  = depth === 0
-      ? 'https://xrim-lab.github.io/X-ARt/'
-      : `${root}/`;
+    const logoSrc  = `${root}/images/ARtrio_logo_white-01.png`;
+    const homeHref = isRoot ? './' : '../';
 
-    // Nav link hrefs
+    // Nav link hrefs — current page link becomes '#' (no navigation)
     const links = {
-      tty2: depth === 0 ? 'TTY2/' : (depth === 1 ? (page === 'tty2' ? '#' : '../TTY2/') : '../../TTY2/'),
-      efv:  depth === 0 ? 'EFV/'  : (depth === 1 ? (page === 'efv'  ? '#' : '../EFV/')  : '../../EFV/'),
+      tty2: isRoot ? 'TTY2/' : (page === 'tty2' ? '#' : '../TTY2/'),
+      efv:  isRoot ? 'EFV/'  : (page === 'efv'  ? '#' : '../EFV/'),
     };
 
     this.innerHTML = `
@@ -66,17 +71,6 @@ class SiteHeader extends HTMLElement {
 </header>`;
 
     this._initMenu();
-  }
-
-  // Returns the folder depth of the current page (0 = root, 1 = TTY2/ or EFV/, …)
-  _depth() {
-    const path = window.location.pathname;
-    // Count non-empty segments minus the filename
-    const segments = path.split('/').filter(Boolean);
-    // If last segment looks like a file, don't count it
-    const last = segments[segments.length - 1] || '';
-    const fileDepth = last.includes('.') ? segments.length - 1 : segments.length;
-    return fileDepth;
   }
 
   _initMenu() {
