@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nature: Metaphysics + Metaphor - ARtrio</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+
+  <style>
+    body {
+        overflow-y: auto;
+        padding-top: 80px;
+    }
+
+    .simple-content-wrapper {
+        max-width: 800px;
+        margin: 0 auto;
+        padding-bottom: 4rem;
+    }
+
+    .event-image {
+        width: 100%;
+        height: auto;
+        border-radius: 4px;
+        margin-bottom: 2rem;
+        border: 1px solid var(--border-color);
+    }
+
+    .site-header {
+        transform: translateY(0) !important;
+        opacity: 1 !important;
+    }
+  </style>
+</head>
+
+<body>
+  <header id="siteHeader" class="site-header is-visible">
+    <div class="header-container site-container">
+        <a href="https://artrio.org" class="header-brand">「ARtrio」</a>
+        <button class="menu-toggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="main-nav">
+            <span class="hamburger"></span>
+        </button>
+    </div>
+
+    <nav id="main-nav" class="main-navigation site-container">
+        <ul>
+            <li class="has-dropdown">
+                <a class="dropdown-toggle" role="button">Projects</a>
+                <ul class="dropdown-menu">
+                    <li><a href="/TTY2/">Through The Years, To Touch You</a></li>
+                    <li><a href="/EFV/">EQUUS: FORM + VOID</a></li>
+                    <li><a href="/NMM/">Nature: Metaphysics + Metaphor</a></li>
+                </ul>
+            </li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+  </header>
+
+  <main class="site-container">
+    <div class="simple-content-wrapper">
+      <section class="intro-hero" id="intro">
+        <div class="intro-title" aria-label="Site Title">
+          <h1>Nature:<br>Metaphysics + Metaphor</h1>
+          <h2>by 「ARtrio」</h2>
+          <div class="subtitle" style="font-family: var(--font-mono); letter-spacing:0.25em; margin-top:0.5rem;">
+            Man, Nature, Technology, Art
+          </div>
+        </div>
+      </section>
+
+      <section class="raised">
+        <img src="images/placeholder.svg" alt="Placeholder artwork for Nature: Metaphysics + Metaphor" class="event-image">
+        <h2>Project Details</h2>
+        <p class="lead">Project information coming soon.</p>
+        <p>This page is a placeholder for Nature: Metaphysics + Metaphor. Project description, images, and related information will be added here.</p>
+      </section>
+    </div>
+  </main>
+
+  <footer id="contact" class="site-footer">
+    <h2>Contact</h2>
+    <p>For enquiries, please contact <a href="mailto:braudt@ust.hk">braudt@ust.hk</a></p>
+    <small>&copy; 2026 「ARtrio」</small>
+  </footer>
+
+  <script>
+    const menuToggle = document.querySelector('.menu-toggle');
+    let autoCloseTimer = null;
+
+    function closeMobileNav() {
+      if (document.body.classList.contains('nav-open')) {
+        document.body.classList.remove('nav-open');
+        menuToggle.setAttribute('aria-expanded', 'false');
+        if (autoCloseTimer) clearTimeout(autoCloseTimer);
+      }
+    }
+
+    menuToggle.addEventListener('click', () => {
+      if (document.body.classList.contains('nav-open')) {
+        closeMobileNav();
+      } else {
+        document.body.classList.add('nav-open');
+        menuToggle.setAttribute('aria-expanded', 'true');
+        if (autoCloseTimer) clearTimeout(autoCloseTimer);
+        autoCloseTimer = setTimeout(closeMobileNav, 5000);
+      }
+    });
+
+    document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
+      toggle.addEventListener('click', event => {
+        if (window.innerWidth < 768) {
+          event.preventDefault();
+          toggle.parentElement.classList.toggle('is-open');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
