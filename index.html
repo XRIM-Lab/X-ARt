@@ -27,8 +27,8 @@
   <link rel="stylesheet" href="/style.css">
 
   <!-- model-viewer + effects -->
-  <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer/dist/model-viewer-module.min.js"></script>
-  <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer-effects/dist/model-viewer-effects.min.js"></script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer-module.min.js"></script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer-effects@1.4.0/dist/model-viewer-effects.min.js"></script>
 
     <style>
     :root {
@@ -212,10 +212,10 @@
   </footer>
 
   <!-- Bootstrap JS (optional for carousel) -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <!-- Scroll-driven rotation logic + loading management -->
-<script type="module">
+<script>
   // ============================
   // === MENU LOGIC           ===
   // ============================
@@ -321,22 +321,42 @@
     }
   }
 
+  const splashStartedAt = performance.now();
+  let splashReleaseTimer;
+  let splashReleased = false;
+  const splashDeadlineTimer = setTimeout(revealPage, 1250);
+
+  function revealPage() {
+    if (splashReleased) return;
+    splashReleased = true;
+    clearTimeout(splashDeadlineTimer);
+    clearTimeout(splashReleaseTimer);
+    loadingScreen.classList.add('fade-out');
+    mainContent.classList.remove('content-hidden');
+    setTimeout(() => {
+      loadingScreen.style.display = 'none';
+    }, 350);
+  }
+
   function hideLoadingScreen() {
-    if (!loadingScreen.classList.contains('fade-out')) {
-      loadingScreen.classList.add('fade-out');
-      mainContent.classList.remove('content-hidden');
-      setTimeout(() => {
-        loadingScreen.style.display = 'none';
-      }, 800);
+    if (splashReleased || splashReleaseTimer) return;
+    const minimumRemaining = 350 - (performance.now() - splashStartedAt);
+    if (minimumRemaining > 0) {
+      splashReleaseTimer = setTimeout(revealPage, minimumRemaining);
+    } else {
+      revealPage();
     }
   }
 
-  viewer.addEventListener('load', () => { setTimeout(hideLoadingScreen, 500); });
-  setTimeout(hideLoadingScreen, 10000);
+  viewer.addEventListener('load', hideLoadingScreen, { once: true });
+  viewer.addEventListener('error', hideLoadingScreen, { once: true });
+  customElements.whenDefined('model-viewer').then(() => {
+    if (viewer.loaded) hideLoadingScreen();
+  });
 
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', () => { if (!prefersReduced) update(); });
-  document.addEventListener('DOMContentLoaded', () => { if (!prefersReduced) update(); });
+  update();
 </script>
 </body>
 </html>
