@@ -25,7 +25,6 @@
 
   <!-- model-viewer + effects -->
   <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer-module.min.js"></script>
-  <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer-effects@1.4.0/dist/model-viewer-effects.min.js"></script>
 
   <link rel="stylesheet" href="../style.css">
 
@@ -61,6 +60,7 @@
     <model-viewer
       id="bgViewer"
       src="400kArtworkonly_glb.glb"
+      data-mobile-src="400kArtworkonly_mobile.glb"
       alt="ARtrio background 3D model"
       shadow-intensity="1"
       environment-image="neutral"
@@ -222,6 +222,39 @@ This project offers a site-specific multi sensory experience, at the intersectio
   // ============================
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const viewer = document.getElementById('bgViewer');
+  const mobileLayout = window.matchMedia('(max-width: 767px), (pointer: coarse)');
+  const desktopModelSrc = viewer.getAttribute('src');
+  const mobileModelSrc = viewer.dataset.mobileSrc;
+  const desktopShadowIntensity = viewer.getAttribute('shadow-intensity');
+  const effectComposer = viewer.querySelector('effect-composer');
+  let effectsPromise;
+
+  function loadEffects() {
+    if (!effectsPromise) {
+      effectsPromise = customElements.whenDefined('model-viewer').then(() =>
+        import('https://cdn.jsdelivr.net/npm/@google/model-viewer-effects@1.4.0/dist/model-viewer-effects.min.js')
+      );
+    }
+    return effectsPromise;
+  }
+
+  function updateViewerVariant() {
+    const isMobile = mobileLayout.matches;
+    const modelSrc = isMobile ? mobileModelSrc : desktopModelSrc;
+    if (modelSrc && viewer.getAttribute('src') !== modelSrc) viewer.setAttribute('src', modelSrc);
+    viewer.setAttribute('shadow-intensity', isMobile ? '0' : desktopShadowIntensity);
+    if (isMobile) {
+      effectComposer?.remove();
+    } else {
+      loadEffects().then(() => {
+        if (!mobileLayout.matches && effectComposer && !effectComposer.isConnected) viewer.append(effectComposer);
+      }).catch(() => {});
+    }
+  }
+
+  updateViewerVariant();
+  mobileLayout.addEventListener('change', updateViewerVariant);
+
   const loadingScreen = document.getElementById('loadingScreen');
   const mainContent = document.querySelector('main');
   const docEl = document.documentElement;
