@@ -200,6 +200,9 @@
   const mobileModelSrc = viewer.dataset.mobileSrc;
   const desktopShadowIntensity = viewer.getAttribute('shadow-intensity');
   const effectComposer = viewer.querySelector('effect-composer');
+  const bloomEffect = effectComposer?.querySelector('bloom-effect');
+  const desktopBloomStrength = bloomEffect?.getAttribute('strength') ?? '5';
+  const desktopBloomRadius = bloomEffect?.getAttribute('radius') ?? '0.3';
   let effectsPromise;
 
   function loadEffects() {
@@ -216,13 +219,11 @@
     const modelSrc = isMobile ? mobileModelSrc : desktopModelSrc;
     if (modelSrc && viewer.getAttribute('src') !== modelSrc) viewer.setAttribute('src', modelSrc);
     viewer.setAttribute('shadow-intensity', isMobile ? '0' : desktopShadowIntensity);
-    if (isMobile) {
-      effectComposer?.remove();
-    } else {
-      loadEffects().then(() => {
-        if (!mobileLayout.matches && effectComposer && !effectComposer.isConnected) viewer.append(effectComposer);
-      }).catch(() => {});
-    }
+    bloomEffect?.setAttribute('strength', isMobile ? '2' : desktopBloomStrength);
+    bloomEffect?.setAttribute('radius', isMobile ? '0.15' : desktopBloomRadius);
+    loadEffects().then(() => {
+      if (effectComposer && !effectComposer.isConnected) viewer.append(effectComposer);
+    }).catch(() => {});
   }
 
   updateViewerVariant();
