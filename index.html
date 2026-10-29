@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>「ARtrio」- Man, Nature, Technology, Art</title>
+  <title>artrio - Man, Nature, Technology, Art</title>
 
   <!-- ES Module shims + import map -->
   <script async src="https://ga.jspm.io/npm:es-module-shims@1.7.1/dist/es-module-shims.js"></script>
@@ -41,14 +41,14 @@
 
 </head>
 
-<body>
+<body class="home-page">
 
 <site-header page="home"></site-header>
 
   <!-- Loading screen -->
   <div id="loadingScreen" class="loading-screen">
     <div class="loading-content">
-      <img src="images/ARtrio_logo_white-01.png" alt="ARtrio Logo" style="width: 350px; height: auto;">
+      <img src="images/ARtrio_logo_white-01.png" alt="artrio Logo" style="width: 350px; height: auto;">
       <h2> (Formerly 「X-ARt」) </h2>
 
       <div class="subtitle" style="letter-spacing:0.25em; margin-top:0.5rem;">
@@ -67,7 +67,7 @@
       id="bgViewer"
       src="mesh.glb"
       data-mobile-src="mesh.mobile.glb"
-      alt="ARtrio background 3D model"
+      alt="artrio background 3D model"
       shadow-intensity="1"
       environment-image="neutral"
       camera-orbit="90deg 90deg 6m"
@@ -84,7 +84,7 @@
     <!-- 1) Intro screen with title -->
     <section class="intro-hero" id="intro">
       <div class="intro-title" aria-label="Site Title">
-      <img src="images/ARtrio_logo_white-01.png" alt="ARtrio Logo" style="width: 350px; height: auto;">
+      <img src="images/ARtrio_logo_white-01.png" alt="artrio Logo" style="width: 350px; height: auto;">
       <h2> (Formerly 「X-ARt」) </h2>
 
         <div class="subtitle">
@@ -94,39 +94,119 @@
       </div>
     </section>
 
-    <!-- 2) About & Gallery Section -->
-    <section id="about" class="two-col">
-      <div class="col text raised">
-        <h2>About 「ARtrio」</h2>
+    <div class="content-flow">
+    <!-- 2) About section -->
+    <section id="about" class="about-intro">
+      <div class="content-panel">
+        <h2>About artrio</h2>
         <p class="lead">
           Using augmented reality technologies, we metaphorically reveal the ‘fields of force’ and ‘flows of materials’ of Nature, to arouse a greater appreciation of Nature and its invisible forces that affect every aspect of our lives.
         </p>
         <p>
-            Our work is a blend of site-specific installations, performance art, and technological experimentation, always aiming to bridge the gap between the digital and the natural world.
+          Our work is a blend of site-specific installations, performance art, and technological experimentation, always aiming to bridge the gap between the digital and the natural world.
         </p>
-                <p>
-            Until December 2025, 「ARtrio」 was operating under the name 「X-ARt」
-                </p>
-      </div>
-
-      <div class="col gallery raised">
-        <div id="projectCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3500">
-          <div class="carousel-inner">
-            <div class="carousel-item active"><img src="images/YTTPAF.png" alt="Yim Tin Tsai Performing Arts Festival"></div>
-            <div class="carousel-item"><img src="images/Teaser.jpg" alt="Teaser Image"></div>
-            <div class="carousel-item"><img src="images/TTY.jpeg" alt="TTY Location"></div>
-            <div class="carousel-item"><img src="images/Fringe.jpeg" alt="Fringe Club"></div>
-            <div class="carousel-item"><img src="images/ecorotunda.png" alt="Ecorotunda"></div>
-            <div class="carousel-item"><img src="images/sharpisland.png" alt="Sharp Island"></div>
-          </div>
-        </div>
+        <p>Until December 2025, artrio was operating under the name 「X-ARt」.</p>
       </div>
     </section>
 
-    <!-- 3) Performances & Experimentations -->
+    <!-- 3) Featured projects -->
+    <section id="featured-projects" class="featured-projects">
+      <div class="section-heading">
+        <h2>Featured Projects</h2>
+      </div>
+      <div class="featured-project-grid">
+        <a class="featured-project-card" href="/TTY2/">
+          <div class="featured-project-image">
+            <img src="TTY2/images/Performance+AR.jpg" alt="Performance from Through the Years, To Touch You">
+          </div>
+          <div class="featured-project-copy">
+            <span class="mono-label">2025</span>
+            <h3>Through the Years, To Touch You</h3>
+            <span class="feature-link">Explore project</span>
+          </div>
+        </a>
+        <a class="featured-project-card" href="/EFV/">
+          <div class="featured-project-image">
+            <img src="EFV/images/EFV_cover.jpeg" alt="EQUUS: FORM + VOID cover artwork">
+          </div>
+          <div class="featured-project-copy">
+            <span class="mono-label">2026</span>
+            <h3>EQUUS: FORM + VOID</h3>
+            <span class="feature-link">Explore project</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- 4) Image gallery -->
+    <section id="gallery" class="home-gallery">
+      <div class="section-heading">
+        <h2>Image Gallery</h2>
+      </div>
+
+      <div id="homeGalleryCarousel" class="carousel slide home-gallery-carousel" data-bs-ride="carousel" data-bs-interval="5000">
+        <div class="carousel-indicators">
+          <button type="button" data-bs-target="#homeGalleryCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Show EQUUS: Form + Void"></button>
+          <button type="button" data-bs-target="#homeGalleryCarousel" data-bs-slide-to="1" aria-label="Show TTY2.2: Gates and Tides of Change"></button>
+          <button type="button" data-bs-target="#homeGalleryCarousel" data-bs-slide-to="2" aria-label="Show Come, Stay, Linger, Time"></button>
+          <button type="button" data-bs-target="#homeGalleryCarousel" data-bs-slide-to="3" aria-label="Show Nature: Consciousness + Being"></button>
+          <button type="button" data-bs-target="#homeGalleryCarousel" data-bs-slide-to="4" aria-label="Show Through the Years, To Touch You"></button>
+          <button type="button" data-bs-target="#homeGalleryCarousel" data-bs-slide-to="5" aria-label="Show Ecorotunda"></button>
+          <button type="button" data-bs-target="#homeGalleryCarousel" data-bs-slide-to="6" aria-label="Show Sharp Island"></button>
+          <button type="button" data-bs-target="#homeGalleryCarousel" data-bs-slide-to="7" aria-label="Show Nature: Metaphysics and Metaphor"></button>
+        </div>
+        <div class="carousel-inner">
+
+          <div class="carousel-item active">
+            <img src="images/EQUUS.JPG" alt="Fringe Festival EQUUS">
+            <div class="home-gallery-caption">EQUUS: Form + Void (Jan 2026)</div>
+          </div>
+          <div class="carousel-item">
+            <img src="images/YTTPAF.png" alt="TTY2.2 Yim Tin Tsai Performing Arts Festival">
+            <div class="home-gallery-caption">TTY2.2: Gates and Tides of Change (Oct 2025)</div>
+          </div>
+          <div class="carousel-item">
+            <img src="images/CSLT.jpeg" alt="Come, Stay, Linger, Time">
+            <div class="home-gallery-caption">Come, Stay, Linger, Time (May 2025)</div>
+          </div>
+          <div class="carousel-item">
+            <img src="images/Fringe.jpeg" alt="N:C+B Fringe Club">
+            <div class="home-gallery-caption">Nature: Consciousness + Being (Jan 2025)</div>
+          </div>
+          <div class="carousel-item">
+            <img src="images/TTY.jpeg" alt="TTY Through the Years, To Touch You Sai Kung Hoi ARts Festival">
+            <div class="home-gallery-caption">TTY2: Through the Years, To Touch You (Nov 2024 - Jan 2025)</div>
+          </div>
+          <div class="carousel-item">
+            <img src="images/ecorotunda.png" alt="Ecorotunda Yim Tin Tsai">
+            <div class="home-gallery-caption">Experimentations at Yim Tin Tsai Ecorotunda (Jul 2024)</div>
+          </div>
+          <div class="carousel-item">
+            <img src="images/sharpisland.png" alt="Sharp Island">
+            <div class="home-gallery-caption">Experimentations at Sharp Island Beach (Apr 2023)</div>
+          </div>
+          <div class="carousel-item">
+            <img src="images/Teaser.jpg" alt="artrio teaser image">
+            <div class="home-gallery-caption">Nature: Metaphysics and Metaphor (Dec 2023)</div>
+          </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#homeGalleryCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous image</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#homeGalleryCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next image</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- 4) Performances & Experimentations -->
     <section id="performances" class="detail-section">
-      <h2>Performances & Experimentations</h2>
+      <div class="content-panel">
+        <h2>Performances & Experimentations</h2>
       <ul>
+        <li><span class="mono-label">2026.01.10</span> Kat O Dajiao Art Festival, Kat O, Central HK</li>
         <li><span class="mono-label">2026.01.10</span> Fringe Festival, Fringe Club, Central HK  <a href="/EFV/">Performance Page</a><span class="annotation">(2 performances)</span></li>
         <li><span class="mono-label">2026.01.09</span> Fringe Festival, Fringe Club, Central HK  <a href="/EFV/">Performance Page</a></li>
         <li><span class="mono-label">2025.10.11</span> Yim Tin Tsai Performing Arts Festival, Yim Tin Tsai, HK</li>
@@ -144,18 +224,23 @@
         <li><span class="mono-label">2024.04.25</span> Sharp Island beach, HK</li>
         <li><span class="mono-label">2024.02.10</span> Shaw Auditorium, HKUST, HK</li>
         <li><span class="mono-label">2023.12.02</span> Heath, Tsim Sha Tsui, HK</li>
-      </ul>
+        </ul>
+      </div>
     </section>
 
-    <!-- 4) Engagement -->
+    <!-- 5) Engagement -->
     <section id="engagement" class="detail-section">
-         <h2>Engagement</h2>
-         <ul>
-             <li><span class="mono-label">2024.12.08</span> Sai Kung Hoi Arts Festival, Yim Tin Tsai, HK <span class="annotation">(3 workshops)</span></li>
-         </ul>
+      <div class="content-panel">
+        <h2>Engagement</h2>
+        <ul>
+          <li><span class="mono-label">2026.04.09</span> HKUST, Clearwater Bay, Hong Kong</li>
+          <li><span class="mono-label">2024.12.08</span> Sai Kung Hoi Arts Festival, Yim Tin Tsai, HK <span class="annotation">(3 workshops)</span></li>
+
+        </ul>
+      </div>
     </section>
 
-    <!-- 5) Team -->
+    <!-- 6) Team -->
     <section id="team" class="two-col">
       <div class="col raised">
         <h2>Artists</h2>
@@ -181,9 +266,10 @@
         </ul>
       </div>
     </section>
+    </div>
   </main>
 
-<site-footer year="2026" name="「ARtrio」"></site-footer>
+<site-footer year="2026" name="artrio"></site-footer>
 
   <!-- Bootstrap JS (optional for carousel) -->
   <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -194,6 +280,7 @@
   // === 3D & SCROLL LOGIC    ===
   // ============================
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isFirefox = /Firefox\/\d/.test(navigator.userAgent);
   const viewer = document.getElementById('bgViewer');
   const mobileLayout = window.matchMedia('(max-width: 767px), (pointer: coarse)');
   const desktopModelSrc = viewer.getAttribute('src');
@@ -259,8 +346,97 @@
     ticking = false;
   }
 
+  const aboutSection = document.getElementById('about');
+  let lastScrollY = window.scrollY;
+  let entrancePhase = 'settling';
+  let settleTimer;
+  let transitionTimer;
+  let entranceFrame;
+  let entranceDestination;
+
+  function getEntranceZones() {
+    const aboutTop = aboutSection.getBoundingClientRect().top + window.scrollY;
+    const buffer = Math.min(window.innerHeight * 0.2, aboutTop * 0.25);
+    return { aboutTop, heroEnd: buffer, contentStart: aboutTop - buffer };
+  }
+
+  function getEntrancePhase() {
+    const { heroEnd, contentStart } = getEntranceZones();
+    return window.scrollY <= heroEnd ? 'hero' : window.scrollY >= contentStart ? 'content' : 'neutral';
+  }
+
+  function settleEntrance() {
+    clearTimeout(transitionTimer);
+    clearTimeout(settleTimer);
+    entrancePhase = 'settling';
+    settleTimer = setTimeout(() => {
+      lastScrollY = window.scrollY;
+      entrancePhase = getEntrancePhase();
+    }, 160);
+  }
+
+  function runEntranceScroll(destination) {
+    clearTimeout(settleTimer);
+    entrancePhase = 'animating';
+    entranceDestination = destination;
+    if (isFirefox) {
+      const start = window.scrollY;
+      const distance = destination - start;
+      const startedAt = performance.now();
+      function animateEntrance(now) {
+        const progress = clamp((now - startedAt) / 600, 0, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        window.scrollTo(0, start + distance * eased);
+        if (progress < 1) {
+          entranceFrame = requestAnimationFrame(animateEntrance);
+        } else {
+          entranceFrame = null;
+          lastScrollY = window.scrollY;
+          settleEntrance();
+        }
+      }
+      entranceFrame = requestAnimationFrame(animateEntrance);
+    } else {
+      window.scrollTo({ top: destination, behavior: 'smooth' });
+      transitionTimer = setTimeout(settleEntrance, 2400);
+    }
+  }
+
   function onScroll() {
     if (window._onScrollMenu) window._onScrollMenu();
+
+    const currentScrollY = window.scrollY;
+    const previousScrollY = lastScrollY;
+    lastScrollY = currentScrollY;
+
+    if (!prefersReduced && !isFirefox && entrancePhase === 'animating' && Math.abs(currentScrollY - entranceDestination) < 4) {
+      settleEntrance();
+    }
+
+    if (!prefersReduced && entrancePhase !== 'animating') {
+      if (entrancePhase === 'settling') {
+        settleEntrance();
+      } else {
+        const { aboutTop, heroEnd, contentStart } = getEntranceZones();
+        const entering = entrancePhase === 'hero' && currentScrollY > previousScrollY &&
+          previousScrollY <= heroEnd && currentScrollY > 0 && currentScrollY < aboutTop;
+        const leaving = entrancePhase === 'content' && currentScrollY < previousScrollY &&
+          previousScrollY >= contentStart && previousScrollY <= aboutTop + window.innerHeight &&
+          currentScrollY < aboutTop && currentScrollY > 0;
+        if (entering) {
+          runEntranceScroll(aboutTop);
+        } else if (leaving) {
+          runEntranceScroll(0);
+        } else if (currentScrollY <= heroEnd) {
+          entrancePhase = 'hero';
+        } else if (currentScrollY >= contentStart) {
+          entrancePhase = 'content';
+        } else {
+          entrancePhase = 'neutral';
+        }
+      }
+    }
+
     if (prefersReduced) return;
     if (!ticking) {
       ticking = true;
@@ -301,7 +477,38 @@
     if (viewer.loaded) hideLoadingScreen();
   });
 
+  entrancePhase = getEntrancePhase();
+  window.addEventListener('wheel', event => {
+    if (entrancePhase === 'animating' || (!isFirefox && entrancePhase === 'settling')) {
+      if (event.cancelable) event.preventDefault();
+      return;
+    }
+    if (isFirefox || prefersReduced || event.ctrlKey || event.deltaY <= 0 || !event.cancelable) return;
+    const { aboutTop, heroEnd } = getEntranceZones();
+    if (window.scrollY <= heroEnd) {
+      event.preventDefault();
+      lastScrollY = window.scrollY;
+      runEntranceScroll(aboutTop);
+    }
+  }, { passive: false });
+  window.addEventListener('keydown', event => {
+    if ((entrancePhase === 'animating' || (!isFirefox && entrancePhase === 'settling')) && ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', ' ', 'Home', 'End'].includes(event.key)) {
+      event.preventDefault();
+    }
+  });
+  window.addEventListener('touchmove', event => {
+    if (entrancePhase === 'animating' || (!isFirefox && entrancePhase === 'settling')) event.preventDefault();
+  }, { passive: false });
   window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('pageshow', event => {
+    if (!event.persisted && entrancePhase === 'animating') return;
+    clearTimeout(settleTimer);
+    clearTimeout(transitionTimer);
+    if (entranceFrame != null) cancelAnimationFrame(entranceFrame);
+    entranceFrame = null;
+    lastScrollY = window.scrollY;
+    entrancePhase = getEntrancePhase();
+  });
   window.addEventListener('resize', () => { if (!prefersReduced) update(); });
   update();
 </script>
