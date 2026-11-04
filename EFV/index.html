@@ -88,6 +88,30 @@
         color: var(--accent-color);
     }
 
+    #writingViewer {
+        position: absolute;
+        left: 0;
+        top: 15vh;
+        width: 32vw;
+        height: 70vh;
+        pointer-events: none;
+        mix-blend-mode: screen;
+    }
+
+    #writingViewer canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+
+    @media (max-width: 767px) {
+        #writingViewer {
+            top: 20vh;
+            width: 38vw;
+            height: 60vh;
+        }
+    }
+
     /* Force header visible without scrolling logic */
     .site-header {
         transform: translateY(0) !important;
@@ -102,6 +126,7 @@
 
   <div class="bg-3d" aria-hidden="true">
     <div id="bgViewer" data-src="horse.glb" data-mobile-src="horse.glb"></div>
+    <div id="writingViewer" data-src="writing.glb" data-mobile-src="writing.glb"></div>
   </div>
 
   <main class="site-container">
@@ -223,6 +248,7 @@ Fringe Festival 2026 | Fringe Underground</p>
     import { initBackground3D } from '../background3d.js';
 
     const viewer = document.getElementById('bgViewer');
+    const writingViewer = document.getElementById('writingViewer');
     const mobileLayout = window.matchMedia('(max-width: 767px), (pointer: coarse)');
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let background;
@@ -245,7 +271,9 @@ Fringe Festival 2026 | Fringe Underground</p>
       }
       const progress = getPageProgress();
       background?.setProgress(progress);
-      viewer.style.opacity = String(0.9 - progress * 0.2);
+      const opacity = String(0.9 - progress * 0.2);
+      viewer.style.opacity = opacity;
+      writingViewer.style.opacity = opacity;
     }
 
     function scheduleUpdate() {
@@ -257,30 +285,49 @@ Fringe Festival 2026 | Fringe Underground</p>
     window.addEventListener('pageshow', scheduleUpdate);
     scheduleUpdate();
 
+    const backgroundOptions = {
+      desktopBloomStrength: 0.4,
+      mobileBloomStrength: 0.4,
+      bloomRadius: 0.0005,
+      mobileBloomRadius: 0.0005,
+      bloomThreshold: 0.1,
+      bloomTint: '#ff8800',
+      modelScale: 1.5,
+      cameraElevation: 0,
+      cameraAzimuthStart: 0,
+      cameraAzimuthMid: 30,
+      cameraAzimuthRange: -60,
+      cameraOscillates: false,
+      fireMaterial: {
+        vertexUrl: '../Fire2.vert',
+        fragmentUrl: '../Fire2.frag',
+        color: '#ff8800',
+        emissionGain: 5,
+        textureScaleX: 0.25,
+        textureOffsetX: 0.375,
+        clampTextureX: true
+      }
+    };
+
     try {
-      background = initBackground3D(viewer, mobileLayout, {
-        desktopBloomStrength: 0.4,
-        mobileBloomStrength: 0.4,
-        bloomRadius: 0.0005,
-        mobileBloomRadius: 0.0005,
-        bloomThreshold: 0.1,
-        bloomTint: '#ff8800',
-        modelScale: 2,
-        cameraElevation: 0,
+      const writingBackground = initBackground3D(writingViewer, mobileLayout, {
+        ...backgroundOptions,
+        modelScale: 1.5,
+        modelRotation: { x: 90, z: 90 },
         cameraAzimuthStart: 0,
-        cameraAzimuthMid: 30,
-        cameraAzimuthRange: -60,
-        cameraOscillates: false,
-        fireMaterial: {
-          vertexUrl: '../Fire2.vert',
-          fragmentUrl: '../Fire2.frag',
-          color: '#ff8800',
-          emissionGain: 5,
-          textureScaleX: 0.25,
-          textureOffsetX: 0.375,
-          clampTextureX: true
-        }
+        cameraAzimuthMid: null,
+        cameraAzimuthRange: 0,
+        cameraOscillates: false
       });
+      writingBackground.ready.catch(error => {
+        console.error('Could not load EFV writing background', error);
+      });
+    } catch (error) {
+      console.error('Could not initialize EFV writing background', error);
+    }
+
+    try {
+      background = initBackground3D(viewer, mobileLayout, backgroundOptions);
       background.setProgress(prefersReducedMotion ? 0 : getPageProgress());
       await background.ready;
       scheduleUpdate();

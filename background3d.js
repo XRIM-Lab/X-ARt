@@ -60,6 +60,7 @@ export function initBackground3D(viewer, mobileLayout, {
   mobileBloomRadius = bloomRadius,
   bloomTint = null,
   modelScale = 1,
+  modelRotation = null,
   cameraElevation = 50,
   cameraAzimuthStart = 45,
   cameraAzimuthMid = null,
@@ -231,7 +232,20 @@ export function initBackground3D(viewer, mobileLayout, {
   async function loadVariant() {
     const sequence = ++loadSequence;
     const src = mobileLayout.matches ? viewer.dataset.mobileSrc : viewer.dataset.src;
-    if (!models.has(src)) models.set(src, loader.loadAsync(src));
+    if (!models.has(src)) {
+      models.set(src, loader.loadAsync(src).then(gltf => {
+        if (!modelRotation) return gltf;
+        const orientedModel = new THREE.Group();
+        orientedModel.rotation.set(
+          THREE.MathUtils.degToRad(modelRotation.x ?? 0),
+          THREE.MathUtils.degToRad(modelRotation.y ?? 0),
+          THREE.MathUtils.degToRad(modelRotation.z ?? 0),
+          'ZYX'
+        );
+        orientedModel.add(gltf.scene);
+        return { ...gltf, scene: orientedModel };
+      }));
+    }
     const gltf = await models.get(src);
     if (sequence !== loadSequence) return;
 
