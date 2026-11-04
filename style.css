@@ -409,6 +409,35 @@ a:hover {
 span.annotation { color: var(--text-secondary); font-style: italic; }
 p.support { margin-top: 1.5rem; color: var(--text-secondary); font-size: 0.9rem; }
 
+.tty2-events li {
+  display: grid;
+  grid-template-columns: 10ch minmax(0, 1fr) auto;
+  gap: 0.5rem 1.5rem;
+  align-items: start;
+}
+.tty2-events .event-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+.tty2-events .event-title {
+  font-weight: 600;
+}
+.tty2-events .event-venue {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+.tty2-events .annotation {
+  white-space: nowrap;
+  font-size: 0.85rem;
+}
+@media (max-width: 767px) {
+  .tty2-events li {
+    grid-template-columns: 1fr;
+  }
+}
+
 
 /* ============================ */
 /* ===   HEADER & MENU      === */
