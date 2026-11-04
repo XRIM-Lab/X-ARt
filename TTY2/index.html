@@ -29,6 +29,13 @@
 
   <!-- Shared Web Components (header, footer) -->
   <script src="../components.js"></script>
+
+    <style>
+    :root {
+      --bg-gradient: 
+        radial-gradient(120% 120% at 50% 50%, rgba(0,0,0,0.55), rgba(0,0,0,0.75));
+    }
+  </style>
 </head>
 
 <body>
@@ -90,6 +97,25 @@ This project offers a site-specific multi sensory experience, at the intersectio
 
     </section>
 
+        <!-- 3) Video -->
+    <section id="video" class="site-section raised">
+      <h2>Video</h2>
+      <div class="video-container">
+<iframe width="560" height="315" src="https://www.youtube.com/embed/w2eAQPp25aQ?si=GyMv4JNVFht0VKh4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      </div>
+    </section>
+
+    <section id="awards" class="detail-section raised">
+      <h2>Awards</h2>
+      <ul>
+        <li><span class="mono-label">2026</span> Finalist, Lumen Prize (Systems and Structures) <span class="annotation">Norway</span></li>
+        <li><span class="mono-label">2026</span> Cultural &amp; Heritage Award, Brand Design Award <span class="annotation">Hong Kong</span></li>
+        <li><span class="mono-label">2026</span> iF Design Award (Installation) <span class="annotation">Germany</span></li>
+        <li><span class="mono-label">2025</span> Judge’s Award (Entertainment), Global Design Awards <span class="annotation">Hong Kong</span></li>
+        <li><span class="mono-label">2025</span> Top 10 Award (Entertainment), Global Design Awards <span class="annotation">Hong Kong</span></li>
+      </ul>
+    </section>
+
     <section id="gallery" class="home-gallery">
       <div class="section-heading">
         <h2>Image Gallery</h2>
@@ -140,16 +166,7 @@ This project offers a site-specific multi sensory experience, at the intersectio
       </div>
     </section>
 
-    <section id="awards" class="detail-section raised">
-      <h2>Awards</h2>
-      <ul>
-        <li><span class="mono-label">2026</span> Finalist, Lumen Prize (Systems and Structures) <span class="annotation">Norway</span></li>
-        <li><span class="mono-label">2026</span> Cultural &amp; Heritage Award, Brand Design Award <span class="annotation">Hong Kong</span></li>
-        <li><span class="mono-label">2026</span> iF Design Award (Installation) <span class="annotation">Germany</span></li>
-        <li><span class="mono-label">2025</span> Judge’s Award (Entertainment), Global Design Awards <span class="annotation">Hong Kong</span></li>
-        <li><span class="mono-label">2025</span> Top 10 Award (Entertainment), Global Design Awards <span class="annotation">Hong Kong</span></li>
-      </ul>
-    </section>
+
 
     <section id="events" class="detail-section raised event-list">
       <h2>Events</h2>
@@ -202,13 +219,7 @@ This project offers a site-specific multi sensory experience, at the intersectio
       </ul>
     </section>
 
-    <!-- 3) Video -->
-    <section id="video" class="site-section raised">
-      <h2>Video</h2>
-      <div class="video-container">
-<iframe width="560" height="315" src="https://www.youtube.com/embed/w2eAQPp25aQ?si=GyMv4JNVFht0VKh4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-      </div>
-    </section>
+
 
     <!-- 4) Team & Thanks -->
     <section id="team" class="site-section two-col">
@@ -449,7 +460,7 @@ This project offers a site-specific multi sensory experience, at the intersectio
 
   import('../background3d.js').then(({ initBackground3D }) => {
     background = initBackground3D(viewer, mobileLayout, {
-      desktopBloomStrength: 1.0,
+      desktopBloomStrength: 0.5,
       mobileBloomStrength: 0,
       bloomThreshold: 0.75,
       modelScale: 2
