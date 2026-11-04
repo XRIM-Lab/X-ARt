@@ -7,18 +7,18 @@
 //   <site-footer year="2026" name="「ARtrio」"></site-footer>
 //
 // Canonical <head> block to include on every page (adjust paths for depth):
-//   <!-- ES Module shims + import map (required for model-viewer-module + effects) -->
-//   <script async src="https://ga.jspm.io/npm:es-module-shims@1.7.1/dist/es-module-shims.js"></script>
-//   <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.174.0/build/three.module.min.js" } }</script>
+//   <!-- Three.js import map for pages with 3D backgrounds -->
+//   <script type="importmap">{ "imports": {
+//     "three": "https://cdn.jsdelivr.net/npm/three@0.174.0/build/three.module.js",
+//     "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.174.0/examples/jsm/"
+//   } }</script>
 //   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
 //   <link rel="preconnect" href="https://fonts.googleapis.com">
 //   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 //   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 //   <link rel="stylesheet" href="../style.css">   <!-- adjust depth: style.css or ../style.css -->
 //   <script src="../components.js"></script>       <!-- adjust depth: components.js or ../components.js -->
-//   <!-- model-viewer@4.1.0 + effects (pinned — 4.2.0+ requires three@^0.182.0 which breaks effects@1.5.0) -->
-//   <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer-module.min.js"></script>
-//   <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer-effects/dist/model-viewer-effects.min.js"></script>
+//   <!-- Load background3d.js from the page script when using a 3D background. -->
 // =============================================================================
 
 // ---------------------------------------------------------------------------

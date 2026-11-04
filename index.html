@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>artrio - Man, Nature, Technology, Art</title>
 
-  <!-- ES Module shims + import map -->
-  <script async src="https://ga.jspm.io/npm:es-module-shims@1.7.1/dist/es-module-shims.js"></script>
+  <!-- Three.js import map -->
   <script type="importmap">
   {
     "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@0.174.0/build/three.module.min.js"
+      "three": "https://cdn.jsdelivr.net/npm/three@0.174.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.174.0/examples/jsm/"
     }
   }
   </script>
@@ -29,13 +29,12 @@
   <!-- Shared Web Components (header, footer) -->
   <script src="components.js"></script>
 
-  <!-- model-viewer + effects -->
-  <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.1.0/dist/model-viewer-module.min.js"></script>
+  <!-- Three.js background renderer -->
 
-    <style>
+  <style>
     :root {
       --bg-gradient: 
-        radial-gradient(120% 120% at 50% 50%, rgba(0,0,0,0.55), rgba(0,0,0,0.75));
+        radial-gradient(120% 120% at 50% 50%, rgba(0,0,0,0.3), rgba(0,0,0,0));
     }
   </style>
 
@@ -63,21 +62,7 @@
 
   <!-- Fixed 3D background layer behind all content -->
   <div class="bg-3d" aria-hidden="true">
-    <model-viewer
-      id="bgViewer"
-      src="mesh.glb"
-      data-mobile-src="mesh.mobile.glb"
-      alt="artrio background 3D model"
-      shadow-intensity="1"
-      environment-image="neutral"
-      camera-orbit="90deg 90deg 6m"
-      interaction-prompt="none"
-      loading="eager"
-    >
-      <effect-composer>
-        <bloom-effect strength="5" radius="0.3" threshold="0.1" smoothing="0" bloom-color="#00ff00"></bloom-effect>
-      </effect-composer>
-    </model-viewer>
+    <div id="bgViewer" data-src="mesh_test.glb" data-mobile-src="mesh_test.mobile.glb"></div>
   </div>
 
   <main class="site-container content-hidden">
@@ -346,38 +331,7 @@
   const isFirefox = /Firefox\/\d/.test(navigator.userAgent);
   const viewer = document.getElementById('bgViewer');
   const mobileLayout = window.matchMedia('(max-width: 767px), (pointer: coarse)');
-  const desktopModelSrc = viewer.getAttribute('src');
-  const mobileModelSrc = viewer.dataset.mobileSrc;
-  const desktopShadowIntensity = viewer.getAttribute('shadow-intensity');
-  const effectComposer = viewer.querySelector('effect-composer');
-  const bloomEffect = effectComposer?.querySelector('bloom-effect');
-  const desktopBloomStrength = bloomEffect?.getAttribute('strength') ?? '5';
-  const desktopBloomRadius = bloomEffect?.getAttribute('radius') ?? '0.3';
-  let effectsPromise;
-
-  function loadEffects() {
-    if (!effectsPromise) {
-      effectsPromise = customElements.whenDefined('model-viewer').then(() =>
-        import('https://cdn.jsdelivr.net/npm/@google/model-viewer-effects@1.4.0/dist/model-viewer-effects.min.js')
-      );
-    }
-    return effectsPromise;
-  }
-
-  function updateViewerVariant() {
-    const isMobile = mobileLayout.matches;
-    const modelSrc = isMobile ? mobileModelSrc : desktopModelSrc;
-    if (modelSrc && viewer.getAttribute('src') !== modelSrc) viewer.setAttribute('src', modelSrc);
-    viewer.setAttribute('shadow-intensity', isMobile ? '0' : desktopShadowIntensity);
-    bloomEffect?.setAttribute('strength', isMobile ? '2' : desktopBloomStrength);
-    bloomEffect?.setAttribute('radius', isMobile ? '0.15' : desktopBloomRadius);
-    loadEffects().then(() => {
-      if (effectComposer && !effectComposer.isConnected) viewer.append(effectComposer);
-    }).catch(() => {});
-  }
-
-  updateViewerVariant();
-  mobileLayout.addEventListener('change', updateViewerVariant);
+  let background;
 
   const loadingScreen = document.getElementById('loadingScreen');
   const mainContent = document.querySelector('main');
@@ -396,14 +350,8 @@
   let ticking = false;
   function update() {
     const p = getPageProgress();
-    const baseAz = 45;
-    const turns = 0.5;
-    const az = baseAz + p * 360 * turns;
-    const elev = 50;
-    const radius = '6m';
-
     if (!prefersReduced) {
-      viewer.setAttribute('camera-orbit', `${az}deg ${elev}deg ${radius}`);
+      background?.setProgress(p);
       viewer.style.opacity = String(0.9 - p * 0.2);
     }
     ticking = false;
@@ -534,10 +482,24 @@
     }
   }
 
-  viewer.addEventListener('load', hideLoadingScreen, { once: true });
-  viewer.addEventListener('error', hideLoadingScreen, { once: true });
-  customElements.whenDefined('model-viewer').then(() => {
-    if (viewer.loaded) hideLoadingScreen();
+  import('./background3d.js').then(({ initBackground3D }) => {
+    background = initBackground3D(viewer, mobileLayout, {
+      desktopBloomStrength: 0.4,
+      mobileBloomStrength: 0.125,
+        bloomRadius: 0.0005,
+        bloomThreshold: 0.1,
+  mobileBloomRadius: 0.02,
+      bloomTint: '#ffaa00',
+      modelScale: 2,
+      fireMaterial: {
+        emissionGain: 5
+      }
+    });
+    background.setProgress(prefersReduced ? 0 : getPageProgress());
+    return background.ready;
+  }).then(hideLoadingScreen, error => {
+    console.error('Could not load 3D background', error);
+    hideLoadingScreen();
   });
 
   entrancePhase = getEntrancePhase();

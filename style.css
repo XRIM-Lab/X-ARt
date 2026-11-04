@@ -60,7 +60,6 @@ section:last-of-type {
   border-bottom: none;
 }
 .home-page .content-flow {
-  background: rgba(0, 0, 0, 0.16);
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
 }
@@ -84,7 +83,6 @@ section:last-of-type {
   -webkit-backdrop-filter: none;
 }
 .home-page .site-footer {
-  background: rgba(0, 0, 0, 0.16);
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
 }
@@ -104,8 +102,12 @@ section:last-of-type {
   height: 100vh;
   display: block;
   background-color: var(--bg-color);
-  --poster-color: transparent;
-  will-change: transform, opacity;
+  will-change: opacity;
+}
+#bgViewer canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 .bg-3d::after {
   content: "";
