@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>EQUUS: FORM + VOID - ARtrio</title>
 
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.174.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.174.0/examples/jsm/"
+    }
+  }
+  </script>
+
   <!-- Bootstrap (for grid + basic styling) -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
 
@@ -91,6 +100,10 @@
 
 <site-header page="efv"></site-header>
 
+  <div class="bg-3d" aria-hidden="true">
+    <div id="bgViewer" data-src="horse.glb" data-mobile-src="horse.glb"></div>
+  </div>
+
   <main class="site-container">
     <div class="simple-content-wrapper">
         
@@ -106,6 +119,7 @@
           Man, Nature, Technology, Art
         </div>
         <div class="intro-hint" aria-hidden="true">Scroll to enter</div>
+      </div>
         </section>
 
                 <!-- Description Text (English) -->
@@ -204,6 +218,76 @@ Fringe Festival 2026 | Fringe Underground</p>
   </main>
 
 <site-footer year="2026" name="「ARtrio」"></site-footer>
+
+  <script type="module">
+    import { initBackground3D } from '../background3d.js';
+
+    const viewer = document.getElementById('bgViewer');
+    const mobileLayout = window.matchMedia('(max-width: 767px), (pointer: coarse)');
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let background;
+    let updateFrame;
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function getPageProgress() {
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      return maxScroll <= 0 ? 0 : clamp(window.scrollY / maxScroll, 0, 1);
+    }
+
+    function update() {
+      updateFrame = undefined;
+      if (prefersReducedMotion) {
+        background?.setProgress(0);
+        return;
+      }
+      const progress = getPageProgress();
+      background?.setProgress(progress);
+      viewer.style.opacity = String(0.9 - progress * 0.2);
+    }
+
+    function scheduleUpdate() {
+      if (updateFrame === undefined) updateFrame = requestAnimationFrame(update);
+    }
+
+    window.addEventListener('scroll', scheduleUpdate, { passive: true });
+    window.addEventListener('resize', scheduleUpdate);
+    window.addEventListener('pageshow', scheduleUpdate);
+    scheduleUpdate();
+
+    try {
+      background = initBackground3D(viewer, mobileLayout, {
+        desktopBloomStrength: 0.4,
+        mobileBloomStrength: 0.4,
+        bloomRadius: 0.0005,
+        mobileBloomRadius: 0.0005,
+        bloomThreshold: 0.1,
+        bloomTint: '#ff8800',
+        modelScale: 2,
+        cameraElevation: 0,
+        cameraAzimuthStart: 0,
+        cameraAzimuthMid: 30,
+        cameraAzimuthRange: -60,
+        cameraOscillates: false,
+        fireMaterial: {
+          vertexUrl: '../Fire2.vert',
+          fragmentUrl: '../Fire2.frag',
+          color: '#ff8800',
+          emissionGain: 5,
+          textureScaleX: 0.25,
+          textureOffsetX: 0.375,
+          clampTextureX: true
+        }
+      });
+      background.setProgress(prefersReducedMotion ? 0 : getPageProgress());
+      await background.ready;
+      scheduleUpdate();
+    } catch (error) {
+      console.error('Could not load EFV 3D background', error);
+    }
+  </script>
 
 </body>
 </html>

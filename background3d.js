@@ -14,7 +14,10 @@ const DEFAULT_FIRE_MATERIAL = {
   emissionGain: 1,
   scroll1: 2,
   scroll2: 0,
-  displacementIntensity: 1
+  displacementIntensity: 1,
+  textureScaleX: 1,
+  textureOffsetX: 0,
+  clampTextureX: false
 };
 
 function prepareFireVertexShader(source) {
@@ -57,6 +60,11 @@ export function initBackground3D(viewer, mobileLayout, {
   mobileBloomRadius = bloomRadius,
   bloomTint = null,
   modelScale = 1,
+  cameraElevation = 50,
+  cameraAzimuthStart = 45,
+  cameraAzimuthMid = null,
+  cameraAzimuthRange = 180,
+  cameraOscillates = false,
   fireMaterial = null
 }) {
   const renderer = new THREE.WebGLRenderer({ alpha: true, powerPreference: 'low-power' });
@@ -114,8 +122,14 @@ export function initBackground3D(viewer, mobileLayout, {
 
   function render() {
     if (!currentModel || document.hidden) return;
-    const azimuth = THREE.MathUtils.degToRad(45 + progress * 180);
-    const elevation = THREE.MathUtils.degToRad(50);
+    const rotationProgress = cameraOscillates ? Math.sin(progress * Math.PI * 2) : progress;
+    const azimuthDegrees = cameraAzimuthMid === null
+      ? cameraAzimuthStart + rotationProgress * cameraAzimuthRange
+      : progress <= 0.5
+        ? THREE.MathUtils.lerp(cameraAzimuthStart, cameraAzimuthMid, progress * 2)
+        : THREE.MathUtils.lerp(cameraAzimuthMid, cameraAzimuthStart + cameraAzimuthRange, (progress - 0.5) * 2);
+    const azimuth = THREE.MathUtils.degToRad(azimuthDegrees);
+    const elevation = THREE.MathUtils.degToRad(cameraElevation);
     camera.position.set(
       center.x + distance * Math.cos(elevation) * Math.sin(azimuth),
       center.y + distance * Math.sin(elevation),
@@ -143,6 +157,10 @@ export function initBackground3D(viewer, mobileLayout, {
     }
     const [vertexSource, fragmentSource] = await fireShaderPromise;
     if (!fireShaderMaterial) {
+      if (fireConfig.clampTextureX) {
+        sourceMap.wrapS = THREE.ClampToEdgeWrapping;
+        sourceMap.needsUpdate = true;
+      }
       fireShaderMaterial = new THREE.ShaderMaterial({
         glslVersion: THREE.GLSL3,
         vertexShader: prepareFireVertexShader(vertexSource),
@@ -156,7 +174,7 @@ export function initBackground3D(viewer, mobileLayout, {
           _Dissolve: { value: 1 },
           _ClipStart: { value: 0 },
           _ClipEnd: { value: 0 },
-          _MainTex_ST: { value: new THREE.Vector4(1, 1, 0, 0) },
+          _MainTex_ST: { value: new THREE.Vector4(fireConfig.textureScaleX, 1, fireConfig.textureOffsetX, 0) },
           _Color: { value: new THREE.Color(fireConfig.color) },
           _EmissionGain: { value: fireConfig.emissionGain }
         },
