@@ -91,8 +91,8 @@
     </section>
 
     <!-- 2) Text description left, image gallery right -->
-    <section id="about" class="two-col">
-      <div class="col text raised">
+    <section id="about" class="about-intro">
+      <div class="content-panel raised">
         <h2>About this Project</h2>
         <p class="lead">
 ‘Through The Tears, To Touch You (TTY2)’ (流 穿越 ) is a site-specific art installation and performance  taking place on the old pier of Tim Tin Tsai, a 300 years-old Hakka island village in Hong Kong.        </p>
@@ -104,30 +104,67 @@ This project offers a site-specific multi sensory experience, at the intersectio
 <p><a href="/TTY2/SKHAF/">Festival Website (Archived copy 18/07/2005) </a></p>
 </div>
 
-      <div class="col gallery raised">
-        <div id="projectCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3500">
-          <div class="carousel-inner">
-            <div class="carousel-item active">
-              <img src="images/Performance+AR.jpg" class="d-block w-100" alt="TTY2"/>
-            </div>
-            <div class="carousel-item">
-              <img src="images/Dominie_Moongate.jpg" class="d-block w-100" alt="TTY2"/>
-            </div>
-            <div class="carousel-item">
-              <img src="images/ScreenView.jpg" class="d-block w-100" alt="TTY2"/>
-            </div>
-            <div class="carousel-item">
-              <img src="images/Drone+AR.jpg" class="d-block w-100" alt="TTY2"/>
-            </div>
-            <div class="carousel-item">
-              <img src="images/20241108-IMG_1365.jpg" class="d-block w-100" alt="TTY2"/>
-            </div>
-            <div class="carousel-item">
-              <img src="images/Moongate2.jpg" class="d-block w-100" alt="TTY2"/>
-            </div>
+    </section>
+
+    <section id="gallery" class="home-gallery">
+      <div class="section-heading">
+        <h2>Image Gallery</h2>
+      </div>
+      <div id="projectCarousel" class="carousel slide home-gallery-carousel" data-bs-ride="carousel" data-bs-interval="5000">
+        <div class="carousel-indicators">
+          <button type="button" data-bs-target="#projectCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Show performance with augmented reality"></button>
+          <button type="button" data-bs-target="#projectCarousel" data-bs-slide-to="1" aria-label="Show bamboo Moongate"></button>
+          <button type="button" data-bs-target="#projectCarousel" data-bs-slide-to="2" aria-label="Show screen view"></button>
+          <button type="button" data-bs-target="#projectCarousel" data-bs-slide-to="3" aria-label="Show drone view with augmented reality"></button>
+          <button type="button" data-bs-target="#projectCarousel" data-bs-slide-to="4" aria-label="Show Yim Tin Tsai performance"></button>
+          <button type="button" data-bs-target="#projectCarousel" data-bs-slide-to="5" aria-label="Show Moongate"></button>
+        </div>
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <img src="images/Performance+AR.jpg" alt="Performance with augmented reality">
+            <div class="home-gallery-caption">Performance with AR</div>
+          </div>
+          <div class="carousel-item">
+            <img src="images/Dominie_Moongate.jpg" alt="Performer at the bamboo Moongate">
+            <div class="home-gallery-caption">Bamboo Moongate</div>
+          </div>
+          <div class="carousel-item">
+            <img src="images/ScreenView.jpg" alt="Screen view of the project">
+            <div class="home-gallery-caption">Screen View</div>
+          </div>
+          <div class="carousel-item">
+            <img src="images/Drone+AR.jpg" alt="Drone view with augmented reality">
+            <div class="home-gallery-caption">Drone View with AR</div>
+          </div>
+          <div class="carousel-item">
+            <img src="images/20241108-IMG_1365.jpg" alt="Performance at Yim Tin Tsai">
+            <div class="home-gallery-caption">Yim Tin Tsai Performance</div>
+          </div>
+          <div class="carousel-item">
+            <img src="images/Moongate2.jpg" alt="Bamboo Moongate installation">
+            <div class="home-gallery-caption">Moongate Installation</div>
           </div>
         </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#projectCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous image</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#projectCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next image</span>
+        </button>
       </div>
+    </section>
+
+    <section id="awards" class="detail-section raised">
+      <h2>Awards</h2>
+      <ul>
+        <li><span class="mono-label">2026</span> Finalist, Lumen Prize (Systems and Structures) <span class="annotation">Norway</span></li>
+        <li><span class="mono-label">2026</span> Cultural &amp; Heritage Award, Brand Design Award <span class="annotation">Hong Kong</span></li>
+        <li><span class="mono-label">2026</span> iF Design Award (Installation) <span class="annotation">Germany</span></li>
+        <li><span class="mono-label">2025</span> Judge’s Award (Entertainment), Global Design Awards <span class="annotation">Hong Kong</span></li>
+        <li><span class="mono-label">2025</span> Top 10 Award (Entertainment), Global Design Awards <span class="annotation">Hong Kong</span></li>
+      </ul>
     </section>
 
     <!-- 3) Video -->
