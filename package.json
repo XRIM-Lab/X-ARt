@@ -1,0 +1,16 @@
+{
+  "name": "artrio-local-tests",
+  "private": true,
+  "scripts": {
+    "test": "npm run test:unit",
+    "test:unit": "node --experimental-vm-modules --test tests/*.test.mjs",
+    "test:e2e": "playwright test --config=tests/browser/playwright.config.mjs",
+    "test:e2e:ui": "playwright test --config=tests/browser/playwright.config.mjs --ui",
+    "test:all": "npm run test:unit && npm run test:e2e"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.0",
+    "bootstrap": "5.3.3",
+    "three": "0.174.0"
+  }
+}
