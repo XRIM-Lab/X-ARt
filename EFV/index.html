@@ -34,7 +34,6 @@
         /* Ensure normal scrolling behavior */
         overflow-y: auto; 
         /* Add some top padding so content isn't hidden behind the fixed header */
-        padding-top: 80px; 
     }
     
     .simple-content-wrapper {
@@ -113,10 +112,6 @@
     }
 
     /* Force header visible without scrolling logic */
-    .site-header {
-        transform: translateY(0) !important;
-        opacity: 1 !important;
-    }
   </style>
 </head>
 
@@ -148,7 +143,7 @@
         </section>
 
                 <!-- Description Text (English) -->
-        <section class="mb-5 raised">
+        <section id="about" class="mb-5 raised">
         <!-- Image (Single Column) -->
         <div class="mb-5">
             <img src="images/EFV_cover.jpeg" alt="EQUUS Cover Art" class="event-image">
@@ -245,45 +240,23 @@ Fringe Festival 2026 | Fringe Underground</p>
 <site-footer year="2026" name="「ARtrio」"></site-footer>
 
   <script type="module">
-    import { initBackground3D } from '../background3d.js';
+    import { initPageScroll } from '../page-scroll.js';
 
     const viewer = document.getElementById('bgViewer');
     const writingViewer = document.getElementById('writingViewer');
     const mobileLayout = window.matchMedia('(max-width: 767px), (pointer: coarse)');
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let background;
-    let updateFrame;
 
-    function clamp(value, min, max) {
-      return Math.max(min, Math.min(max, value));
-    }
-
-    function getPageProgress() {
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-      return maxScroll <= 0 ? 0 : clamp(window.scrollY / maxScroll, 0, 1);
-    }
-
-    function update() {
-      updateFrame = undefined;
-      if (prefersReducedMotion) {
-        background?.setProgress(0);
-        return;
+    const pageScroll = initPageScroll({
+      contentStart: document.getElementById('about'),
+      onUpdate(progress, prefersReducedMotion) {
+        if (prefersReducedMotion) return;
+        background?.setProgress(progress);
+        const opacity = String(0.9 - progress * 0.2);
+        viewer.style.opacity = opacity;
+        writingViewer.style.opacity = opacity;
       }
-      const progress = getPageProgress();
-      background?.setProgress(progress);
-      const opacity = String(0.9 - progress * 0.2);
-      viewer.style.opacity = opacity;
-      writingViewer.style.opacity = opacity;
-    }
-
-    function scheduleUpdate() {
-      if (updateFrame === undefined) updateFrame = requestAnimationFrame(update);
-    }
-
-    window.addEventListener('scroll', scheduleUpdate, { passive: true });
-    window.addEventListener('resize', scheduleUpdate);
-    window.addEventListener('pageshow', scheduleUpdate);
-    scheduleUpdate();
+    });
 
     const backgroundOptions = {
       desktopBloomStrength: 0.4,
@@ -309,31 +282,45 @@ Fringe Festival 2026 | Fringe Underground</p>
       }
     };
 
-    try {
-      const writingBackground = initBackground3D(writingViewer, mobileLayout, {
-        ...backgroundOptions,
-        modelScale: 1.5,
-        modelRotation: { x: 90, z: 90 },
-        cameraAzimuthStart: 0,
-        cameraAzimuthMid: null,
-        cameraAzimuthRange: 0,
-        cameraOscillates: false
-      });
-      writingBackground.ready.catch(error => {
-        console.error('Could not load EFV writing background', error);
-      });
-    } catch (error) {
-      console.error('Could not initialize EFV writing background', error);
+    async function initializeBackgrounds() {
+      let initBackground3D;
+      try {
+        ({ initBackground3D } = await import('../background3d.js'));
+      } catch (error) {
+        console.error('Could not load EFV 3D background module', error);
+        pageScroll.refresh();
+        return;
+      }
+
+      try {
+        const writingBackground = initBackground3D(writingViewer, mobileLayout, {
+          ...backgroundOptions,
+          modelScale: 1.5,
+          modelRotation: { x: 90, z: 90 },
+          cameraAzimuthStart: 0,
+          cameraAzimuthMid: null,
+          cameraAzimuthRange: 0,
+          cameraOscillates: false
+        });
+        writingBackground.ready.catch(error => {
+          console.error('Could not load EFV writing background', error);
+        });
+      } catch (error) {
+        console.error('Could not initialize EFV writing background', error);
+      }
+
+      try {
+        background = initBackground3D(viewer, mobileLayout, backgroundOptions);
+        background.setProgress(pageScroll.prefersReducedMotion ? 0 : pageScroll.getProgress());
+        await background.ready;
+        pageScroll.refresh();
+      } catch (error) {
+        console.error('Could not load EFV 3D background', error);
+        pageScroll.refresh();
+      }
     }
 
-    try {
-      background = initBackground3D(viewer, mobileLayout, backgroundOptions);
-      background.setProgress(prefersReducedMotion ? 0 : getPageProgress());
-      await background.ready;
-      scheduleUpdate();
-    } catch (error) {
-      console.error('Could not load EFV 3D background', error);
-    }
+    initializeBackgrounds();
   </script>
 
 </body>

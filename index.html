@@ -323,137 +323,29 @@
   <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <!-- Scroll-driven rotation logic + loading management -->
-<script>
+<script type="module">
+  import { initPageScroll } from './page-scroll.js';
+
   // ============================
   // === 3D & SCROLL LOGIC    ===
   // ============================
-  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const isFirefox = /Firefox\/\d/.test(navigator.userAgent);
   const viewer = document.getElementById('bgViewer');
   const mobileLayout = window.matchMedia('(max-width: 767px), (pointer: coarse)');
   let background;
 
   const loadingScreen = document.getElementById('loadingScreen');
   const mainContent = document.querySelector('main');
-  const docEl = document.documentElement;
 
   mainContent.classList.add('content-hidden');
 
-  function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
-
-  function getPageProgress() {
-    const max = docEl.scrollHeight - window.innerHeight;
-    if (max <= 0) return 0;
-    return clamp(window.scrollY / max, 0, 1);
-  }
-
-  let ticking = false;
-  function update() {
-    const p = getPageProgress();
-    if (!prefersReduced) {
-      background?.setProgress(p);
-      viewer.style.opacity = String(0.9 - p * 0.2);
+  const pageScroll = initPageScroll({
+    contentStart: document.getElementById('about'),
+    onUpdate(progress, prefersReducedMotion) {
+      if (prefersReducedMotion) return;
+      background?.setProgress(progress);
+      viewer.style.opacity = String(0.9 - progress * 0.2);
     }
-    ticking = false;
-  }
-
-  const aboutSection = document.getElementById('about');
-  let lastScrollY = window.scrollY;
-  let entrancePhase = 'settling';
-  let settleTimer;
-  let transitionTimer;
-  let entranceFrame;
-  let entranceDestination;
-
-  function getEntranceZones() {
-    const aboutTop = aboutSection.getBoundingClientRect().top + window.scrollY;
-    const buffer = Math.min(window.innerHeight * 0.2, aboutTop * 0.25);
-    return { aboutTop, heroEnd: buffer, contentStart: aboutTop - buffer };
-  }
-
-  function getEntrancePhase() {
-    const { heroEnd, contentStart } = getEntranceZones();
-    return window.scrollY <= heroEnd ? 'hero' : window.scrollY >= contentStart ? 'content' : 'neutral';
-  }
-
-  function settleEntrance() {
-    clearTimeout(transitionTimer);
-    clearTimeout(settleTimer);
-    entrancePhase = 'settling';
-    settleTimer = setTimeout(() => {
-      lastScrollY = window.scrollY;
-      entrancePhase = getEntrancePhase();
-    }, 160);
-  }
-
-  function runEntranceScroll(destination) {
-    clearTimeout(settleTimer);
-    entrancePhase = 'animating';
-    entranceDestination = destination;
-    if (isFirefox) {
-      const start = window.scrollY;
-      const distance = destination - start;
-      const startedAt = performance.now();
-      function animateEntrance(now) {
-        const progress = clamp((now - startedAt) / 600, 0, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        window.scrollTo(0, start + distance * eased);
-        if (progress < 1) {
-          entranceFrame = requestAnimationFrame(animateEntrance);
-        } else {
-          entranceFrame = null;
-          lastScrollY = window.scrollY;
-          settleEntrance();
-        }
-      }
-      entranceFrame = requestAnimationFrame(animateEntrance);
-    } else {
-      window.scrollTo({ top: destination, behavior: 'smooth' });
-      transitionTimer = setTimeout(settleEntrance, 2400);
-    }
-  }
-
-  function onScroll() {
-    if (window._onScrollMenu) window._onScrollMenu();
-
-    const currentScrollY = window.scrollY;
-    const previousScrollY = lastScrollY;
-    lastScrollY = currentScrollY;
-
-    if (!prefersReduced && !isFirefox && entrancePhase === 'animating' && Math.abs(currentScrollY - entranceDestination) < 4) {
-      settleEntrance();
-    }
-
-    if (!prefersReduced && entrancePhase !== 'animating') {
-      if (entrancePhase === 'settling') {
-        settleEntrance();
-      } else {
-        const { aboutTop, heroEnd, contentStart } = getEntranceZones();
-        const entering = entrancePhase === 'hero' && currentScrollY > previousScrollY &&
-          previousScrollY <= heroEnd && currentScrollY > 0 && currentScrollY < aboutTop;
-        const leaving = entrancePhase === 'content' && currentScrollY < previousScrollY &&
-          previousScrollY >= contentStart && previousScrollY <= aboutTop + window.innerHeight &&
-          currentScrollY < aboutTop && currentScrollY > 0;
-        if (entering) {
-          runEntranceScroll(aboutTop);
-        } else if (leaving) {
-          runEntranceScroll(0);
-        } else if (currentScrollY <= heroEnd) {
-          entrancePhase = 'hero';
-        } else if (currentScrollY >= contentStart) {
-          entrancePhase = 'content';
-        } else {
-          entrancePhase = 'neutral';
-        }
-      }
-    }
-
-    if (prefersReduced) return;
-    if (!ticking) {
-      ticking = true;
-      requestAnimationFrame(update);
-    }
-  }
+  });
 
   const splashStartedAt = performance.now();
   let splashReleaseTimer;
@@ -495,47 +387,16 @@
         emissionGain: 5
       }
     });
-    background.setProgress(prefersReduced ? 0 : getPageProgress());
+    background.setProgress(pageScroll.prefersReducedMotion ? 0 : pageScroll.getProgress());
     return background.ready;
-  }).then(hideLoadingScreen, error => {
+  }).then(() => {
+    pageScroll.refresh();
+    hideLoadingScreen();
+  }, error => {
     console.error('Could not load 3D background', error);
+    pageScroll.refresh();
     hideLoadingScreen();
   });
-
-  entrancePhase = getEntrancePhase();
-  window.addEventListener('wheel', event => {
-    if (entrancePhase === 'animating' || (!isFirefox && entrancePhase === 'settling')) {
-      if (event.cancelable) event.preventDefault();
-      return;
-    }
-    if (isFirefox || prefersReduced || event.ctrlKey || event.deltaY <= 0 || !event.cancelable) return;
-    const { aboutTop, heroEnd } = getEntranceZones();
-    if (window.scrollY <= heroEnd) {
-      event.preventDefault();
-      lastScrollY = window.scrollY;
-      runEntranceScroll(aboutTop);
-    }
-  }, { passive: false });
-  window.addEventListener('keydown', event => {
-    if ((entrancePhase === 'animating' || (!isFirefox && entrancePhase === 'settling')) && ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', ' ', 'Home', 'End'].includes(event.key)) {
-      event.preventDefault();
-    }
-  });
-  window.addEventListener('touchmove', event => {
-    if (entrancePhase === 'animating' || (!isFirefox && entrancePhase === 'settling')) event.preventDefault();
-  }, { passive: false });
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('pageshow', event => {
-    if (!event.persisted && entrancePhase === 'animating') return;
-    clearTimeout(settleTimer);
-    clearTimeout(transitionTimer);
-    if (entranceFrame != null) cancelAnimationFrame(entranceFrame);
-    entranceFrame = null;
-    lastScrollY = window.scrollY;
-    entrancePhase = getEntrancePhase();
-  });
-  window.addEventListener('resize', () => { if (!prefersReduced) update(); });
-  update();
 </script>
 </body>
 </html>
