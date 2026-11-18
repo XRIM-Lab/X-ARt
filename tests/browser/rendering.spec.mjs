@@ -24,8 +24,13 @@ const pages = [
     name: 'efv',
     path: '/EFV/',
     desktopModel: 'writing.glb',
+<<<<<<< Updated upstream
     mobileModel: 'writing.glb',
     splash: true,
+=======
+    mobileModel: 'writing.mobile.glb',
+    splash: false,
+>>>>>>> Stashed changes
     shader: true,
     heading: 'About this Project'
   },
