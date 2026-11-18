@@ -6,6 +6,7 @@ import { FakeBrowser } from './helpers/fake-browser.mjs';
 import { loadSourceModule } from './helpers/vm-modules.mjs';
 
 const pageScrollSource = readFileSync(new URL('../page-scroll.js', import.meta.url), 'utf8');
+const bootstrapSource = readFileSync(new URL('../page-bootstrap.js', import.meta.url), 'utf8');
 let runId = 0;
 
 function deferred() {
@@ -36,14 +37,17 @@ async function bootPage(page, { reduced = false, importFailure = false, initFail
     if (initFailure) throw new Error('renderer init failed');
     return { ready: ready.promise, setProgress: value => progress.push(value) };
   };
-  const pageScrollImport = page === 'home' ? './page-scroll.js' : '../page-scroll.js';
-  const backgroundImport = page === 'home' ? './background3d.js' : '../background3d.js';
+  const bootstrapImport = page === 'home' ? './page-bootstrap.js' : '../page-bootstrap.js';
   const modules = {
-    [pageScrollImport]: {
+    [bootstrapImport]: {
+      source: bootstrapSource,
+      identifier: `file:///page-bootstrap-${++runId}.mjs`
+    },
+    './page-scroll.js': {
       source: pageScrollSource,
       identifier: `file:///page-scroll-${++runId}.mjs`
     },
-    [backgroundImport]: importFailure
+    './background3d.js': importFailure
       ? { error: new Error('background module unavailable') }
       : { exports: { initBackground3D } }
   };

@@ -7,10 +7,6 @@ import { loadSourceModule } from './helpers/vm-modules.mjs';
 const pageScrollSource = readFileSync(new URL('../page-scroll.js', import.meta.url), 'utf8');
 let moduleSequence = 0;
 
-async function flushMicrotasks() {
-  for (let i = 0; i < 12; i++) await Promise.resolve();
-}
-
 async function withBrowser(browser, callback) {
   const { initPageScroll } = await loadSourceModule(pageScrollSource, {
     context: browser.context,
@@ -225,21 +221,25 @@ test('entrance destinations use the content element position measured at trigger
 
 test('home, TTY2, EFV, and NMM share the controller without duplicate page listeners or lost page behavior', () => {
   const pages = [
-    ['../index.html', './page-scroll.js'],
-    ['../TTY2/index.html', '../page-scroll.js'],
-    ['../EFV/index.html', '../page-scroll.js'],
-    ['../NMM/index.html', '../page-scroll.js']
+    ['../index.html', './page-bootstrap.js'],
+    ['../TTY2/index.html', '../page-bootstrap.js'],
+    ['../EFV/index.html', '../page-bootstrap.js'],
+    ['../NMM/index.html', '../page-bootstrap.js']
   ];
   for (const [path, importPath] of pages) {
     const html = readFileSync(new URL(path, import.meta.url), 'utf8');
     const modules = [...html.matchAll(/<script type="module">([\s\S]*?)<\/script>/g)];
     assert.equal(modules.length, 1);
     const script = modules[0][1];
-    assert.equal((script.match(/from ['"][^'"]*page-scroll\.js['"]/g) ?? []).length, 1);
+    assert.equal((script.match(/from ['"][^'"]*page-bootstrap\.js['"]/g) ?? []).length, 1);
     assert.ok(script.includes(`from '${importPath}'`));
-    assert.ok(script.includes("contentStart: document.getElementById('about')"));
     assert.doesNotMatch(script, /addEventListener\(['"](?:wheel|keydown|touchmove|scroll|pageshow)['"]/);
   }
+
+  const bootstrap = readFileSync(new URL('../page-bootstrap.js', import.meta.url), 'utf8');
+  assert.ok(bootstrap.includes("from './page-scroll.js'"));
+  assert.ok(bootstrap.includes("contentStart: document.getElementById('about')"));
+  assert.doesNotMatch(bootstrap, /addEventListener\(['"](?:wheel|keydown|touchmove|scroll|pageshow)['"]/);
 
   const home = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   const tty = readFileSync(new URL('../TTY2/index.html', import.meta.url), 'utf8');
@@ -259,100 +259,42 @@ test('home, TTY2, EFV, and NMM share the controller without duplicate page liste
   assert.doesNotMatch(components, /page === 'efv' \? ' is-visible'/);
   assert.match(efv, /modelRotation: \{ x: 90, z: 90 \},[\s\S]*?cameraElevation: 0,[\s\S]*?cameraAzimuthStart: 0,[\s\S]*?cameraAzimuthMid: null,[\s\S]*?cameraAzimuthRange: 0,[\s\S]*?cameraOscillates: false/);
   assert.match(efv, /emissionGain:\s*[0-9.]+/);
-  assert.match(efv, /onUpdate\(progress, prefersReducedMotion\) \{\s*if \(prefersReducedMotion\) return;\s*background\?\.setProgress\(progress\);\s*viewer\.style\.opacity = String\(0\.9 - progress \* 0\.2\);/);
+  assert.match(bootstrap, /onUpdate\(progress, prefersReducedMotion\) \{\s*if \(prefersReducedMotion\) return;\s*background\?\.setProgress\(progress\);\s*viewer\.style\.opacity = String\(0\.9 - progress \* 0\.2\);/);
   assert.match(nmm, /<section id="about" class="about-intro">/);
   assert.match(nmm, /<div id="bgViewer" data-src="\.\.\/EFV\/writing\.glb" data-mobile-src="\.\.\/EFV\/writing\.mobile\.glb"><\/div>/);
   assert.equal((nmm.match(/id="bgViewer"/g) ?? []).length, 1);
 });
 
-test('EFV renders one centered writing model with scroll fade but no camera progress', async () => {
+test('EFV passes its centered writing model, camera, and fire shader options to the shared bootstrap', async () => {
   const html = readFileSync(new URL('../EFV/index.html', import.meta.url), 'utf8');
   const module = html.match(/<script type="module">([\s\S]*?)<\/script>/)[1];
-  const pageScrollSource = readFileSync(new URL('../page-scroll.js', import.meta.url), 'utf8');
+  const browser = new FakeBrowser();
+  const inits = [];
 
-  async function run({ failedReady = false, reduced = false } = {}) {
-    const browser = new FakeBrowser({ reduced });
-    const elements = { bgViewer: { style: {} } };
-    browser.document.getElementById = id => id === 'about' ? browser.contentStart() : elements[id];
-    const calls = [];
-    const progress = [];
-    const errors = [];
-    let resolveReady;
-    let rejectReady;
-    const ready = new Promise((resolve, reject) => {
-      resolveReady = resolve;
-      rejectReady = reject;
-    });
-    const initBackground3D = (viewer, mobileLayout, options) => {
-      calls.push({ viewer, mobileLayout, options });
-      return { ready, setProgress: value => progress.push(value) };
-    };
+  await loadSourceModule(module, {
+    context: browser.context,
+    identifier: 'file:///EFV-inline.mjs',
+    modules: {
+      '../page-bootstrap.js': { exports: { initPage: options => inits.push(options) } }
+    }
+  });
 
-    await withBrowser(browser, async initPageScroll => {
-      browser.context.console = { error: message => errors.push(message) };
-      await loadSourceModule(module, {
-        context: browser.context,
-        identifier: `file:///EFV-inline-${failedReady}-${reduced}.mjs`,
-        modules: {
-          '../page-scroll.js': {
-            source: pageScrollSource,
-            identifier: `file:///EFV-page-scroll-${failedReady}-${reduced}.mjs`
-          },
-          '../background3d.js': { exports: { initBackground3D } }
-        }
-      });
-      for (let i = 0; i < 5 && calls.length === 0; i++) await Promise.resolve();
-      assert.equal(calls.length, 1);
-      assert.equal(calls[0].viewer, elements.bgViewer);
-      assert.ok(Number.isFinite(calls[0].options.modelScale) && calls[0].options.modelScale > 0);
-      assert.deepEqual(
-        [calls[0].options.modelRotation.x, calls[0].options.modelRotation.z],
-        [90, 90]
-      );
-      assert.equal(calls[0].options.cameraElevation, 0);
-      assert.equal(calls[0].options.cameraAzimuthStart, 0);
-      assert.equal(calls[0].options.cameraAzimuthMid, null);
-      assert.equal(calls[0].options.cameraAzimuthRange, 0);
-      assert.equal(calls[0].options.cameraOscillates, false);
-      assert.ok(Number.isFinite(calls[0].options.desktopBloomStrength));
-      assert.ok(Number.isFinite(calls[0].options.mobileBloomStrength));
-      assert.ok(Number.isFinite(calls[0].options.fireMaterial.emissionGain));
-      assert.ok(Number.isFinite(calls[0].options.fireMaterial.textureScaleX));
-      assert.ok(Number.isFinite(calls[0].options.fireMaterial.textureOffsetX));
-      assert.equal(typeof calls[0].options.fireMaterial.clampTextureX, 'boolean');
-      assert.deepEqual(progress, [0]);
-
-      if (failedReady) rejectReady(new Error('writing load failed'));
-      else resolveReady();
-      await flushMicrotasks();
-
-      browser.runFrame();
-      if (reduced) {
-        assert.equal(elements.bgViewer.style.opacity, undefined);
-        browser.window.scrollY = 1500;
-        browser.dispatch('scroll');
-        browser.runFrame();
-        browser.dispatch('pageshow', { persisted: true });
-        browser.runFrame();
-        assert.equal(elements.bgViewer.style.opacity, undefined);
-      } else {
-        assert.equal(elements.bgViewer.style.opacity, '0.9');
-        browser.window.scrollY = 1500;
-        browser.dispatch('scroll');
-        browser.runFrame();
-        assert.equal(elements.bgViewer.style.opacity, '0.825');
-        browser.dispatch('resize');
-        browser.runFrame();
-        assert.equal(elements.bgViewer.style.opacity, '0.825');
-        browser.dispatch('pageshow', { persisted: true });
-        browser.runFrame();
-        assert.equal(elements.bgViewer.style.opacity, '0.825');
-      }
-      assert.equal(errors.length, failedReady ? 1 : 0);
-    });
-  }
-
-  await run();
-  await run({ failedReady: true });
-  await run({ reduced: true });
+  assert.equal(inits.length, 1);
+  const options = inits[0].backgroundOptions;
+  assert.ok(Number.isFinite(options.modelScale) && options.modelScale > 0);
+  assert.deepEqual(
+    [options.modelRotation.x, options.modelRotation.z],
+    [90, 90]
+  );
+  assert.equal(options.cameraElevation, 0);
+  assert.equal(options.cameraAzimuthStart, 0);
+  assert.equal(options.cameraAzimuthMid, null);
+  assert.equal(options.cameraAzimuthRange, 0);
+  assert.equal(options.cameraOscillates, false);
+  assert.ok(Number.isFinite(options.desktopBloomStrength));
+  assert.ok(Number.isFinite(options.mobileBloomStrength));
+  assert.ok(Number.isFinite(options.fireMaterial.emissionGain));
+  assert.ok(Number.isFinite(options.fireMaterial.textureScaleX));
+  assert.ok(Number.isFinite(options.fireMaterial.textureOffsetX));
+  assert.equal(typeof options.fireMaterial.clampTextureX, 'boolean');
 });

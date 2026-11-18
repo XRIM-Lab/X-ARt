@@ -237,92 +237,33 @@
 
   <!-- Scroll-driven rotation logic + loading management -->
 <script type="module">
-  import { initPageScroll } from '../page-scroll.js';
+  import { initPage } from '../page-bootstrap.js';
 
-  // ============================
-  // === 3D & SCROLL LOGIC    ===
-  // ============================
-  const viewer = document.getElementById('bgViewer');
-  const mobileLayout = window.matchMedia('(max-width: 767px), (pointer: coarse)');
-  let background;
-
-  const loadingScreen = document.getElementById('loadingScreen');
-  const mainContent = document.querySelector('main');
-
-  mainContent.classList.add('content-hidden');
-
-  const pageScroll = initPageScroll({
-    contentStart: document.getElementById('about'),
-    onUpdate(progress, prefersReducedMotion) {
-      if (prefersReducedMotion) return;
-      background?.setProgress(progress);
-      viewer.style.opacity = String(0.9 - progress * 0.2);
+  initPage({
+    backgroundOptions: {
+      desktopBloomStrength: 0.4,
+      mobileBloomStrength: 0.4,
+      bloomRadius: 0.0005,
+      mobileBloomRadius: 0.0005,
+      bloomThreshold: 0.1,
+      bloomTint: '#ff8800',
+      modelScale: 1.2,
+      modelRotation: { x: 90, z: 90 },
+      cameraElevation: 0,
+      cameraAzimuthStart: 0,
+      cameraAzimuthMid: null,
+      cameraAzimuthRange: 0,
+      cameraOscillates: false,
+      fireMaterial: {
+        vertexUrl: '../Fire2.vert',
+        fragmentUrl: '../Fire2.frag',
+        color: '#ff8800',
+        emissionGain: 5,
+        textureScaleX: 0.25,
+        textureOffsetX: 0.375,
+        clampTextureX: true
+      }
     }
-  });
-
-  const splashStartedAt = performance.now();
-  let splashReleaseTimer;
-  let splashReleased = false;
-  const splashDeadlineTimer = setTimeout(revealPage, 1250);
-
-  function revealPage() {
-    if (splashReleased) return;
-    splashReleased = true;
-    clearTimeout(splashDeadlineTimer);
-    clearTimeout(splashReleaseTimer);
-    loadingScreen.classList.add('fade-out');
-    mainContent.classList.remove('content-hidden');
-    setTimeout(() => {
-      loadingScreen.style.display = 'none';
-    }, 350);
-  }
-
-  function hideLoadingScreen() {
-    if (splashReleased || splashReleaseTimer) return;
-    const minimumRemaining = 350 - (performance.now() - splashStartedAt);
-    if (minimumRemaining > 0) {
-      splashReleaseTimer = setTimeout(revealPage, minimumRemaining);
-    } else {
-      revealPage();
-    }
-  }
-
-  const backgroundOptions = {
-    desktopBloomStrength: 0.4,
-    mobileBloomStrength: 0.4,
-    bloomRadius: 0.0005,
-    mobileBloomRadius: 0.0005,
-    bloomThreshold: 0.1,
-    bloomTint: '#ff8800',
-    modelScale: 1.2,
-    modelRotation: { x: 90, z: 90 },
-    cameraElevation: 0,
-    cameraAzimuthStart: 0,
-    cameraAzimuthMid: null,
-    cameraAzimuthRange: 0,
-    cameraOscillates: false,
-    fireMaterial: {
-      vertexUrl: '../Fire2.vert',
-      fragmentUrl: '../Fire2.frag',
-      color: '#ff8800',
-      emissionGain: 5,
-      textureScaleX: 0.25,
-      textureOffsetX: 0.375,
-      clampTextureX: true
-    }
-  };
-
-  import('../background3d.js').then(({ initBackground3D }) => {
-    background = initBackground3D(viewer, mobileLayout, backgroundOptions);
-    background.setProgress(pageScroll.prefersReducedMotion ? 0 : pageScroll.getProgress());
-    return background.ready;
-  }).then(() => {
-    pageScroll.refresh();
-    hideLoadingScreen();
-  }, error => {
-    console.error('Could not load 3D background', error);
-    pageScroll.refresh();
-    hideLoadingScreen();
   });
 </script>
 </body>

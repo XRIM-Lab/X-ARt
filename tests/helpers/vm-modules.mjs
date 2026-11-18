@@ -22,7 +22,7 @@ export async function loadSourceModule(source, {
         Object.entries(exports).forEach(([name, value]) => this.setExport(name, value));
       }, { context, identifier: `stub:${specifier}` });
     } else {
-      module = createSourceTextModule(descriptor.source, descriptor.identifier ?? `file:///${specifier}`, context);
+      module = createSourceTextModule(descriptor.source, descriptor.identifier ?? `file:///${specifier}`, context, importModuleDynamically);
     }
     cache.set(specifier, module);
     return module;
