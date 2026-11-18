@@ -43,7 +43,7 @@ class SiteHeader extends HTMLElement {
     };
 
     this.innerHTML = `
-<header id="siteHeader" class="site-header${page === 'efv' ? ' is-visible' : ''}">
+<header id="siteHeader" class="site-header">
   <div class="header-container site-container">
     <a href="${homeHref}" class="header-brand">
       <img src="${logoSrc}" alt="ARtrio Logo"
