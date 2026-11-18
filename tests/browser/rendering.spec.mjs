@@ -33,7 +33,7 @@ const pages = [
     name: 'nmm',
     path: '/NMM/',
     desktopModel: 'writing.glb',
-    mobileModel: 'writing.glb',
+    mobileModel: 'writing.mobile.glb',
     splash: true,
     shader: true,
     heading: 'About this Series'

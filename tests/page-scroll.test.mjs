@@ -261,7 +261,7 @@ test('home, TTY2, EFV, and NMM share the controller without duplicate page liste
   assert.match(efv, /emissionGain:\s*[0-9.]+/);
   assert.match(efv, /onUpdate\(progress, prefersReducedMotion\) \{\s*if \(prefersReducedMotion\) return;\s*background\?\.setProgress\(progress\);\s*viewer\.style\.opacity = String\(0\.9 - progress \* 0\.2\);/);
   assert.match(nmm, /<section id="about" class="about-intro">/);
-  assert.match(nmm, /<div id="bgViewer" data-src="\.\.\/EFV\/writing\.glb" data-mobile-src="\.\.\/EFV\/writing\.glb"><\/div>/);
+  assert.match(nmm, /<div id="bgViewer" data-src="\.\.\/EFV\/writing\.glb" data-mobile-src="\.\.\/EFV\/writing\.mobile\.glb"><\/div>/);
   assert.equal((nmm.match(/id="bgViewer"/g) ?? []).length, 1);
 });
 
