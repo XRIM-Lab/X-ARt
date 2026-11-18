@@ -3,121 +3,305 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Nature: Metaphysics + Metaphor - ARtrio</title>
+  <title>Nature Series - 「ARtrio」(formerly 「X-ARt」)</title>
 
+  <!-- Three.js import map -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.174.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.174.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <!-- Bootstrap (optional for grid + carousel) -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+  <!-- Google fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css">
+
+  <!-- Shared stylesheet -->
+  <link rel="stylesheet" href="../style.css">
+
+  <!-- Shared Web Components (header, footer) -->
+  <script src="../components.js"></script>
 
   <style>
-    body {
-        overflow-y: auto;
-        padding-top: 80px;
-    }
-
-    .simple-content-wrapper {
-        max-width: 800px;
-        margin: 0 auto;
-        padding-bottom: 4rem;
-    }
-
-    .event-image {
-        width: 100%;
-        height: auto;
-        border-radius: 4px;
-        margin-bottom: 2rem;
-        border: 1px solid var(--border-color);
-    }
-
-    .site-header {
-        transform: translateY(0) !important;
-        opacity: 1 !important;
+    :root {
+      --bg-gradient:
+        radial-gradient(120% 120% at 50% 50%, rgba(0,0,0,0.55), rgba(0,0,0,0.75));
     }
   </style>
 </head>
 
 <body>
-  <header id="siteHeader" class="site-header is-visible">
-    <div class="header-container site-container">
-        <a href="https://artrio.org" class="header-brand">「ARtrio」</a>
-        <button class="menu-toggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="main-nav">
-            <span class="hamburger"></span>
-        </button>
+
+<site-header page="nmm"></site-header>
+
+  <!-- Loading screen -->
+  <div id="loadingScreen" class="loading-screen">
+    <div class="loading-content">
+      <h1 class="loading-title">Nature Series</h1>
+      <h2> by 「ARtrio」</h2>
+      <h3> (Formerly 「X-ARt」) </h3>
+      <div class="subtitle" style="font-family: var(--font-mono); letter-spacing:0.25em; margin-top:0.5rem;">
+        Man, Nature, Technology, Art
+      </div>
+      <div class="loading-spinner">
+        <div class="spinner-ring"></div>
+      </div>
+      <p class="loading-text">Loading experience...</p>
     </div>
+  </div>
 
-    <nav id="main-nav" class="main-navigation site-container">
-        <ul>
-            <li class="has-dropdown">
-                <a class="dropdown-toggle" role="button">Projects</a>
-                <ul class="dropdown-menu">
-                    <li><a href="/TTY2/">Through The Years, To Touch You</a></li>
-                    <li><a href="/EFV/">EQUUS: FORM + VOID</a></li>
-                </ul>
-            </li>
-            <li><a href="#contact">Contact</a></li>
-        </ul>
-    </nav>
-  </header>
+  <!-- Fixed 3D background layer behind all content -->
+  <div class="bg-3d" aria-hidden="true">
+    <div id="bgViewer" data-src="../EFV/writing.glb" data-mobile-src="../EFV/writing.glb"></div>
+  </div>
 
-  <main class="site-container">
-    <div class="simple-content-wrapper">
-      <section class="intro-hero" id="intro">
-        <div class="intro-title" aria-label="Site Title">
-          <h1>Nature:<br>Metaphysics + Metaphor</h1>
-          <h2>by 「ARtrio」</h2>
-          <div class="subtitle" style="font-family: var(--font-mono); letter-spacing:0.25em; margin-top:0.5rem;">
-            Man, Nature, Technology, Art
+  <main class="site-container content-hidden">
+    <!-- 1) Intro screen: only title on the full viewport, background artwork visible -->
+    <section class="intro-hero" id="intro">
+      <div class="intro-title" aria-label="Site Title">
+        <h1>Nature<br>Series</h1>
+        <h2> by 「ARtrio」</h2>
+        <h3> (Formerly 「X-ARt」) </h3>
+
+        <div class="subtitle" style="font-family: var(--font-mono); letter-spacing:0.25em; margin-top:0.5rem;">
+          Man, Nature, Technology, Art
+        </div>
+        <div class="intro-hint" aria-hidden="true">Scroll to enter</div>
+      </div>
+    </section>
+
+    <!-- 2) Project description -->
+    <section id="about" class="about-intro">
+      <div class="content-panel raised">
+        <h2>About this Series</h2>
+        <p class="lead">An ongoing exploration of Nature's invisible forces through performance and augmented reality.</p>
+        <p>The Nature Series is ARtrio's foundational body of work: a sequence of performances and installations that use augmented reality to make visible the "fields of force" and "flows of materials" of Nature — the invisible energies that affect every aspect of our lives.</p>
+        <p>Two iterations have been developed so far. <strong>Nature: Metaphysics + Metaphor (N:M+M)</strong> explored the metaphorical resonance between natural forces and human expression, pairing AR calligraphy and digital flows with live performance. <strong>Nature: Consciousness + Being (N:C+B)</strong> deepened the inquiry toward presence and awareness, staging the dialogue between body, perception, and the unseen currents of the natural world.</p>
+        <p>Each performance is site-specific and developed in collaboration with XRIM Lab at ISD, HKUST, whose technologies visualise digital fields and flows in real time.</p>
+      </div>
+    </section>
+
+    <!-- 3) Image gallery -->
+    <section id="gallery" class="home-gallery">
+      <div class="section-heading">
+        <h2>Image Gallery</h2>
+      </div>
+      <div id="natureCarousel" class="carousel slide home-gallery-carousel" data-bs-ride="carousel" data-bs-interval="5000">
+        <div class="carousel-indicators">
+          <button type="button" data-bs-target="#natureCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Show Nature: Consciousness + Being"></button>
+          <button type="button" data-bs-target="#natureCarousel" data-bs-slide-to="1" aria-label="Show Nature: Metaphysics and Metaphor"></button>
+        </div>
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <img src="../images/Fringe.jpeg" alt="Nature: Consciousness + Being at the Fringe Club">
+            <div class="home-gallery-caption">Nature: Consciousness + Being (Jan 2025)</div>
+          </div>
+          <div class="carousel-item">
+            <img src="../images/Teaser.jpg" alt="Nature: Metaphysics and Metaphor teaser artwork">
+            <div class="home-gallery-caption">Nature: Metaphysics and Metaphor (Dec 2023)</div>
           </div>
         </div>
-      </section>
+        <button class="carousel-control-prev" type="button" data-bs-target="#natureCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous image</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#natureCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next image</span>
+        </button>
+      </div>
+    </section>
 
-      <section class="raised">
-        <img src="images/placeholder.svg" alt="Placeholder artwork for Nature: Metaphysics + Metaphor" class="event-image">
-        <h2>Project Details</h2>
-        <p class="lead">Project information coming soon.</p>
-        <p>This page is a placeholder for Nature: Metaphysics + Metaphor. Project description, images, and related information will be added here.</p>
-      </section>
-    </div>
+    <!-- 4) Events -->
+    <section id="events" class="detail-section raised event-list">
+      <h2>Events</h2>
+      <ul>
+        <li>
+          <time class="mono-label" datetime="2025-03-24">2025.03.24</time>
+          <div class="event-info">
+            <strong class="event-title">N:C+B: Nature: Consciousness + Being</strong>
+            <span class="event-venue">Art Fringe, Fringe Club, Central, HK</span>
+          </div>
+        </li>
+        <li>
+          <time class="mono-label" datetime="2025-01-10">2025.01.10</time>
+          <div class="event-info">
+            <strong class="event-title">N:C+B: Nature: Consciousness + Being</strong>
+            <span class="event-venue">Fringe Festival, Fringe Club, Central, HK</span>
+          </div>
+        </li>
+        <li>
+          <time class="mono-label" datetime="2024-08-01">2024.08.01</time>
+          <div class="event-info">
+            <strong class="event-title">Untitled</strong>
+            <span class="event-venue">The Altitude, Gaia Hotel Bandung, Yogjakarta, Indonesia</span>
+          </div>
+        </li>
+        <li>
+          <time class="mono-label" datetime="2024-07-29">2024.07.29</time>
+          <div class="event-info">
+            <strong class="event-title">Untitled</strong>
+            <span class="event-venue">Borobodur, Panambaran, Yogjakarta, Indonesia</span>
+          </div>
+        </li>
+        <li>
+          <time class="mono-label" datetime="2024-05">2024.05</time>
+          <div class="event-info">
+            <strong class="event-title">Untitled</strong>
+            <span class="event-venue">Tew Falls, Hamilton, Ontario, Canada</span>
+          </div>
+        </li>
+        <li>
+          <time class="mono-label" datetime="2024-05">2024.05</time>
+          <div class="event-info">
+            <strong class="event-title">Untitled</strong>
+            <span class="event-venue">Nordlingen Woods, Markham, Ontario, Canada</span>
+          </div>
+        </li>
+        <li>
+          <time class="mono-label" datetime="2024-04-25">2024.04.25</time>
+          <div class="event-info">
+            <strong class="event-title">Untitled</strong>
+            <span class="event-venue">Sharp Island beach, HK</span>
+          </div>
+        </li>
+        <li>
+          <time class="mono-label" datetime="2024-02-10">2024.02.10</time>
+          <div class="event-info">
+            <strong class="event-title">N:M+M: Nature: Metaphysics + Metaphor</strong>
+            <span class="event-venue">Shaw Auditorium, HKUST, HK</span>
+          </div>
+        </li>
+        <li>
+          <time class="mono-label" datetime="2023-12-02">2023.12.02</time>
+          <div class="event-info">
+            <strong class="event-title">N:M+M: Nature: Metaphysics + Metaphor</strong>
+            <span class="event-venue">Heath, Tsim Sha Tsui, HK</span>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- 5) Team & Thanks -->
+    <section id="team" class="site-section two-col">
+      <div class="col raised">
+        <div class="artists-list">
+          <h2>Artists</h2>
+          <ul>
+            <li><a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/blyhn_art.design.music/">bLYHn</a></li>
+            <li><a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/dominie_n_art/">Dominie CHAN</a></li>
+            <li><a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/christopherchancs/">Christopher CS CHAN</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="col raised">
+        <div class="thanks-list">
+          <h2>Technology</h2>
+          <ul>
+            <li><a target="_blank" rel="noopener noreferrer" href="https://xrim.hkust.edu.hk/">XRIM-Lab</a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <footer id="contact" class="site-footer">
-    <h2>Contact</h2>
-    <p>For enquiries, please contact <a href="mailto:braudt@ust.hk">braudt@ust.hk</a></p>
-    <small>&copy; 2026 「ARtrio」</small>
-  </footer>
+<site-footer year="2026" name="「ARtrio」"></site-footer>
 
-  <script>
-    const menuToggle = document.querySelector('.menu-toggle');
-    let autoCloseTimer = null;
+  <!-- Bootstrap JS (optional for carousel) -->
+  <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    function closeMobileNav() {
-      if (document.body.classList.contains('nav-open')) {
-        document.body.classList.remove('nav-open');
-        menuToggle.setAttribute('aria-expanded', 'false');
-        if (autoCloseTimer) clearTimeout(autoCloseTimer);
-      }
-    }
+  <!-- Scroll-driven rotation logic + loading management -->
+  <script type="module">
+    import { initPageScroll } from '../page-scroll.js';
 
-    menuToggle.addEventListener('click', () => {
-      if (document.body.classList.contains('nav-open')) {
-        closeMobileNav();
-      } else {
-        document.body.classList.add('nav-open');
-        menuToggle.setAttribute('aria-expanded', 'true');
-        if (autoCloseTimer) clearTimeout(autoCloseTimer);
-        autoCloseTimer = setTimeout(closeMobileNav, 5000);
+    const viewer = document.getElementById('bgViewer');
+    const mobileLayout = window.matchMedia('(max-width: 767px), (pointer: coarse)');
+    let background;
+
+    const loadingScreen = document.getElementById('loadingScreen');
+    const mainContent = document.querySelector('main');
+
+    mainContent.classList.add('content-hidden');
+
+    const pageScroll = initPageScroll({
+      contentStart: document.getElementById('about'),
+      onUpdate(progress, prefersReducedMotion) {
+        if (prefersReducedMotion) return;
+        background?.setProgress(progress);
+        viewer.style.opacity = String(0.9 - progress * 0.2);
       }
     });
 
-    document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
-      toggle.addEventListener('click', event => {
-        if (window.innerWidth < 768) {
-          event.preventDefault();
-          toggle.parentElement.classList.toggle('is-open');
-        }
-      });
+    const splashStartedAt = performance.now();
+    let splashReleaseTimer;
+    let splashReleased = false;
+    const splashDeadlineTimer = setTimeout(revealPage, 1250);
+
+    function revealPage() {
+      if (splashReleased) return;
+      splashReleased = true;
+      clearTimeout(splashDeadlineTimer);
+      clearTimeout(splashReleaseTimer);
+      loadingScreen.classList.add('fade-out');
+      mainContent.classList.remove('content-hidden');
+      setTimeout(() => {
+        loadingScreen.style.display = 'none';
+      }, 350);
+    }
+
+    function hideLoadingScreen() {
+      if (splashReleased || splashReleaseTimer) return;
+      const minimumRemaining = 350 - (performance.now() - splashStartedAt);
+      if (minimumRemaining > 0) {
+        splashReleaseTimer = setTimeout(revealPage, minimumRemaining);
+      } else {
+        revealPage();
+      }
+    }
+
+    const backgroundOptions = {
+      desktopBloomStrength: 0.4,
+      mobileBloomStrength: 0.4,
+      bloomRadius: 0.0005,
+      mobileBloomRadius: 0.0005,
+      bloomThreshold: 0.1,
+      bloomTint: '#ff8800',
+      modelScale: 1.2,
+      modelRotation: { x: 90, z: 90 },
+      cameraElevation: 0,
+      cameraAzimuthStart: 0,
+      cameraAzimuthMid: null,
+      cameraAzimuthRange: 0,
+      cameraOscillates: false,
+      fireMaterial: {
+        vertexUrl: '../Fire2.vert',
+        fragmentUrl: '../Fire2.frag',
+        color: '#ff8800',
+        emissionGain: 5,
+        textureScaleX: 0.25,
+        textureOffsetX: 0.375,
+        clampTextureX: true
+      }
+    };
+
+    import('../background3d.js').then(({ initBackground3D }) => {
+      background = initBackground3D(viewer, mobileLayout, backgroundOptions);
+      background.setProgress(pageScroll.prefersReducedMotion ? 0 : pageScroll.getProgress());
+      return background.ready;
+    }).then(() => {
+      pageScroll.refresh();
+      hideLoadingScreen();
+    }, error => {
+      console.error('Could not load 3D background', error);
+      pageScroll.refresh();
+      hideLoadingScreen();
     });
   </script>
 </body>

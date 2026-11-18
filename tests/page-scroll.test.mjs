@@ -223,11 +223,12 @@ test('entrance destinations use the content element position measured at trigger
   });
 });
 
-test('home, TTY2, and EFV share the controller without duplicate page listeners or lost page behavior', () => {
+test('home, TTY2, EFV, and NMM share the controller without duplicate page listeners or lost page behavior', () => {
   const pages = [
     ['../index.html', './page-scroll.js'],
     ['../TTY2/index.html', '../page-scroll.js'],
-    ['../EFV/index.html', '../page-scroll.js']
+    ['../EFV/index.html', '../page-scroll.js'],
+    ['../NMM/index.html', '../page-scroll.js']
   ];
   for (const [path, importPath] of pages) {
     const html = readFileSync(new URL(path, import.meta.url), 'utf8');
@@ -243,11 +244,13 @@ test('home, TTY2, and EFV share the controller without duplicate page listeners 
   const home = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   const tty = readFileSync(new URL('../TTY2/index.html', import.meta.url), 'utf8');
   const efv = readFileSync(new URL('../EFV/index.html', import.meta.url), 'utf8');
+  const nmm = readFileSync(new URL('../NMM/index.html', import.meta.url), 'utf8');
   const components = readFileSync(new URL('../components.js', import.meta.url), 'utf8');
-  assert.match(home, /id="loadingScreen"/);
-  assert.match(tty, /id="loadingScreen"/);
-  assert.doesNotMatch(efv, /id="loadingScreen"|content-hidden/);
-  assert.match(efv, /<section id="about" class="mb-5 raised">/);
+  for (const html of [home, tty, efv, nmm]) {
+    assert.match(html, /id="loadingScreen"/);
+    assert.match(html, /content-hidden/);
+  }
+  assert.match(efv, /<section id="about" class="about-intro">/);
   assert.match(efv, /<div id="bgViewer" data-src="writing\.glb" data-mobile-src="writing\.glb"><\/div>/);
   assert.equal((efv.match(/id="bgViewer"/g) ?? []).length, 1);
   assert.doesNotMatch(efv, /horse\.glb|writingViewer/);
@@ -256,8 +259,10 @@ test('home, TTY2, and EFV share the controller without duplicate page listeners 
   assert.doesNotMatch(components, /page === 'efv' \? ' is-visible'/);
   assert.match(efv, /modelRotation: \{ x: 90, z: 90 \},[\s\S]*?cameraElevation: 0,[\s\S]*?cameraAzimuthStart: 0,[\s\S]*?cameraAzimuthMid: null,[\s\S]*?cameraAzimuthRange: 0,[\s\S]*?cameraOscillates: false/);
   assert.match(efv, /emissionGain:\s*[0-9.]+/);
-  assert.match(efv, /onUpdate\(progress, prefersReducedMotion\) \{\s*if \(prefersReducedMotion\) return;\s*viewer\.style\.opacity = String\(0\.9 - progress \* 0\.2\);/);
-  assert.doesNotMatch(efv, /setProgress|writingBackground|writingViewer/);
+  assert.match(efv, /onUpdate\(progress, prefersReducedMotion\) \{\s*if \(prefersReducedMotion\) return;\s*background\?\.setProgress\(progress\);\s*viewer\.style\.opacity = String\(0\.9 - progress \* 0\.2\);/);
+  assert.match(nmm, /<section id="about" class="about-intro">/);
+  assert.match(nmm, /<div id="bgViewer" data-src="\.\.\/EFV\/writing\.glb" data-mobile-src="\.\.\/EFV\/writing\.glb"><\/div>/);
+  assert.equal((nmm.match(/id="bgViewer"/g) ?? []).length, 1);
 });
 
 test('EFV renders one centered writing model with scroll fade but no camera progress', async () => {
@@ -315,7 +320,7 @@ test('EFV renders one centered writing model with scroll fade but no camera prog
       assert.ok(Number.isFinite(calls[0].options.fireMaterial.textureScaleX));
       assert.ok(Number.isFinite(calls[0].options.fireMaterial.textureOffsetX));
       assert.equal(typeof calls[0].options.fireMaterial.clampTextureX, 'boolean');
-      assert.deepEqual(progress, []);
+      assert.deepEqual(progress, [0]);
 
       if (failedReady) rejectReady(new Error('writing load failed'));
       else resolveReady();
@@ -343,9 +348,7 @@ test('EFV renders one centered writing model with scroll fade but no camera prog
         browser.runFrame();
         assert.equal(elements.bgViewer.style.opacity, '0.825');
       }
-      assert.deepEqual(progress, []);
       assert.equal(errors.length, failedReady ? 1 : 0);
-      assert.ok(!module.includes('content-hidden'));
     });
   }
 

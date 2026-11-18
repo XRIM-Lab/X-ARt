@@ -25,9 +25,18 @@ const pages = [
     path: '/EFV/',
     desktopModel: 'writing.glb',
     mobileModel: 'writing.glb',
-    splash: false,
+    splash: true,
     shader: true,
-    heading: 'About Performance'
+    heading: 'About this Project'
+  },
+  {
+    name: 'nmm',
+    path: '/NMM/',
+    desktopModel: 'writing.glb',
+    mobileModel: 'writing.glb',
+    splash: true,
+    shader: true,
+    heading: 'About this Series'
   }
 ];
 
@@ -131,6 +140,6 @@ test('model request failure leaves page content usable and releases splashes whe
   await page.route(`**/${entry.mobileModel === entry.desktopModel ? entry.mobileModel : testInfo.project.name === 'mobile-chromium' ? entry.mobileModel : entry.desktopModel}`, route => route.abort());
   await page.goto(pageUrl(entry.path));
   if (entry.splash) await expect(page.locator('#loadingScreen')).toBeHidden();
-  await expect(page.getByRole('heading', { name: entry.name === 'home' ? 'About artrio' : 'About Performance' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: entry.heading })).toBeVisible();
   await expect(page.getByRole('link', { name: entry.name === 'home' ? 'EQUUS: FORM + VOID' : 'Henry Ho' })).toBeVisible();
 });

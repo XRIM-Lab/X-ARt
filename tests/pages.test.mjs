@@ -24,7 +24,7 @@ async function flushMicrotasks() {
 
 async function bootPage(page, { reduced = false, importFailure = false, initFailure = false } = {}) {
   const browser = new FakeBrowser({ reduced });
-  const file = page === 'home' ? '../index.html' : page === 'tty2' ? '../TTY2/index.html' : '../EFV/index.html';
+  const file = page === 'home' ? '../index.html' : page === 'tty2' ? '../TTY2/index.html' : page === 'nmm' ? '../NMM/index.html' : '../EFV/index.html';
   const text = await readFile(new URL(file, import.meta.url), 'utf8');
   const script = text.match(/<script type="module">([\s\S]*?)<\/script>/)?.[1];
   assert.ok(script, `missing ${page} module script`);
@@ -136,39 +136,44 @@ test('reduced motion keeps home and TTY2 camera/fade updates disabled', async ()
   }
 });
 
-test('EFV has no splash gate and remains scroll-readable when renderer import or load fails', async () => {
-  for (const options of [{ importFailure: true }, { initFailure: true }, {}]) {
-    const result = await bootPage('efv', options);
-    const main = result.browser.document.querySelector('main');
-    assert.equal(main.classList.contains('content-hidden'), false);
-    assert.equal(result.browser.listeners.has('scroll'), true);
-    if (options.importFailure || options.initFailure) {
+test('EFV and NMM keep splash gate and release visible content when renderer import or load fails', async () => {
+  for (const page of ['efv', 'nmm']) {
+    for (const options of [{ importFailure: true }, { initFailure: true }, {}]) {
+      const result = await bootPage(page, options);
+      const main = result.browser.document.querySelector('main');
+      assert.equal(main.classList.contains('content-hidden'), true);
+      assert.equal(result.browser.listeners.has('scroll'), true);
+      if (options.importFailure || options.initFailure) {
+        result.browser.advance(5000);
+        assert.equal(main.classList.contains('content-hidden'), false);
+        assert.equal(result.browser.errors.length, 1);
+        continue;
+      }
+      assert.equal(result.calls.length, 1);
+      assert.equal(result.calls[0].viewer, result.browser.document.getElementById('bgViewer'));
+      result.ready.reject(new Error('writing model load failed'));
+      await flushMicrotasks();
       result.browser.advance(5000);
       assert.equal(main.classList.contains('content-hidden'), false);
+      result.browser.window.scrollY = 1500;
+      result.browser.dispatch('scroll');
+      result.browser.runFrame();
+      assert.equal(result.browser.document.getElementById('bgViewer').style.opacity, '0.825');
+      assert.equal(result.progress.length, 2);
+      assert.equal(result.progress[0], 0);
       assert.equal(result.browser.errors.length, 1);
-      continue;
     }
-    assert.equal(result.calls.length, 1);
-    assert.equal(result.calls[0].viewer, result.browser.document.getElementById('bgViewer'));
-    result.ready.reject(new Error('writing model load failed'));
-    await flushMicrotasks();
-    result.browser.window.scrollY = 1500;
-    result.browser.dispatch('scroll');
-    result.browser.runFrame();
-    assert.equal(result.browser.document.getElementById('bgViewer').style.opacity, '0.825');
-    assert.deepEqual(result.progress, []);
-    assert.equal(result.browser.errors.length, 1);
-  }
 
-  const reduced = await bootPage('efv', { reduced: true });
-  const viewer = reduced.browser.document.getElementById('bgViewer');
-  reduced.ready.resolve();
-  await flushMicrotasks();
-  reduced.browser.runFrame();
-  reduced.browser.window.scrollY = 1500;
-  reduced.browser.dispatch('scroll');
-  reduced.browser.dispatch('pageshow', { persisted: true });
-  reduced.browser.runFrame();
-  assert.equal(viewer.style.opacity, undefined);
-  assert.deepEqual(reduced.progress, []);
+    const reduced = await bootPage(page, { reduced: true });
+    const viewer = reduced.browser.document.getElementById('bgViewer');
+    reduced.ready.resolve();
+    await flushMicrotasks();
+    reduced.browser.runFrame();
+    reduced.browser.window.scrollY = 1500;
+    reduced.browser.dispatch('scroll');
+    reduced.browser.dispatch('pageshow', { persisted: true });
+    reduced.browser.runFrame();
+    assert.equal(viewer.style.opacity, undefined);
+    assert.deepEqual(reduced.progress, [0]);
+  }
 });

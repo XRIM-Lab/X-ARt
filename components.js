@@ -3,7 +3,7 @@
 // Usage: <script src="/components.js"></script>  (add to every page <head>)
 //
 // Components:
-//   <site-header page="home|tty2|efv"></site-header>
+//   <site-header page="home|tty2|efv|nmm"></site-header>
 //   <site-footer year="2026" name="「ARtrio」"></site-footer>
 //
 // Canonical <head> block to include on every page (adjust paths for depth):
@@ -22,14 +22,14 @@
 // =============================================================================
 
 // ---------------------------------------------------------------------------
-// <site-header page="home|tty2|efv">
+// <site-header page="home|tty2|efv|nmm">
 // ---------------------------------------------------------------------------
 class SiteHeader extends HTMLElement {
   connectedCallback() {
     const page = this.getAttribute('page') || 'home';
 
     // Resolve paths relative to the current page's depth
-    // page="home" → root level; page="tty2"|"efv" → one level deep
+    // page="home" → root level; page="tty2"|"efv"|"nmm" → one level deep
     const isRoot = page === 'home';
     const root   = isRoot ? '.' : '..';
 
@@ -40,6 +40,7 @@ class SiteHeader extends HTMLElement {
     const links = {
       tty2: isRoot ? 'TTY2/' : (page === 'tty2' ? '#' : '../TTY2/'),
       efv:  isRoot ? 'EFV/'  : (page === 'efv'  ? '#' : '../EFV/'),
+      nmm:  isRoot ? 'NMM/'  : (page === 'nmm'  ? '#' : '../NMM/'),
     };
 
     this.innerHTML = `
@@ -63,6 +64,7 @@ class SiteHeader extends HTMLElement {
         <ul class="dropdown-menu">
           <li><a href="${links.tty2}"${page === 'tty2' ? ' aria-current="page"' : ''}>Through The Years, To Touch You</a></li>
           <li><a href="${links.efv}"${page  === 'efv'  ? ' aria-current="page"' : ''}>EQUUS: FORM + VOID</a></li>
+          <li><a href="${links.nmm}"${page  === 'nmm'  ? ' aria-current="page"' : ''}>Nature Series</a></li>
         </ul>
       </li>
       <li><a href="#contact">Contact</a></li>

@@ -9,12 +9,12 @@ test('first-party pages render content, local images, and layouts without overfl
   const pages = [
     { path: '/', heading: 'About artrio', about: true },
     { path: '/TTY2/', heading: 'About this Project', about: true },
-    { path: '/EFV/', heading: 'About Performance', about: true },
-    { path: '/NMM/', heading: 'Project Details', about: false }
+    { path: '/EFV/', heading: 'About this Project', about: true },
+    { path: '/NMM/', heading: 'About this Series', about: true }
   ];
   for (const entry of pages) {
     await page.goto(pageUrl(entry.path));
-    if (entry.path !== '/EFV/') await expect(page.locator('#loadingScreen')).toBeHidden();
+    await expect(page.locator('#loadingScreen')).toBeHidden();
     await expect(page.getByRole('heading', { name: entry.heading })).toBeVisible();
     await expect(page.locator('#intro')).toHaveCount(1);
     await expect(page.locator('#contact')).toHaveCount(1);
@@ -53,7 +53,7 @@ test('desktop wheel, keyboard, header reveal, project links, and history use the
   await expect(efvLink).toHaveAttribute('href', 'EFV/');
   await efvLink.click();
   await expect(page).toHaveURL(/\/EFV\/$/);
-  await expect(page.getByRole('heading', { name: 'About Performance' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'About this Project' })).toBeVisible();
   await page.goBack();
   await expect(page.getByRole('heading', { name: 'About artrio' })).toBeVisible();
 });
@@ -117,7 +117,8 @@ test('reduced motion keeps EFV scroll native and avoids opacity changes', async 
   const page = await context.newPage();
   await blockExternalAndServePackages(page);
   await page.goto(pageUrl('/EFV/'));
-  await expect(page.getByRole('heading', { name: 'About Performance' })).toBeVisible();
+  await expect(page.locator('#loadingScreen')).toBeHidden();
+  await expect(page.getByRole('heading', { name: 'About this Project' })).toBeVisible();
   await page.evaluate(() => window.scrollTo(0, 300));
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(300);
   expect(await page.locator('#bgViewer').evaluate(viewer => viewer.style.opacity)).toBe('');
