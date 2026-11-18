@@ -246,20 +246,12 @@ test('home, TTY2, EFV, and NMM share the controller without duplicate page liste
   const efv = readFileSync(new URL('../EFV/index.html', import.meta.url), 'utf8');
   const nmm = readFileSync(new URL('../NMM/index.html', import.meta.url), 'utf8');
   const components = readFileSync(new URL('../components.js', import.meta.url), 'utf8');
-<<<<<<< Updated upstream
   for (const html of [home, tty, efv, nmm]) {
     assert.match(html, /id="loadingScreen"/);
     assert.match(html, /content-hidden/);
   }
   assert.match(efv, /<section id="about" class="about-intro">/);
-  assert.match(efv, /<div id="bgViewer" data-src="writing\.glb" data-mobile-src="writing\.glb"><\/div>/);
-=======
-  assert.match(home, /id="loadingScreen"/);
-  assert.match(tty, /id="loadingScreen"/);
-  assert.doesNotMatch(efv, /id="loadingScreen"|content-hidden/);
-  assert.match(efv, /<section id="about" class="mb-5 raised">/);
   assert.match(efv, /<div id="bgViewer" data-src="writing\.glb" data-mobile-src="writing\.mobile\.glb"><\/div>/);
->>>>>>> Stashed changes
   assert.equal((efv.match(/id="bgViewer"/g) ?? []).length, 1);
   assert.doesNotMatch(efv, /horse\.glb|writingViewer/);
   assert.doesNotMatch(efv, /padding-top:\s*80px/);
