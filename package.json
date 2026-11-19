@@ -12,6 +12,7 @@
     "@gltf-transform/cli": "4.5.1",
     "@playwright/test": "1.56.0",
     "bootstrap": "5.3.3",
+    "fbx2gltf": "^0.9.7-p1",
     "three": "0.174.0"
   }
 }
