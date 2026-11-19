@@ -114,7 +114,9 @@ test('selected desktop/mobile GLBs are valid embedded GLB v2 assets', () => {
     'TTY2/400kArtworkonly_glb.glb',
     'TTY2/400kArtworkonly_mobile.glb',
     'EFV/writing.glb',
-    'EFV/writing.mobile.glb'
+    'EFV/writing.mobile.glb',
+    'NMM/NCB.glb',
+    'NMM/NCB.mobile.glb'
   ];
   for (const relativePath of paths) {
     const gltf = parseGlb(path.join(repoRoot, relativePath));
@@ -124,7 +126,7 @@ test('selected desktop/mobile GLBs are valid embedded GLB v2 assets', () => {
 });
 
 test('fire shader models provide mapped textures and mesh position/UV attributes', () => {
-  for (const relativePath of ['mesh_test.glb', 'mesh_test.mobile.glb', 'EFV/writing.glb', 'EFV/writing.mobile.glb']) {
+  for (const relativePath of ['mesh_test.glb', 'mesh_test.mobile.glb', 'EFV/writing.glb', 'EFV/writing.mobile.glb', 'NMM/NCB.glb', 'NMM/NCB.mobile.glb']) {
     const gltf = parseGlb(path.join(repoRoot, relativePath));
     const texturedMaterials = new Set(
       (gltf.materials ?? [])

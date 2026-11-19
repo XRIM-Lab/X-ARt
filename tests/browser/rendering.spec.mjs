@@ -32,10 +32,10 @@ const pages = [
   {
     name: 'nmm',
     path: '/NMM/',
-    desktopModel: 'writing.glb',
-    mobileModel: 'writing.mobile.glb',
+    desktopModel: 'NCB.glb',
+    mobileModel: 'NCB.mobile.glb',
     splash: true,
-    shader: true,
+    shader: false,
     heading: 'About this Series'
   }
 ];

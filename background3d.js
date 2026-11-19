@@ -66,6 +66,7 @@ export function initBackground3D(viewer, mobileLayout, {
   cameraAzimuthMid = null,
   cameraAzimuthRange = 180,
   cameraOscillates = false,
+  lightIntensity = 1,
   fireMaterial = null
 }) {
   const renderer = new THREE.WebGLRenderer({ alpha: true, powerPreference: 'low-power' });
@@ -77,6 +78,7 @@ export function initBackground3D(viewer, mobileLayout, {
   const environment = new RoomEnvironment();
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(environment).texture;
+  scene.environmentIntensity = lightIntensity;
   environment.dispose();
   pmrem.dispose();
 
