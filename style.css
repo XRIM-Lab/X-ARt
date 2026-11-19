@@ -410,6 +410,12 @@ a:hover {
 .detail-section .mono-label { flex-shrink: 0; }
 span.annotation { color: var(--text-secondary); font-style: italic; }
 p.support { margin-top: 1.5rem; color: var(--text-secondary); font-size: 0.9rem; }
+#team h2 { margin-bottom: 1rem; }
+#team .artists-list + .thanks-list,
+#team .thanks-list + .thanks-list { margin-top: 2rem; }
+@media (max-width: 991.98px) {
+  #team > .col { padding-top: 0; padding-bottom: 0; }
+}
 
 .event-list li {
   display: grid;
