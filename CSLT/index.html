@@ -178,6 +178,9 @@
     const CAMERA_MARGIN = 1.1;
     const DESKTOP_POINT_SIZE = 0.055;
     const MOBILE_POINT_SIZE = 0.065;
+    const ZOOM_TARGET_X = 0.75;
+    const ZOOM_TARGET_Y = 0.5;
+    const ZOOM_ARC_HEIGHT = 0.08;
 
     class CsltPointCloud extends HTMLElement {
       #mobileLayout = window.matchMedia('(max-width: 767px), (pointer: coarse)');
@@ -188,6 +191,11 @@
       #direction;
       #right;
       #viewUp;
+      #samples = [];
+      #openingPosition;
+      #panRight = 0;
+      #panUp = 0;
+      #bow = 0;
       #renderer;
       #scene;
       #camera;
@@ -198,9 +206,17 @@
       }
 
       setProgress(progress) {
+        this.#applyPose(progress);
+      }
+
+      #applyPose(progress) {
         this.#progress = Math.max(0, Math.min(1, progress));
-        if (!this.#camera) return;
-        this.#camera.zoom = 1 + 0.6 * this.#progress;
+        if (!this.#camera || !this.#openingPosition) return;
+        const t = this.#progress;
+        this.#camera.position.copy(this.#openingPosition)
+          .addScaledVector(this.#right, t * this.#panRight)
+          .addScaledVector(this.#viewUp, t * this.#panUp + 4 * t * (1 - t) * this.#bow);
+        this.#camera.zoom = 1 + 0.6 * t;
         this.#camera.updateProjectionMatrix();
         this.#render();
       }
@@ -254,7 +270,6 @@
         this.append(renderer.domElement);
         window.addEventListener('resize', () => this.#resize());
         document.addEventListener('visibilitychange', () => this.#render());
-        camera.zoom = 1 + 0.6 * this.#progress;
         this.#resize();
       }
 
@@ -264,6 +279,7 @@
         const vertex = new THREE.Vector3();
         for (let i = 0; i < position.count; i += step) {
           vertex.fromBufferAttribute(position, i).applyQuaternion(rotation);
+          this.#samples.push(vertex.clone());
           axes[0].push(vertex.x);
           axes[1].push(vertex.y);
           axes[2].push(vertex.z);
@@ -289,10 +305,58 @@
         this.#camera.near = Math.max(0.01, distance / 100);
         this.#camera.far = Math.max(100, distance * 4);
         this.#camera.position.copy(this.#center).addScaledVector(this.#direction, distance);
+        this.#openingPosition = this.#camera.position.clone();
         this.#camera.up.copy(this.#viewUp);
         this.#camera.lookAt(this.#center);
+        this.#camera.zoom = 1;
         this.#camera.updateProjectionMatrix();
-        this.#render();
+        this.#camera.updateMatrixWorld();
+        this.#measurePath();
+        this.#applyPose(this.#progress);
+      }
+
+      #measurePath() {
+        this.#panRight = 0;
+        this.#panUp = 0;
+        this.#bow = 0;
+        const camera = this.#camera;
+        const projection = camera.projectionMatrix.elements;
+        const vertex = this.#center.clone();
+        const projected = [];
+        for (const sample of this.#samples) {
+          vertex.copy(sample).applyMatrix4(camera.matrixWorldInverse);
+          const depth = -vertex.z;
+          if (!Number.isFinite(depth) || depth < camera.near || depth > camera.far) continue;
+          const x = projection[0] * vertex.x / depth;
+          const y = projection[5] * vertex.y / depth;
+          if (!(x >= -1 && x <= 1 && y >= -1 && y <= 1)) continue;
+          projected.push({ x, y, cameraX: vertex.x, cameraY: vertex.y, depth });
+        }
+        if (!projected.length) return;
+        const xs = projected.map(point => point.x).sort((a, b) => a - b);
+        const ys = projected.map(point => point.y).sort((a, b) => a - b);
+        const pick = (values, fraction) => values[Math.min(values.length - 1, Math.floor(values.length * fraction))];
+        const minX = pick(xs, 0.01);
+        const maxX = pick(xs, 0.99);
+        const minY = pick(ys, 0.01);
+        const maxY = pick(ys, 0.99);
+        const targetX = minX + ZOOM_TARGET_X * (maxX - minX);
+        const targetY = minY + ZOOM_TARGET_Y * (maxY - minY);
+        const aspect = camera.aspect || 1;
+        let nearest;
+        let nearestDistance = Infinity;
+        for (const point of projected) {
+          const dx = (point.x - targetX) * aspect;
+          const dy = point.y - targetY;
+          const distance = dx * dx + dy * dy;
+          if (distance < nearestDistance) {
+            nearestDistance = distance;
+            nearest = point;
+          }
+        }
+        this.#panRight = nearest.cameraX;
+        this.#panUp = nearest.cameraY;
+        this.#bow = ZOOM_ARC_HEIGHT * (maxY - minY) * nearest.depth / projection[5];
       }
 
       #fitDistance() {

@@ -171,7 +171,7 @@ test('model request failure leaves page content usable and releases splashes whe
   await expect(page.getByRole('link', { name: entry.name === 'home' ? 'EQUUS: FORM + VOID' : 'Henry Ho' })).toBeVisible();
 });
 
-test('CSLT loads only its responsive PLY, draws real points, and zooms without moving on scroll', async ({ page }, testInfo) => {
+test('CSLT loads only its responsive PLY, draws real points, and pans along a curved zoom without turning', async ({ page }, testInfo) => {
   await blockExternalAndServePackages(page);
   await instrumentWebGL(page, { capturePoints: true });
   const isMobile = testInfo.project.name === 'mobile-chromium';
@@ -203,22 +203,68 @@ test('CSLT loads only its responsive PLY, draws real points, and zooms without m
   await page.screenshot({ path: openingShot });
   await testInfo.attach(`CSLT-opening-${testInfo.project.name}`, { path: openingShot });
 
+  await page.evaluate(() => document.getElementById('bgViewer').setProgress(0.5));
+  await expect.poll(() => page.evaluate(target =>
+    Math.abs((window.__webglDiagnostics.pointDraws.at(-1)?.projection?.[0] ?? 0) - target) < 1e-4,
+    opening.projection[0] * 1.3)).toBe(true);
+  const midpoint = await page.evaluate(() => window.__webglDiagnostics.pointDraws.at(-1));
+  const midpointShot = path.join(screenshotDir, `CSLT-${testInfo.project.name}-midpoint.png`);
+  await page.screenshot({ path: midpointShot });
+  await testInfo.attach(`CSLT-midpoint-${testInfo.project.name}`, { path: midpointShot });
+
   await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
-  await expect.poll(() => page.evaluate(() => window.__webglDiagnostics.pointDraws.at(-1)?.projection?.[0]))
-    .toBeGreaterThan(opening.projection[0] * 1.4);
+  await expect.poll(() => page.evaluate(target =>
+    Math.abs((window.__webglDiagnostics.pointDraws.at(-1)?.projection?.[0] ?? 0) - target) < 1e-4,
+    opening.projection[0] * 1.6)).toBe(true);
+  const end = await page.evaluate(() => window.__webglDiagnostics.pointDraws.at(-1));
   const zoomedShot = path.join(screenshotDir, `CSLT-${testInfo.project.name}-zoomed.png`);
   await page.screenshot({ path: zoomedShot });
   await testInfo.attach(`CSLT-zoomed-${testInfo.project.name}`, { path: zoomedShot });
 
+  for (const draw of [midpoint, end]) {
+    for (let i = 0; i < 12; i++) {
+      expect(Math.abs(draw.modelView[i] - opening.modelView[i])).toBeLessThan(1e-5);
+    }
+    expect(Math.abs(draw.modelView[14] - opening.modelView[14])).toBeLessThan(1e-4);
+  }
+  expect(midpoint.modelView[12]).toBeLessThan(opening.modelView[12]);
+  expect(midpoint.modelView[12]).toBeGreaterThan(end.modelView[12]);
+  expect(end.modelView[12]).toBeLessThan(opening.modelView[12]);
+  const meanY = (opening.modelView[13] + end.modelView[13]) / 2;
+  expect(midpoint.modelView[13]).toBeLessThan(meanY - 1e-4);
+
+  const viewport = page.viewportSize();
+  const originalWidth = await page.locator('#bgViewer').evaluate(element => element.clientWidth);
+  const resizedWidth = Math.max(320, Math.round(viewport.width * 0.7));
+  await page.setViewportSize({ width: resizedWidth, height: viewport.height });
+  await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
+  const resizedClientWidth = await page.locator('#bgViewer').evaluate(element => element.clientWidth);
+  await expect.poll(() => page.evaluate(targets => {
+    const draw = window.__webglDiagnostics.pointDraws.at(-1);
+    return draw && Math.abs(draw.projection[0] - targets.p0) < 1e-4
+      && Math.abs(draw.projection[5] - targets.p5) < 1e-4;
+  }, { p0: end.projection[0] * originalWidth / resizedClientWidth, p5: opening.projection[5] * 1.6 })).toBe(true);
+  const resizedEnd = await page.evaluate(() => window.__webglDiagnostics.pointDraws.at(-1));
+  expect(plyRequests).toEqual([`/CSLT/pointcloud/${cloud}`]);
+  expect(Math.abs(await page.locator('#bgViewer canvas').evaluate(canvas => canvas.getBoundingClientRect().width) - resizedWidth)).toBeLessThan(2);
+
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
-  await expect.poll(() => page.evaluate(reference =>
-    Math.abs(window.__webglDiagnostics.pointDraws.at(-1)?.projection?.[0] - reference), opening.projection[0]))
-    .toBeLessThan(1e-6);
+  await expect.poll(() => page.evaluate(target =>
+    Math.abs((window.__webglDiagnostics.pointDraws.at(-1)?.projection?.[5] ?? 0) - target) < 1e-4,
+    opening.projection[5])).toBe(true);
+  const resizedOpening = await page.evaluate(() => window.__webglDiagnostics.pointDraws.at(-1));
+  expect(resizedEnd.modelView[12]).toBeLessThan(resizedOpening.modelView[12]);
+
+  await page.setViewportSize(viewport);
+  await expect.poll(() => page.evaluate(target =>
+    Math.abs((window.__webglDiagnostics.pointDraws.at(-1)?.projection?.[0] ?? 0) - target) < 1e-4,
+    opening.projection[0])).toBe(true);
+  const restored = await page.evaluate(() => window.__webglDiagnostics.pointDraws.at(-1));
+  for (let i = 0; i < 16; i++) {
+    expect(Math.abs(restored.modelView[i] - opening.modelView[i])).toBeLessThan(1e-5);
+  }
 
   const diagnostics = await page.evaluate(() => window.__webglDiagnostics);
-  for (const draw of diagnostics.pointDraws) {
-    expect(draw.modelView).toEqual(diagnostics.pointDraws[0].modelView);
-  }
   expect(diagnostics.shaderErrors).toEqual([]);
   expect(diagnostics.programErrors).toEqual([]);
   expect(plyRequests).toEqual([`/CSLT/pointcloud/${cloud}`]);
@@ -243,6 +289,7 @@ test('CSLT reduced motion keeps the point cloud zoom and fade fixed', async ({ p
   expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
   const latest = await page.evaluate(() => window.__webglDiagnostics.pointDraws.at(-1));
   expect(latest.projection).toEqual(resting.projection);
+  expect(latest.modelView).toEqual(resting.modelView);
   expect(await page.locator('#bgViewer').evaluate(viewer => viewer.style.opacity)).toBe('');
 });
 
