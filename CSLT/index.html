@@ -181,7 +181,8 @@
     const MOBILE_POINT_SIZE = 0.065;
     // Midway down the right aisle, in the shared PLY coordinate system.
     const INTERIOR_CAMERA_POSITION = [0.775, 1.424, 0.745];
-    const ZOOM_ARC_HEIGHT = 0.3;
+    const ZOOM_ARC_RIGHT = 0.3;
+    const BALL_RADIUS = 0.3;
 
     class CsltPointCloud extends HTMLElement {
       #mobileLayout = window.matchMedia('(max-width: 767px), (pointer: coarse)');
@@ -194,6 +195,8 @@
       #viewUp;
       #openingPosition;
       #interiorPosition;
+      #ball;
+      #ballMaterial;
       #renderer;
       #scene;
       #camera;
@@ -211,8 +214,10 @@
         this.#progress = Math.max(0, Math.min(1, progress));
         if (!this.#camera || !this.#openingPosition) return;
         const t = this.#progress;
+        // Taper the side sweep before the camera reaches the doorway.
+        const arc = 4 * t * (1 - t);
         this.#camera.position.lerpVectors(this.#openingPosition, this.#interiorPosition, t)
-          .addScaledVector(this.#viewUp, 4 * t * (1 - t) * ZOOM_ARC_HEIGHT);
+          .addScaledVector(this.#right, ZOOM_ARC_RIGHT * arc * arc);
         this.#render();
       }
 
@@ -267,6 +272,43 @@
         window.addEventListener('resize', () => this.#resize());
         document.addEventListener('visibilitychange', () => this.#render());
         this.#resize();
+        this.#loadBall(THREE, mobile).catch(error => console.warn('Could not load CSLT placeholder ball', error));
+      }
+
+      async #loadBall(THREE, mobile) {
+        const [{ GLTFLoader }, { DRACOLoader }] = await Promise.all([
+          import('three/addons/loaders/GLTFLoader.js'),
+          import('three/addons/loaders/DRACOLoader.js')
+        ]);
+        const draco = new DRACOLoader();
+        draco.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.174.0/examples/jsm/libs/draco/');
+        try {
+          const src = mobile ? '../mesh_test.mobile.glb' : '../mesh_test.glb';
+          const { scene: model } = await new GLTFLoader().setDRACOLoader(draco).loadAsync(src);
+          const bounds = new THREE.Box3().setFromObject(model).getBoundingSphere(new THREE.Sphere());
+          if (bounds.radius <= 0) return;
+          const material = new THREE.MeshBasicMaterial({
+            color: 0xff8800,
+            side: THREE.DoubleSide,
+            transparent: true,
+            depthWrite: false
+          });
+          model.traverse(object => {
+            if (object.isMesh) object.material = material;
+          });
+
+          const ball = new THREE.Group();
+          model.position.sub(bounds.center);
+          ball.add(model);
+          ball.scale.setScalar(BALL_RADIUS / bounds.radius);
+          ball.position.copy(this.#interiorPosition);
+          this.#ball = ball;
+          this.#ballMaterial = material;
+          this.#scene.add(ball);
+          this.#render();
+        } finally {
+          draco.dispose();
+        }
       }
 
       #robustBounds(THREE, position, rotation) {
@@ -326,6 +368,12 @@
 
       #render() {
         if (!this.#renderer || document.hidden) return;
+        if (this.#ball) {
+          // The camera finishes at the ball's center, so fade it before arrival.
+          const distance = this.#camera.position.distanceTo(this.#ball.position);
+          this.#ballMaterial.opacity = Math.max(0, Math.min(1, (distance - 0.65) / 0.85));
+          this.#ball.visible = this.#ballMaterial.opacity > 0;
+        }
         this.#renderer.render(this.#scene, this.#camera);
       }
     }

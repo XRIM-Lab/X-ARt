@@ -272,7 +272,7 @@ test('home, TTY2, EFV, NMM, and CSLT share the controller without duplicate page
   assert.equal((cslt.match(/<cslt-point-cloud\b/g) ?? []).length, 1);
   const csltScript = cslt.match(/<script type="module">([\s\S]*?)<\/script>/)[1];
   assert.ok(csltScript.includes("contentStart: document.getElementById('about')"));
-  assert.doesNotMatch(cslt, /page-bootstrap|\.glb/);
+  assert.doesNotMatch(cslt, /page-bootstrap/);
 });
 
 test('EFV passes its centered writing model, camera, and fire shader options to the shared bootstrap', async () => {

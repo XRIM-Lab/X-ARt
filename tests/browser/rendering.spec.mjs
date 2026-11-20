@@ -58,7 +58,10 @@ const cslt = {
 async function instrumentWebGL(page, { capturePoints = false } = {}) {
   await page.addInitScript(capture => {
     window.__webglDiagnostics = { drawCalls: 0, shaderErrors: [], programErrors: [] };
-    if (capture) window.__webglDiagnostics.pointDraws = [];
+    if (capture) {
+      window.__webglDiagnostics.pointDraws = [];
+      window.__webglDiagnostics.meshDrawCalls = 0;
+    }
     const prototype = window.WebGL2RenderingContext?.prototype;
     if (!prototype) return;
     const countIndex = { drawArrays: 2, drawElements: 1, drawRangeElements: 3 };
@@ -67,6 +70,7 @@ async function instrumentWebGL(page, { capturePoints = false } = {}) {
       if (!original) continue;
       prototype[name] = function (...args) {
         window.__webglDiagnostics.drawCalls++;
+        if (capture && args[0] === this.TRIANGLES) window.__webglDiagnostics.meshDrawCalls++;
         if (capture && args[0] === this.POINTS) {
           const program = this.getParameter(this.CURRENT_PROGRAM);
           const projection = this.getUniformLocation(program, 'projectionMatrix');
@@ -171,12 +175,13 @@ test('model request failure leaves page content usable and releases splashes whe
   await expect(page.getByRole('link', { name: entry.name === 'home' ? 'EQUUS: FORM + VOID' : 'Henry Ho' })).toBeVisible();
 });
 
-test('CSLT loads only its responsive PLY, draws real points, and dollies into the right aisle without turning', async ({ page }, testInfo) => {
+test('CSLT renders its responsive scan and homepage ball, then dollies into the right aisle without turning', async ({ page }, testInfo) => {
   await blockExternalAndServePackages(page);
   await instrumentWebGL(page, { capturePoints: true });
   const isMobile = testInfo.project.name === 'mobile-chromium';
   const cloud = isMobile ? cslt.mobileCloud : cslt.desktopCloud;
   const pointCount = isMobile ? cslt.mobileCount : cslt.desktopCount;
+  const ball = isMobile ? 'mesh_test.mobile.glb' : 'mesh_test.glb';
   const errors = [];
   const plyRequests = [];
   const glbRequests = [];
@@ -195,6 +200,7 @@ test('CSLT loads only its responsive PLY, draws real points, and dollies into th
   await expect(page.locator('#bgViewer canvas')).toBeVisible();
   await expect(page.locator('#loadingScreen')).toBeHidden();
   await page.waitForFunction(count => window.__webglDiagnostics?.pointDraws?.some(draw => draw.count === count), pointCount, { timeout: 30000 });
+  await page.waitForFunction(() => window.__webglDiagnostics.meshDrawCalls > 0);
 
   const latestDraw = () => page.evaluate(() => window.__webglDiagnostics.pointDraws.at(-1));
   const distanceFromAisle = ({ modelView: m }) => {
@@ -217,9 +223,27 @@ test('CSLT loads only its responsive PLY, draws real points, and dollies into th
   await page.screenshot({ path: midpointShot });
   await testInfo.attach(`CSLT-midpoint-${testInfo.project.name}`, { path: midpointShot });
 
+  const approachDraws = await page.evaluate(() => {
+    const diagnostics = window.__webglDiagnostics;
+    const before = diagnostics.meshDrawCalls;
+    document.getElementById('bgViewer').setProgress(0.9);
+    return diagnostics.meshDrawCalls - before;
+  });
+  expect(approachDraws).toBeGreaterThan(0);
+  const approachShot = testInfo.outputPath('CSLT-ball-approach.png');
+  await page.screenshot({ path: approachShot, style: '.intro-title { visibility: hidden; }' });
+  await testInfo.attach('CSLT-ball-approach', { path: approachShot });
+
   await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
   await expect.poll(async () => distanceFromAisle(await latestDraw())).toBeLessThan(0.1);
   const end = await latestDraw();
+  const arrivalDraws = await page.evaluate(() => {
+    const diagnostics = window.__webglDiagnostics;
+    const before = diagnostics.meshDrawCalls;
+    document.getElementById('bgViewer').setProgress(1);
+    return diagnostics.meshDrawCalls - before;
+  });
+  expect(arrivalDraws).toBe(0);
   const zoomedShot = path.join(screenshotDir, `CSLT-${testInfo.project.name}-zoomed.png`);
   await page.screenshot({ path: zoomedShot });
   await testInfo.attach(`CSLT-zoomed-${testInfo.project.name}`, { path: zoomedShot });
@@ -232,11 +256,11 @@ test('CSLT loads only its responsive PLY, draws real points, and dollies into th
   }
   expect(midpoint.modelView[14]).toBeGreaterThan(opening.modelView[14]);
   expect(end.modelView[14]).toBeGreaterThan(midpoint.modelView[14]);
-  expect(midpoint.modelView[12]).toBeLessThan(opening.modelView[12]);
-  expect(midpoint.modelView[12]).toBeGreaterThan(end.modelView[12]);
   expect(end.modelView[12]).toBeLessThan(opening.modelView[12]);
+  const meanX = (opening.modelView[12] + end.modelView[12]) / 2;
+  expect(midpoint.modelView[12]).toBeLessThan(meanX - 1e-4);
   const meanY = (opening.modelView[13] + end.modelView[13]) / 2;
-  expect(midpoint.modelView[13]).toBeLessThan(meanY - 1e-4);
+  expect(midpoint.modelView[13]).toBeCloseTo(meanY, 3);
 
   const viewport = page.viewportSize();
   const originalWidth = await page.locator('#bgViewer').evaluate(element => element.clientWidth);
@@ -268,7 +292,7 @@ test('CSLT loads only its responsive PLY, draws real points, and dollies into th
   expect(diagnostics.shaderErrors).toEqual([]);
   expect(diagnostics.programErrors).toEqual([]);
   expect(plyRequests).toEqual([`/CSLT/pointcloud/${cloud}`]);
-  expect(glbRequests).toEqual([]);
+  expect(glbRequests).toEqual([`/${ball}`]);
   expect(errors).toEqual([]);
 });
 
