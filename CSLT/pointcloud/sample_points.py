@@ -1,22 +1,23 @@
+import heapq
 import math
 import mmap
 import os
 import struct
+from collections import Counter
 from pathlib import Path
+from random import Random
 
 
 SOURCE_NAME = "sshop2-better-edit.ply"
 DESKTOP_BUDGET = 220_000
 MOBILE_BUDGET = 80_000
-GRID_BITS = 9
-GRID_SIZE = 1 << GRID_BITS
+REGION_SIZE = 0.125
+DENSITY_EXPONENT = 0.8
 MIN_OPACITY_LOGIT = math.log(0.10 / 0.90)
 DC_FACTOR = 0.28209479177387814
 FLOAT = struct.Struct("<f")
 POINT = struct.Struct("<fffBBB")
 REQUIRED = ("x", "y", "z", "f_dc_0", "f_dc_1", "f_dc_2", "opacity")
-SPREAD = tuple(sum(((i >> bit) & 1) << (3 * bit) for bit in range(GRID_BITS))
-               for i in range(GRID_SIZE))
 
 
 def read_header(source):
@@ -70,48 +71,48 @@ def accepted_points(data, header):
             yield start, x, y, z, opacity
 
 
-def voxel_candidates(data, header):
-    xmin = ymin = zmin = math.inf
-    xmax = ymax = zmax = -math.inf
-    for _, x, y, z, _ in accepted_points(data, header):
-        xmin, ymin, zmin = min(xmin, x), min(ymin, y), min(zmin, z)
-        xmax, ymax, zmax = max(xmax, x), max(ymax, y), max(zmax, z)
-    extent = max(xmax - xmin, ymax - ymin, zmax - zmin)
-    if not math.isfinite(extent) or extent <= 0:
-        raise ValueError("No usable 3D point extent")
-    scale = (GRID_SIZE - 1) / extent
-    candidates = {}
+def region_key(x, y, z):
+    return tuple(math.floor(value / REGION_SIZE) for value in (x, y, z))
+
+
+def allocate_budgets(counts, desktop_budget, mobile_budget):
+    inverse_weights = {key: count ** -DENSITY_EXPONENT for key, count in counts.items()}
+    queue = [(0.5 * weight, key) for key, weight in inverse_weights.items()]
+    heapq.heapify(queue)
+    desktop, mobile = Counter(), Counter()
+    for index in range(min(desktop_budget, sum(counts.values()))):
+        _, key = heapq.heappop(queue)
+        desktop[key] += 1
+        if index < mobile_budget:
+            mobile[key] += 1
+        if desktop[key] < counts[key]:
+            heapq.heappush(queue, ((desktop[key] + 0.5) * inverse_weights[key], key))
+    return desktop, mobile
+
+
+def sample_clouds(data, header):
+    counts = Counter(region_key(x, y, z) for _, x, y, z, _ in accepted_points(data, header))
+    if not counts:
+        raise ValueError("No usable points")
+    desktop_quotas, mobile_quotas = allocate_budgets(counts, DESKTOP_BUDGET, MOBILE_BUDGET)
+    samples = {key: [] for key in desktop_quotas}
+    random = Random(0).random
     for start, x, y, z, opacity in accepted_points(data, header):
-        ix = min(GRID_SIZE - 1, int((x - xmin) * scale))
-        iy = min(GRID_SIZE - 1, int((y - ymin) * scale))
-        iz = min(GRID_SIZE - 1, int((z - zmin) * scale))
-        key = SPREAD[ix] | (SPREAD[iy] << 1) | (SPREAD[iz] << 2)
-        current = candidates.get(key)
-        if current is None or opacity > current[0]:
-            candidates[key] = opacity, start
-    return [(key, opacity, start) for key, (opacity, start) in candidates.items()]
-
-
-def sample(candidates, budget):
-    if len(candidates) <= budget:
-        return candidates
-    finer = candidates
-    for shift in range(3, 3 * GRID_BITS + 1, 3):
-        cells = {}
-        for point in finer:
-            key, opacity, start = point
-            cell = key >> shift
-            current = cells.get(cell)
-            if current is None or (opacity, -start) > (current[1], -current[2]):
-                cells[cell] = point
-        if len(cells) <= budget:
-            coarse = list(cells.values())
-            chosen = {point[0] for point in coarse}
-            extra = sorted((point for point in finer if point[0] not in chosen),
-                           key=lambda point: (point[0] * 0x9E3779B1) & 0xFFFFFFFF)
-            return coarse + extra[:budget - len(coarse)]
-        finer = list(cells.values())
-    raise ValueError("Could not reduce cloud to its point budget")
+        key = region_key(x, y, z)
+        if key not in samples:
+            continue
+        weight = 0.25 + 1 / (1 + math.exp(-opacity))
+        candidate = (math.log1p(-random()) / weight, start)
+        heap = samples[key]
+        if len(heap) < desktop_quotas[key]:
+            heapq.heappush(heap, candidate)
+        elif candidate > heap[0]:
+            heapq.heapreplace(heap, candidate)
+    desktop, mobile = [], []
+    for key, heap in samples.items():
+        desktop.extend(start for _, start in heap)
+        mobile.extend(start for _, start in heapq.nlargest(mobile_quotas[key], heap))
+    return desktop, mobile
 
 
 def rgb_byte(coefficient):
@@ -126,7 +127,7 @@ def write_ply(path, points, data, fields):
             "property uchar red\nproperty uchar green\nproperty uchar blue\nend_header\n"
         ).encode("ascii"))
         read = FLOAT.unpack_from
-        for _, _, start in sorted(points):
+        for start in sorted(points):
             x, y, z, r, g, b = (read(data, start + field)[0] for field in fields[:6])
             out.write(POINT.pack(x, y, z, rgb_byte(r), rgb_byte(g), rgb_byte(b)))
 
@@ -136,8 +137,7 @@ def main():
     with (directory / SOURCE_NAME).open("rb") as source:
         header = read_header(source)
         with mmap.mmap(source.fileno(), 0, access=mmap.ACCESS_READ) as data:
-            desktop = sample(voxel_candidates(data, header), DESKTOP_BUDGET)
-            mobile = sample(desktop, MOBILE_BUDGET)
+            desktop, mobile = sample_clouds(data, header)
             for filename, points in (("shop.ply", desktop), ("shop.mobile.ply", mobile)):
                 path = directory / filename
                 write_ply(path, points, data, header[3])
