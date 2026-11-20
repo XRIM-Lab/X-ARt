@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" role="img" aria-labelledby="title description">
+  <title id="title">Nature: Metaphysics + Metaphor</title>
+  <desc id="description">Abstract placeholder artwork to be replaced with project imagery.</desc>
+  <defs>
+    <radialGradient id="background" cx="50%" cy="45%" r="75%">
+      <stop offset="0" stop-color="#343b32"/>
+      <stop offset="1" stop-color="#0a0a0a"/>
+    </radialGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d9d4b7" stop-opacity=".9"/>
+      <stop offset="1" stop-color="#a6b49b" stop-opacity=".25"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="750" fill="url(#background)"/>
+  <path d="M0 565 C210 470 315 680 520 555 S850 435 1200 560" fill="none" stroke="url(#line)" stroke-width="2"/>
+  <path d="M0 605 C225 510 340 720 550 590 S900 480 1200 595" fill="none" stroke="url(#line)" stroke-width="1" opacity=".6"/>
+  <circle cx="600" cy="335" r="145" fill="none" stroke="#d9d4b7" stroke-opacity=".35"/>
+  <circle cx="600" cy="335" r="95" fill="none" stroke="#d9d4b7" stroke-opacity=".2"/>
+  <text x="600" y="330" fill="#efefef" font-family="Inter, sans-serif" font-size="30" font-weight="600" text-anchor="middle">Nature: Metaphysics</text>
+  <text x="600" y="375" fill="#cccccc" font-family="Inter, sans-serif" font-size="25" text-anchor="middle">+ Metaphor</text>
+  <text x="600" y="690" fill="#cccccc" font-family="monospace" font-size="14" letter-spacing="4" text-anchor="middle">PLACEHOLDER ARTWORK</text>
+</svg>

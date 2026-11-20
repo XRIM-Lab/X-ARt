@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CSLT: Come Stay Linger Time - 「ARtrio」(formerly 「X-ARt」)</title>
+
+  <!-- Three.js import map -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.174.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.174.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <!-- Bootstrap (optional for grid + carousel) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+  <!-- Google fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Shared stylesheet -->
+  <link rel="stylesheet" href="../style.css">
+
+  <!-- Shared Web Components (header, footer) -->
+  <script src="../components.js"></script>
+
+  <style>
+    :root {
+      --bg-gradient:
+        radial-gradient(120% 120% at 50% 50%, rgba(0,0,0,0.275), rgba(0,0,0,0.375));
+    }
+  </style>
+</head>
+
+<body>
+
+<site-header page="cslt"></site-header>
+
+  <!-- Loading screen -->
+  <div id="loadingScreen" class="loading-screen">
+    <div class="loading-content">
+      <h1 class="loading-title">CSLT</h1>
+      <h2> by 「ARtrio」</h2>
+      <h3> (Formerly 「X-ARt」) </h3>
+      <div class="subtitle" style="font-family: var(--font-mono); letter-spacing:0.25em; margin-top:0.5rem;">
+        Come Stay Linger Time
+      </div>
+      <div class="loading-spinner">
+        <div class="spinner-ring"></div>
+      </div>
+      <p class="loading-text">Loading experience...</p>
+    </div>
+  </div>
+
+  <!-- Fixed 3D background layer behind all content -->
+  <div class="bg-3d" aria-hidden="true">
+    <cslt-point-cloud id="bgViewer" data-src="pointcloud/shop.ply" data-mobile-src="pointcloud/shop.mobile.ply"></cslt-point-cloud>
+  </div>
+
+  <main class="site-container content-hidden">
+    <!-- 1) Intro screen: only title on the full viewport, background artwork visible -->
+    <section class="intro-hero" id="intro">
+      <div class="intro-title" aria-label="Site Title">
+        <h1>CSLT</h1>
+        <h2> by 「ARtrio」</h2>
+        <h3> (Formerly 「X-ARt」) </h3>
+
+        <div class="subtitle" style="font-family: var(--font-mono); letter-spacing:0.25em; margin-top:0.5rem;">
+          Come Stay Linger Time
+        </div>
+        <div class="intro-hint" aria-hidden="true">Scroll to enter</div>
+      </div>
+    </section>
+
+    <!-- 2) Project description -->
+    <section id="about" class="about-intro">
+      <div class="content-panel raised">
+        <h2>About this Project</h2>
+        <p class="lead">A farewell performance for Tsun Lun Shoe Shop, a 70-year-old family business facing the former Kowloon Walled City.</p>
+        <p>CSLT (Come Stay Linger Time) is a site-specific performance created for the closing of Tsun Lun Shoe Shop — a three-generation family business that has stood for 70 years in Kowloon City, facing the former Kowloon Walled City.</p>
+        <p>As the entire block gives way to urban redevelopment, the performance lingers in the shop one last time — an invitation to come, stay, and linger in a place about to disappear, and to honour the everyday history it holds.</p>
+      </div>
+    </section>
+
+    <!-- 3) Image gallery -->
+    <section id="gallery" class="home-gallery">
+      <div class="section-heading">
+        <h2>Image Gallery</h2>
+      </div>
+      <div id="csltCarousel" class="carousel slide home-gallery-carousel" data-bs-ride="carousel" data-bs-interval="5000">
+        <div class="carousel-indicators">
+          <button type="button" data-bs-target="#csltCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Show CSLT photo"></button>
+        </div>
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <img src="images/placeholder.svg" alt="CSLT performance photo">
+            <div class="home-gallery-caption">CSLT — Tsun Lun Shoe Shop, Kowloon City</div>
+          </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#csltCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous image</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#csltCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next image</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- 4) Events -->
+    <section id="events" class="detail-section raised event-list">
+      <h2>Events</h2>
+      <ul>
+        <li>
+          <time class="mono-label">2025.05.28</time>
+          <div class="event-info">
+            <strong class="event-title">CSLT: Come Stay Linger Time</strong>
+            <span class="event-venue">Tsun Lun Shoe Shop, Kowloon City, HK</span>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- 5) Team & Thanks -->
+    <section id="team" class="site-section two-col">
+      <div class="col raised">
+        <div class="artists-list">
+          <h2>Artists</h2>
+          <ul>
+            <li><a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/blyhn_art.design.music/">bLYHn</a></li>
+            <li><a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/dominie_n_art/">Dominie CHAN</a></li>
+            <li><a target="_blank" rel="noopener noreferrer" href="https://braudt.people.ust.hk/">Tristan BRAUD</a></li>
+            <li><a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/christopherchancs/">Christopher CS CHAN</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="col raised">
+
+      <div class="thanks-list">
+        <h2>Special Thanks</h2>
+        <ul>
+          <li>Tsun Lun Shoe Shop</li>
+        </ul>
+      </div>
+
+      <div class="thanks-list">
+        <h2>Technology</h2>
+        <ul>
+          <li><a target="_blank" rel="noopener noreferrer" href="https://xrim.hkust.edu.hk/">XRIM-Lab</a></li>
+        </ul>
+      </div>
+      </div>
+    </section>
+  </main>
+
+<site-footer year="2026" name="「ARtrio」"></site-footer>
+
+  <!-- Bootstrap JS (optional for carousel) -->
+  <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Scroll-driven point-cloud zoom + loading management -->
+  <script type="module">
+    import { initPageScroll } from '../page-scroll.js';
+
+    const SCAN_ROTATION_DEGREES = [30.3, -0.1, 16.7];
+    const CAMERA_AZIMUTH_DEGREES = 165;
+    const CAMERA_ELEVATION_DEGREES = 12;
+    const CAMERA_ROLL_DEGREES = 90;
+    const VIEW_Z_ROTATION_DEGREES = -0;
+    const VIEW_Y_ROTATION_DEGREES = -20;
+    const VIEW_X_ROTATION_DEGREES = -3;
+    const CAMERA_MARGIN = 1.1;
+    const DESKTOP_POINT_SIZE = 0.055;
+    const MOBILE_POINT_SIZE = 0.065;
+
+    class CsltPointCloud extends HTMLElement {
+      #mobileLayout = window.matchMedia('(max-width: 767px), (pointer: coarse)');
+      #loadPromise;
+      #progress = 0;
+      #bounds;
+      #center;
+      #direction;
+      #right;
+      #viewUp;
+      #renderer;
+      #scene;
+      #camera;
+
+      async load() {
+        this.#loadPromise ??= this.#start();
+        return this.#loadPromise;
+      }
+
+      setProgress(progress) {
+        this.#progress = Math.max(0, Math.min(1, progress));
+        if (!this.#camera) return;
+        this.#camera.zoom = 1 + 0.6 * this.#progress;
+        this.#camera.updateProjectionMatrix();
+        this.#render();
+      }
+
+      async #start() {
+        const mobile = this.#mobileLayout.matches;
+        const src = mobile ? this.dataset.mobileSrc : this.dataset.src;
+        const [THREE, { PLYLoader }] = await Promise.all([
+          import('three'),
+          import('three/addons/loaders/PLYLoader.js')
+        ]);
+        const geometry = await new PLYLoader().loadAsync(src);
+
+        const renderer = new THREE.WebGLRenderer({ alpha: true, powerPreference: 'low-power' });
+        renderer.setClearColor(0x000000, 0);
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(40, 1, 0.01, 1000);
+        const points = new THREE.Points(geometry, new THREE.PointsMaterial({
+          vertexColors: true,
+          size: mobile ? MOBILE_POINT_SIZE : DESKTOP_POINT_SIZE,
+          sizeAttenuation: true
+        }));
+        points.rotation.set(
+          THREE.MathUtils.degToRad(SCAN_ROTATION_DEGREES[0]),
+          THREE.MathUtils.degToRad(SCAN_ROTATION_DEGREES[1]),
+          THREE.MathUtils.degToRad(SCAN_ROTATION_DEGREES[2])
+        );
+        const azimuth = THREE.MathUtils.degToRad(CAMERA_AZIMUTH_DEGREES);
+        const elevation = THREE.MathUtils.degToRad(CAMERA_ELEVATION_DEGREES);
+        this.#direction = new THREE.Vector3(
+          Math.cos(elevation) * Math.sin(azimuth),
+          Math.sin(elevation),
+          Math.cos(elevation) * Math.cos(azimuth)
+        );
+        const up = this.#direction.clone().cross(new THREE.Vector3(0, 1, 0)).cross(this.#direction).normalize();
+        this.#viewUp = up.applyAxisAngle(this.#direction, THREE.MathUtils.degToRad(CAMERA_ROLL_DEGREES));
+        this.#right = this.#viewUp.clone().cross(this.#direction).normalize();
+
+        points.rotateOnWorldAxis(this.#viewUp, THREE.MathUtils.degToRad(VIEW_Z_ROTATION_DEGREES));
+        points.rotateOnWorldAxis(this.#right, THREE.MathUtils.degToRad(VIEW_Y_ROTATION_DEGREES));
+        points.rotateOnWorldAxis(this.#direction, THREE.MathUtils.degToRad(VIEW_X_ROTATION_DEGREES));
+        scene.add(points);
+
+        this.#bounds = this.#robustBounds(THREE, geometry.getAttribute('position'), points.quaternion);
+        this.#center = this.#bounds.min.clone().add(this.#bounds.max).multiplyScalar(0.5);
+
+        this.#renderer = renderer;
+        this.#scene = scene;
+        this.#camera = camera;
+        this.append(renderer.domElement);
+        window.addEventListener('resize', () => this.#resize());
+        document.addEventListener('visibilitychange', () => this.#render());
+        camera.zoom = 1 + 0.6 * this.#progress;
+        this.#resize();
+      }
+
+      #robustBounds(THREE, position, rotation) {
+        const step = Math.max(1, Math.floor(position.count / 20000));
+        const axes = [[], [], []];
+        const vertex = new THREE.Vector3();
+        for (let i = 0; i < position.count; i += step) {
+          vertex.fromBufferAttribute(position, i).applyQuaternion(rotation);
+          axes[0].push(vertex.x);
+          axes[1].push(vertex.y);
+          axes[2].push(vertex.z);
+        }
+        const min = new THREE.Vector3();
+        const max = new THREE.Vector3();
+        axes.forEach((values, axis) => {
+          values.sort((a, b) => a - b);
+          min.setComponent(axis, values[Math.floor(values.length * 0.01)]);
+          max.setComponent(axis, values[Math.floor(values.length * 0.99)]);
+        });
+        return { min, max };
+      }
+
+      #resize() {
+        if (!this.#renderer) return;
+        const width = Math.max(1, this.clientWidth);
+        const height = Math.max(1, this.clientHeight);
+        this.#renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, this.#mobileLayout.matches ? 1.5 : 2));
+        this.#renderer.setSize(width, height, false);
+        this.#camera.aspect = width / height;
+        const distance = this.#fitDistance() * CAMERA_MARGIN;
+        this.#camera.near = Math.max(0.01, distance / 100);
+        this.#camera.far = Math.max(100, distance * 4);
+        this.#camera.position.copy(this.#center).addScaledVector(this.#direction, distance);
+        this.#camera.up.copy(this.#viewUp);
+        this.#camera.lookAt(this.#center);
+        this.#camera.updateProjectionMatrix();
+        this.#render();
+      }
+
+      #fitDistance() {
+        const tanVertical = Math.tan(this.#camera.fov * Math.PI / 360);
+        const tanHorizontal = tanVertical * this.#camera.aspect;
+        const corner = this.#center.clone();
+        let distance = 0;
+        for (const x of [this.#bounds.min.x, this.#bounds.max.x]) {
+          for (const y of [this.#bounds.min.y, this.#bounds.max.y]) {
+            for (const z of [this.#bounds.min.z, this.#bounds.max.z]) {
+              corner.set(x, y, z).sub(this.#center);
+              distance = Math.max(distance,
+                corner.dot(this.#direction) + Math.abs(corner.dot(this.#right)) / tanHorizontal,
+                corner.dot(this.#direction) + Math.abs(corner.dot(this.#viewUp)) / tanVertical);
+            }
+          }
+        }
+        return distance;
+      }
+
+      #render() {
+        if (!this.#renderer || document.hidden) return;
+        this.#renderer.render(this.#scene, this.#camera);
+      }
+    }
+
+    customElements.define('cslt-point-cloud', CsltPointCloud);
+
+    const viewer = document.getElementById('bgViewer');
+    const loadingScreen = document.getElementById('loadingScreen');
+    const mainContent = document.querySelector('main');
+
+    mainContent.classList.add('content-hidden');
+
+    const pageScroll = initPageScroll({
+      contentStart: document.getElementById('about'),
+      onUpdate(progress, prefersReducedMotion) {
+        if (prefersReducedMotion) return;
+        viewer.setProgress(progress);
+        viewer.style.opacity = String(0.9 - progress * 0.2);
+      }
+    });
+
+    const splashStartedAt = performance.now();
+    let splashReleaseTimer;
+    let splashReleased = false;
+    const splashDeadlineTimer = setTimeout(revealPage, 1250);
+
+    function revealPage() {
+      if (splashReleased) return;
+      splashReleased = true;
+      clearTimeout(splashDeadlineTimer);
+      clearTimeout(splashReleaseTimer);
+      loadingScreen.classList.add('fade-out');
+      mainContent.classList.remove('content-hidden');
+      setTimeout(() => {
+        loadingScreen.style.display = 'none';
+      }, 350);
+    }
+
+    function hideLoadingScreen() {
+      if (splashReleased || splashReleaseTimer) return;
+      const minimumRemaining = 350 - (performance.now() - splashStartedAt);
+      if (minimumRemaining > 0) {
+        splashReleaseTimer = setTimeout(revealPage, minimumRemaining);
+      } else {
+        revealPage();
+      }
+    }
+
+    viewer.setProgress(pageScroll.prefersReducedMotion ? 0 : pageScroll.getProgress());
+    viewer.load().then(() => {
+      pageScroll.refresh();
+      hideLoadingScreen();
+    }, error => {
+      console.error('Could not load 3D background', error);
+      pageScroll.refresh();
+      hideLoadingScreen();
+    });
+  </script>
+</body>
+</html>

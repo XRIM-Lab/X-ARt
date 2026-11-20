@@ -1,5 +1,10 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
 import { blockExternalAndServePackages, pageUrl } from './fixtures.mjs';
+
+const screenshotDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../test-results');
 
 const pages = [
   {
@@ -40,16 +45,38 @@ const pages = [
   }
 ];
 
-async function instrumentWebGL(page) {
-  await page.addInitScript(() => {
+const cslt = {
+  name: 'CSLT',
+  path: '/CSLT/',
+  desktopCloud: 'shop.ply',
+  mobileCloud: 'shop.mobile.ply',
+  desktopCount: 220000,
+  mobileCount: 80000,
+  heading: 'About this Project'
+};
+
+async function instrumentWebGL(page, { capturePoints = false } = {}) {
+  await page.addInitScript(capture => {
     window.__webglDiagnostics = { drawCalls: 0, shaderErrors: [], programErrors: [] };
+    if (capture) window.__webglDiagnostics.pointDraws = [];
     const prototype = window.WebGL2RenderingContext?.prototype;
     if (!prototype) return;
+    const countIndex = { drawArrays: 2, drawElements: 1, drawRangeElements: 3 };
     for (const name of ['drawArrays', 'drawElements', 'drawRangeElements']) {
       const original = prototype[name];
       if (!original) continue;
       prototype[name] = function (...args) {
         window.__webglDiagnostics.drawCalls++;
+        if (capture && args[0] === this.POINTS) {
+          const program = this.getParameter(this.CURRENT_PROGRAM);
+          const projection = this.getUniformLocation(program, 'projectionMatrix');
+          const modelView = this.getUniformLocation(program, 'modelViewMatrix');
+          window.__webglDiagnostics.pointDraws.push({
+            count: args[countIndex[name]],
+            projection: projection ? Array.from(this.getUniform(program, projection)) : null,
+            modelView: modelView ? Array.from(this.getUniform(program, modelView)) : null
+          });
+        }
         return original.apply(this, args);
       };
     }
@@ -73,7 +100,7 @@ async function instrumentWebGL(page) {
       }
       return result;
     };
-  });
+  }, capturePoints);
 }
 
 for (const entry of pages) {
@@ -142,4 +169,118 @@ test('model request failure leaves page content usable and releases splashes whe
   if (entry.splash) await expect(page.locator('#loadingScreen')).toBeHidden();
   await expect(page.getByRole('heading', { name: entry.heading })).toBeVisible();
   await expect(page.getByRole('link', { name: entry.name === 'home' ? 'EQUUS: FORM + VOID' : 'Henry Ho' })).toBeVisible();
+});
+
+test('CSLT loads only its responsive PLY, draws real points, and zooms without moving on scroll', async ({ page }, testInfo) => {
+  await blockExternalAndServePackages(page);
+  await instrumentWebGL(page, { capturePoints: true });
+  const isMobile = testInfo.project.name === 'mobile-chromium';
+  const cloud = isMobile ? cslt.mobileCloud : cslt.desktopCloud;
+  const pointCount = isMobile ? cslt.mobileCount : cslt.desktopCount;
+  const errors = [];
+  const plyRequests = [];
+  const glbRequests = [];
+  page.on('pageerror', error => errors.push(error.message));
+  page.on('console', message => {
+    if (message.type() === 'error') errors.push(message.text());
+  });
+  page.on('request', request => {
+    const pathname = new URL(request.url()).pathname;
+    if (pathname.endsWith('.ply')) plyRequests.push(pathname);
+    if (pathname.endsWith('.glb')) glbRequests.push(pathname);
+  });
+  const cloudRequest = page.waitForRequest(request => new URL(request.url()).pathname.endsWith(`/${cloud}`));
+  await page.goto(pageUrl(cslt.path), { waitUntil: 'domcontentloaded' });
+  await cloudRequest;
+  await expect(page.locator('#bgViewer canvas')).toBeVisible();
+  await expect(page.locator('#loadingScreen')).toBeHidden();
+  await page.waitForFunction(count => window.__webglDiagnostics?.pointDraws?.some(draw => draw.count === count), pointCount, { timeout: 30000 });
+
+  const opening = await page.evaluate(() => window.__webglDiagnostics.pointDraws.at(-1));
+  expect(opening.count).toBe(pointCount);
+  fs.mkdirSync(screenshotDir, { recursive: true });
+  const openingShot = path.join(screenshotDir, `CSLT-${testInfo.project.name}-opening.png`);
+  await page.screenshot({ path: openingShot });
+  await testInfo.attach(`CSLT-opening-${testInfo.project.name}`, { path: openingShot });
+
+  await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
+  await expect.poll(() => page.evaluate(() => window.__webglDiagnostics.pointDraws.at(-1)?.projection?.[0]))
+    .toBeGreaterThan(opening.projection[0] * 1.4);
+  const zoomedShot = path.join(screenshotDir, `CSLT-${testInfo.project.name}-zoomed.png`);
+  await page.screenshot({ path: zoomedShot });
+  await testInfo.attach(`CSLT-zoomed-${testInfo.project.name}`, { path: zoomedShot });
+
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  await expect.poll(() => page.evaluate(reference =>
+    Math.abs(window.__webglDiagnostics.pointDraws.at(-1)?.projection?.[0] - reference), opening.projection[0]))
+    .toBeLessThan(1e-6);
+
+  const diagnostics = await page.evaluate(() => window.__webglDiagnostics);
+  for (const draw of diagnostics.pointDraws) {
+    expect(draw.modelView).toEqual(diagnostics.pointDraws[0].modelView);
+  }
+  expect(diagnostics.shaderErrors).toEqual([]);
+  expect(diagnostics.programErrors).toEqual([]);
+  expect(plyRequests).toEqual([`/CSLT/pointcloud/${cloud}`]);
+  expect(glbRequests).toEqual([]);
+  expect(errors).toEqual([]);
+});
+
+test('CSLT reduced motion keeps the point cloud zoom and fade fixed', async ({ page }, testInfo) => {
+  await blockExternalAndServePackages(page);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await instrumentWebGL(page, { capturePoints: true });
+  const isMobile = testInfo.project.name === 'mobile-chromium';
+  const pointCount = isMobile ? cslt.mobileCount : cslt.desktopCount;
+  await page.goto(pageUrl(cslt.path), { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#loadingScreen')).toBeHidden();
+  await page.waitForFunction(count => window.__webglDiagnostics?.pointDraws?.some(draw => draw.count === count), pointCount, { timeout: 30000 });
+
+  const resting = await page.evaluate(() => window.__webglDiagnostics.pointDraws.at(-1));
+  await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
+  await page.evaluate(() => new Promise(resolve =>
+    requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+  const latest = await page.evaluate(() => window.__webglDiagnostics.pointDraws.at(-1));
+  expect(latest.projection).toEqual(resting.projection);
+  expect(await page.locator('#bgViewer').evaluate(viewer => viewer.style.opacity)).toBe('');
+});
+
+test('CSLT releases the splash and keeps content usable when the point cloud request fails', async ({ page }, testInfo) => {
+  await blockExternalAndServePackages(page);
+  const cloud = testInfo.project.name === 'mobile-chromium' ? cslt.mobileCloud : cslt.desktopCloud;
+  await page.route(`**/pointcloud/${cloud}`, route => route.abort());
+  await page.goto(pageUrl(cslt.path));
+  await expect(page.locator('#loadingScreen')).toBeHidden();
+  await expect(page.locator('main')).not.toHaveClass(/content-hidden/);
+  await expect(page.getByRole('heading', { name: cslt.heading })).toBeVisible();
+});
+
+test('CSLT releases the splash and keeps content usable while the point cloud is still loading', async ({ page }, testInfo) => {
+  await blockExternalAndServePackages(page);
+  await instrumentWebGL(page, { capturePoints: true });
+  const isMobile = testInfo.project.name === 'mobile-chromium';
+  const cloud = isMobile ? cslt.mobileCloud : cslt.desktopCloud;
+  const pointCount = isMobile ? cslt.mobileCount : cslt.desktopCount;
+  let release;
+  const gate = new Promise(resolve => {
+    release = resolve;
+  });
+  let requested = false;
+  await page.route(`**/pointcloud/${cloud}`, async route => {
+    requested = true;
+    await gate;
+    await route.continue();
+  });
+  try {
+    await page.goto(pageUrl(cslt.path), { waitUntil: 'domcontentloaded' });
+    await expect.poll(() => requested).toBe(true);
+    await expect(page.locator('#loadingScreen')).toBeHidden();
+    await expect(page.locator('main')).not.toHaveClass(/content-hidden/);
+    await expect(page.getByRole('heading', { name: cslt.heading })).toBeVisible();
+    expect(await page.evaluate(() => window.__webglDiagnostics.pointDraws.length)).toBe(0);
+  } finally {
+    release();
+  }
+  await page.waitForFunction(count => window.__webglDiagnostics?.pointDraws?.some(draw => draw.count === count), pointCount, { timeout: 30000 });
 });

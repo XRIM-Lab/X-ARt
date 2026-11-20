@@ -9,7 +9,8 @@ const pages = [
   'index.html',
   'TTY2/index.html',
   'EFV/index.html',
-  'NMM/index.html'
+  'NMM/index.html',
+  'CSLT/index.html'
 ];
 
 function isExternalReference(reference) {
@@ -90,10 +91,10 @@ test('first-party page asset and module references resolve locally', () => {
       }
     }
     for (const match of source.matchAll(/\bimport\s+[^'"]*?\bfrom\s*(['"])([^'"]+)\1/g)) {
-      references.push({ pagePath, reference: match[2] });
+      if (match[2].startsWith('.') || match[2].startsWith('/')) references.push({ pagePath, reference: match[2] });
     }
     for (const match of source.matchAll(/\bimport\(\s*(['"])([^'"]+)\1\s*\)/g)) {
-      references.push({ pagePath, reference: match[2] });
+      if (match[2].startsWith('.') || match[2].startsWith('/')) references.push({ pagePath, reference: match[2] });
     }
   }
   const stylesheet = readFileSync(path.join(repoRoot, 'style.css'), 'utf8');
@@ -122,6 +123,70 @@ test('selected desktop/mobile GLBs are valid embedded GLB v2 assets', () => {
     const gltf = parseGlb(path.join(repoRoot, relativePath));
     assert.ok(gltf.meshes?.length, `${relativePath} contains no meshes`);
     assert.ok(gltf.accessors?.length, `${relativePath} contains no accessors`);
+  }
+});
+
+function parsePly(filePath) {
+  const bytes = readFileSync(filePath);
+  const headerEnd = bytes.indexOf('end_header');
+  assert.ok(headerEnd > 0, `${filePath} is missing a PLY end_header`);
+  const lines = bytes.toString('ascii', 0, headerEnd).split(/\r?\n/).filter(line => line.length);
+  assert.equal(lines[0], 'ply', `${filePath} is not a PLY file`);
+  assert.ok(lines.includes('format binary_little_endian 1.0'), `${filePath} is not binary little-endian PLY`);
+  const elements = lines.filter(line => line.startsWith('element '));
+  const element = elements[0]?.match(/^element vertex ([1-9]\d*)$/);
+  assert.equal(elements.length, 1, `${filePath} must declare exactly one element`);
+  assert.ok(element, `${filePath} must declare 'element vertex <positive integer>' and no face element`);
+  const count = Number(element[1]);
+  assert.deepEqual(
+    lines.filter(line => line.startsWith('property ')),
+    [
+      'property float x',
+      'property float y',
+      'property float z',
+      'property uchar red',
+      'property uchar green',
+      'property uchar blue'
+    ],
+    `${filePath} does not contain exactly XYZ float and RGB uchar properties`
+  );
+  let offset = headerEnd + 'end_header'.length;
+  if (bytes[offset] === 13 && bytes[offset + 1] === 10) {
+    offset += 2;
+  } else if (bytes[offset] === 10) {
+    offset += 1;
+  } else {
+    assert.fail(`${filePath} header is not terminated by exactly one LF or CRLF`);
+  }
+  assert.equal(bytes.length - offset, count * 15, `${filePath} body length is not vertex count * 15 bytes`);
+  return { bytes, offset, count };
+}
+
+test('CSLT point clouds are valid binary PLY vertex buffers within desktop/mobile budgets', () => {
+  const csltHtml = readFileSync(path.join(repoRoot, 'CSLT/index.html'), 'utf8');
+  const viewer = csltHtml.match(/<cslt-point-cloud\b[^>]*>/)?.[0];
+  assert.ok(viewer, 'CSLT page is missing its point-cloud viewer');
+  const clouds = [
+    [viewer.match(/\bdata-src="([^"]+)"/)?.[1], 220000],
+    [viewer.match(/\bdata-mobile-src="([^"]+)"/)?.[1], 80000]
+  ];
+  for (const [reference, budget] of clouds) {
+    assert.ok(reference, 'CSLT point-cloud viewer is missing a PLY path');
+    const filePath = path.resolve(repoRoot, 'CSLT', reference);
+    const { bytes, offset, count } = parsePly(filePath);
+    assert.ok(count > 0 && count <= budget, `${reference} has ${count} points, outside its ${budget} budget`);
+    const colors = new Set();
+    for (let i = 0; i < count; i++) {
+      const base = offset + i * 15;
+      assert.ok(
+        Number.isFinite(bytes.readFloatLE(base)) &&
+        Number.isFinite(bytes.readFloatLE(base + 4)) &&
+        Number.isFinite(bytes.readFloatLE(base + 8)),
+        `${reference} has a non-finite position at vertex ${i}`
+      );
+      colors.add(bytes.readUIntLE(base + 12, 3));
+    }
+    assert.ok(colors.size > 100, `${reference} has only ${colors.size} distinct colors`);
   }
 });
 

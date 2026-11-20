@@ -219,19 +219,21 @@ test('entrance destinations use the content element position measured at trigger
   });
 });
 
-test('home, TTY2, EFV, and NMM share the controller without duplicate page listeners or lost page behavior', () => {
+test('home, TTY2, EFV, NMM, and CSLT share the controller without duplicate page listeners or lost page behavior', () => {
   const pages = [
     ['../index.html', './page-bootstrap.js'],
     ['../TTY2/index.html', '../page-bootstrap.js'],
     ['../EFV/index.html', '../page-bootstrap.js'],
-    ['../NMM/index.html', '../page-bootstrap.js']
+    ['../NMM/index.html', '../page-bootstrap.js'],
+    ['../CSLT/index.html', '../page-scroll.js']
   ];
   for (const [path, importPath] of pages) {
     const html = readFileSync(new URL(path, import.meta.url), 'utf8');
     const modules = [...html.matchAll(/<script type="module">([\s\S]*?)<\/script>/g)];
     assert.equal(modules.length, 1);
     const script = modules[0][1];
-    assert.equal((script.match(/from ['"][^'"]*page-bootstrap\.js['"]/g) ?? []).length, 1);
+    const moduleFile = importPath.split('/').pop().replace('.', '\\.');
+    assert.equal((script.match(new RegExp(`from ['"][^'"]*${moduleFile}['"]`, 'g')) ?? []).length, 1);
     assert.ok(script.includes(`from '${importPath}'`));
     assert.doesNotMatch(script, /addEventListener\(['"](?:wheel|keydown|touchmove|scroll|pageshow)['"]/);
   }
@@ -245,8 +247,9 @@ test('home, TTY2, EFV, and NMM share the controller without duplicate page liste
   const tty = readFileSync(new URL('../TTY2/index.html', import.meta.url), 'utf8');
   const efv = readFileSync(new URL('../EFV/index.html', import.meta.url), 'utf8');
   const nmm = readFileSync(new URL('../NMM/index.html', import.meta.url), 'utf8');
+  const cslt = readFileSync(new URL('../CSLT/index.html', import.meta.url), 'utf8');
   const components = readFileSync(new URL('../components.js', import.meta.url), 'utf8');
-  for (const html of [home, tty, efv, nmm]) {
+  for (const html of [home, tty, efv, nmm, cslt]) {
     assert.match(html, /id="loadingScreen"/);
     assert.match(html, /content-hidden/);
   }
@@ -263,6 +266,13 @@ test('home, TTY2, EFV, and NMM share the controller without duplicate page liste
   assert.match(nmm, /<section id="about" class="about-intro">/);
   assert.match(nmm, /<div id="bgViewer" data-src="NCB\.glb" data-mobile-src="NCB\.mobile\.glb"><\/div>/);
   assert.equal((nmm.match(/id="bgViewer"/g) ?? []).length, 1);
+  assert.match(cslt, /<section id="about" class="about-intro">/);
+  assert.match(cslt, /<cslt-point-cloud id="bgViewer" data-src="pointcloud\/shop\.ply" data-mobile-src="pointcloud\/shop\.mobile\.ply"><\/cslt-point-cloud>/);
+  assert.equal((cslt.match(/id="bgViewer"/g) ?? []).length, 1);
+  assert.equal((cslt.match(/<cslt-point-cloud\b/g) ?? []).length, 1);
+  const csltScript = cslt.match(/<script type="module">([\s\S]*?)<\/script>/)[1];
+  assert.ok(csltScript.includes("contentStart: document.getElementById('about')"));
+  assert.doesNotMatch(cslt, /page-bootstrap|\.glb/);
 });
 
 test('EFV passes its centered writing model, camera, and fire shader options to the shared bootstrap', async () => {
