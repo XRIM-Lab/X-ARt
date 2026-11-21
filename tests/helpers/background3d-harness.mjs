@@ -1,10 +1,12 @@
 import * as THREE from 'three';
 import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { FakeBrowser } from './fake-browser.mjs';
 import { loadModuleFile } from './vm-modules.mjs';
 
 const rendererPath = fileURLToPath(new URL('../../background3d.js', import.meta.url));
+const fireEffectPath = fileURLToPath(new URL('../../fire-effect.js', import.meta.url));
+const fireEffectOptionsPath = fileURLToPath(new URL('../../fire-effect-options.js', import.meta.url));
 const shaderFiles = {
   'Fire2.vert': readFileSync(new URL('../../Fire2.vert', import.meta.url), 'utf8'),
   'Fire2.frag': readFileSync(new URL('../../Fire2.frag', import.meta.url), 'utf8')
@@ -240,10 +242,22 @@ export async function createBackgroundHarness({
     const request = String(url);
     state.fetchCalls.push(request);
     const filename = request.split('/').at(-1);
-    return { text: async () => shaderSources[filename] ?? '' };
+    return {
+      ok: filename in shaderSources,
+      status: filename in shaderSources ? 200 : 404,
+      text: async () => shaderSources[filename] ?? ''
+    };
   };
   const modules = {
     three: { exports: three },
+    './fire-effect.js': {
+      source: readFileSync(fireEffectPath, 'utf8'),
+      identifier: pathToFileURL(fireEffectPath).href
+    },
+    './fire-effect-options.js': {
+      source: readFileSync(fireEffectOptionsPath, 'utf8'),
+      identifier: pathToFileURL(fireEffectOptionsPath).href
+    },
     'three/addons/loaders/GLTFLoader.js': { exports: { GLTFLoader: Loader } },
     'three/addons/loaders/DRACOLoader.js': { exports: { DRACOLoader: DracoLoader } },
     'three/addons/environments/RoomEnvironment.js': {

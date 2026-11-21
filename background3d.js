@@ -6,51 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-
-const DEFAULT_FIRE_MATERIAL = {
-  vertexUrl: 'Fire2.vert',
-  fragmentUrl: 'Fire2.frag',
-  color: '#ffae00',
-  emissionGain: 1,
-  scroll1: 2,
-  scroll2: 0,
-  displacementIntensity: 1,
-  textureScaleX: 1,
-  textureOffsetX: 0,
-  clampTextureX: false
-};
-
-function prepareFireVertexShader(source) {
-  return source
-    .replace(/#version[^\n]*\n/, '')
-    .replace(/precision[^;]+;\n/, '')
-    .replace(/layout\(location = \d+\)\s*/g, '')
-    .replace('uniform mat4 uModelViewProjection;', '')
-    .replace(/uModelViewProjection\s*\*\s*vec4\(aPosition,\s*1\.0\)/, 'projectionMatrix * modelViewMatrix * vec4(aPosition, 1.0)');
-}
-
-function prepareFireFragmentShader(source) {
-  return source
-    .replace(/#version[^\n]*\n/, '')
-    .replace(/precision[^;]+;\n/, '');
-}
-
-function ensureFireAttributes(geometry, vertexColor) {
-  const position = geometry.getAttribute('position');
-  const uv = geometry.getAttribute('uv');
-  const color = geometry.getAttribute('color');
-  if (position && !geometry.getAttribute('aPosition')) geometry.setAttribute('aPosition', position);
-  if (uv && !geometry.getAttribute('aTexcoord')) geometry.setAttribute('aTexcoord', uv);
-  if (color?.itemSize === 4 && !geometry.getAttribute('aColor')) {
-    geometry.setAttribute('aColor', color);
-  } else if (!geometry.getAttribute('aColor') && position) {
-    const colorValues = new Float32Array(position.count * 4);
-    for (let i = 0; i < position.count; i++) {
-      colorValues.set([vertexColor.r, vertexColor.g, vertexColor.b, 1], i * 4);
-    }
-    geometry.setAttribute('aColor', new THREE.Float32BufferAttribute(colorValues, 4));
-  }
-}
+import { applyBloomTint, createFireMaterialApplier } from './fire-effect.js';
 
 export function initBackground3D(viewer, mobileLayout, {
   desktopBloomStrength = 250,
@@ -86,24 +42,7 @@ export function initBackground3D(viewer, mobileLayout, {
   const composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
   const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), desktopBloomStrength, bloomRadius, bloomThreshold);
-  if (bloomTint) {
-    bloom.materialHighPassFilter.fragmentShader = `
-      uniform vec3 defaultColor;
-      uniform float defaultOpacity;
-      uniform float luminosityThreshold;
-      uniform float smoothWidth;
-      uniform sampler2D tDiffuse;
-      varying vec2 vUv;
-      void main() {
-        vec4 texel = texture2D(tDiffuse, vUv);
-        float luminance = dot(texel.rgb, vec3(0.299, 0.587, 0.114));
-        float bloomMask = smoothstep(luminosityThreshold, luminosityThreshold + smoothWidth, luminance);
-        gl_FragColor = mix(vec4(defaultColor, defaultOpacity), vec4(1.0), bloomMask);
-      }`;
-    bloom.materialHighPassFilter.needsUpdate = true;
-    const tint = new THREE.Color(bloomTint);
-    bloom.bloomTintColors.forEach(color => color.set(tint.r, tint.g, tint.b));
-  }
+  if (bloomTint) applyBloomTint(bloom, bloomTint);
   composer.addPass(bloom);
   composer.addPass(new OutputPass());
 
@@ -112,9 +51,8 @@ export function initBackground3D(viewer, mobileLayout, {
   draco.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.174.0/examples/jsm/libs/draco/');
   loader.setDRACOLoader(draco);
   const models = new Map();
-  const fireConfig = fireMaterial && { ...DEFAULT_FIRE_MATERIAL, ...fireMaterial };
+  const applyFireMaterial = fireMaterial && createFireMaterialApplier(fireMaterial);
   const clock = new THREE.Clock();
-  let fireShaderPromise;
   let fireShaderMaterial;
   const center = new THREE.Vector3();
   let distance = 6;
@@ -149,64 +87,6 @@ export function initBackground3D(viewer, mobileLayout, {
   function renderLoop() {
     if (fireShaderMaterial) fireShaderMaterial.uniforms.uTime.value = clock.getElapsedTime();
     render();
-  }
-
-  async function getFireShaderMaterial(sourceMap) {
-    if (!fireShaderPromise) {
-      fireShaderPromise = Promise.all([
-        fetch(fireConfig.vertexUrl).then(response => response.text()),
-        fetch(fireConfig.fragmentUrl).then(response => response.text())
-      ]);
-    }
-    const [vertexSource, fragmentSource] = await fireShaderPromise;
-    if (!fireShaderMaterial) {
-      if (fireConfig.clampTextureX) {
-        sourceMap.wrapS = THREE.ClampToEdgeWrapping;
-        sourceMap.needsUpdate = true;
-      }
-      fireShaderMaterial = new THREE.ShaderMaterial({
-        glslVersion: THREE.GLSL3,
-        vertexShader: prepareFireVertexShader(vertexSource),
-        fragmentShader: prepareFireFragmentShader(fragmentSource),
-        uniforms: {
-          _MainTex: { value: sourceMap },
-          uTime: { value: 0 },
-          _Scroll1: { value: fireConfig.scroll1 },
-          _Scroll2: { value: fireConfig.scroll2 },
-          _DisplacementIntensity: { value: fireConfig.displacementIntensity },
-          _Dissolve: { value: 1 },
-          _ClipStart: { value: 0 },
-          _ClipEnd: { value: 0 },
-          _MainTex_ST: { value: new THREE.Vector4(fireConfig.textureScaleX, 1, fireConfig.textureOffsetX, 0) },
-          _Color: { value: new THREE.Color(fireConfig.color) },
-          _EmissionGain: { value: fireConfig.emissionGain }
-        },
-        transparent: true,
-        alphaTest: 0.08,
-        depthWrite: false,
-        side: THREE.DoubleSide,
-        forceSinglePass: true,
-        blending: THREE.NormalBlending
-      });
-      renderer.setAnimationLoop(renderLoop);
-    }
-    return fireShaderMaterial;
-  }
-
-  async function applyFireMaterial(model) {
-    let sourceMap;
-    const vertexColor = new THREE.Color(fireConfig.color);
-    model.traverse(object => {
-      if (object.isMesh) {
-        ensureFireAttributes(object.geometry, vertexColor);
-        sourceMap ??= object.material.map;
-      }
-    });
-    if (!sourceMap) return;
-    const material = await getFireShaderMaterial(sourceMap);
-    model.traverse(object => {
-      if (object.isMesh) object.material = material;
-    });
   }
 
   function resize() {
@@ -254,8 +134,12 @@ export function initBackground3D(viewer, mobileLayout, {
     if (currentModel) scene.remove(currentModel);
     currentModel = gltf.scene;
     scene.add(currentModel);
-    if (fireConfig) {
-      await applyFireMaterial(currentModel);
+    if (applyFireMaterial) {
+      const material = await applyFireMaterial(currentModel);
+      if (material && !fireShaderMaterial) {
+        fireShaderMaterial = material;
+        renderer.setAnimationLoop(renderLoop);
+      }
       if (sequence !== loadSequence) return;
     }
     const bounds = new THREE.Box3().setFromObject(currentModel);

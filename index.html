@@ -325,23 +325,18 @@
   <!-- Scroll-driven rotation logic + loading management -->
 <script type="module">
   import { initPage } from './page-bootstrap.js';
+  import { FIRE_EFFECT_OPTIONS } from './fire-effect-options.js';
 
   initPage({
     backgroundOptions: {
-      desktopBloomStrength: 0.4,
-      mobileBloomStrength: 0.4,
-      bloomRadius: 0.0005,
-      bloomThreshold: 0.1,
-      mobileBloomRadius: 0.0005,
-      bloomTint: '#ffaa00',
+      desktopBloomStrength: FIRE_EFFECT_OPTIONS.bloom.strength,
+      mobileBloomStrength: FIRE_EFFECT_OPTIONS.bloom.strength,
+      bloomRadius: FIRE_EFFECT_OPTIONS.bloom.radius,
+      bloomThreshold: FIRE_EFFECT_OPTIONS.bloom.threshold,
+      mobileBloomRadius: FIRE_EFFECT_OPTIONS.bloom.radius,
+      bloomTint: FIRE_EFFECT_OPTIONS.bloom.tint,
       modelScale: 2,
-      fireMaterial: {
-        color: '#ff8800',
-        emissionGain: 5,
-        textureScaleX: 0.25,
-        textureOffsetX: 0.375,
-        clampTextureX: true
-      }
+      fireMaterial: FIRE_EFFECT_OPTIONS.material
     }
   });
 </script>

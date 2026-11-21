@@ -7,6 +7,9 @@ from collections import Counter
 from pathlib import Path
 from random import Random
 
+import numpy as np
+from scipy.spatial import cKDTree
+
 
 SOURCE_NAME = "sshop2-better-edit.ply"
 DESKTOP_BUDGET = 220_000
@@ -14,6 +17,8 @@ MOBILE_BUDGET = 80_000
 REGION_SIZE = 0.125
 DENSITY_EXPONENT = 0.8
 MIN_OPACITY_LOGIT = math.log(0.10 / 0.90)
+NEIGHBOR_RADIUS = 0.05
+MIN_NEIGHBORS = 3
 DC_FACTOR = 0.28209479177387814
 FLOAT = struct.Struct("<f")
 POINT = struct.Struct("<fffBBB")
@@ -56,19 +61,29 @@ def read_header(source):
     raise ValueError("Missing or oversized PLY header")
 
 
-def accepted_points(data, header):
+def spatially_supported(positions):
+    if len(positions) <= MIN_NEIGHBORS:
+        return np.zeros(len(positions), dtype=bool)
+    tree = cKDTree(positions)
+    distances, _ = tree.query(tree.data, k=[MIN_NEIGHBORS + 1])
+    return distances[:, 0] <= NEIGHBOR_RADIUS
+
+
+def accepted_indices(data, header):
     offset, stride, count, fields = header
+    vertices = np.ndarray((count, stride // FLOAT.size), dtype="<f4", buffer=data, offset=offset)
+    attributes = vertices[:, [field // FLOAT.size for field in fields]]
+    eligible = np.isfinite(attributes).all(axis=1) & (attributes[:, -1].astype("f8") >= MIN_OPACITY_LOGIT)
+    indices = np.flatnonzero(eligible)
+    return indices[spatially_supported(attributes[indices, :3])]
+
+
+def accepted_points(data, header, indices):
+    offset, stride, _, (ox, oy, oz, _, _, _, oo) = header
     read = FLOAT.unpack_from
-    ox, oy, oz, ore, og, ob, oo = fields
-    for index in range(count):
-        start = offset + index * stride
-        opacity = read(data, start + oo)[0]
-        if not math.isfinite(opacity) or opacity < MIN_OPACITY_LOGIT:
-            continue
-        x, y, z = read(data, start + ox)[0], read(data, start + oy)[0], read(data, start + oz)[0]
-        r, g, b = read(data, start + ore)[0], read(data, start + og)[0], read(data, start + ob)[0]
-        if all(map(math.isfinite, (x, y, z, r, g, b))):
-            yield start, x, y, z, opacity
+    for index in indices:
+        start = offset + int(index) * stride
+        yield start, read(data, start + ox)[0], read(data, start + oy)[0], read(data, start + oz)[0], read(data, start + oo)[0]
 
 
 def region_key(x, y, z):
@@ -91,13 +106,14 @@ def allocate_budgets(counts, desktop_budget, mobile_budget):
 
 
 def sample_clouds(data, header):
-    counts = Counter(region_key(x, y, z) for _, x, y, z, _ in accepted_points(data, header))
+    indices = accepted_indices(data, header)
+    counts = Counter(region_key(x, y, z) for _, x, y, z, _ in accepted_points(data, header, indices))
     if not counts:
         raise ValueError("No usable points")
     desktop_quotas, mobile_quotas = allocate_budgets(counts, DESKTOP_BUDGET, MOBILE_BUDGET)
     samples = {key: [] for key in desktop_quotas}
     random = Random(0).random
-    for start, x, y, z, opacity in accepted_points(data, header):
+    for start, x, y, z, opacity in accepted_points(data, header, indices):
         key = region_key(x, y, z)
         if key not in samples:
             continue

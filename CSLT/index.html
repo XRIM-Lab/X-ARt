@@ -177,12 +177,15 @@
     const VIEW_Y_ROTATION_DEGREES = -20;
     const VIEW_X_ROTATION_DEGREES = -6;
     const CAMERA_MARGIN = 1.1;
-    const DESKTOP_POINT_SIZE = 0.055;
-    const MOBILE_POINT_SIZE = 0.065;
+    const DESKTOP_POINT_SIZE = 0.0055;
+    const MOBILE_POINT_SIZE = 0.0065;
     // Midway down the right aisle, in the shared PLY coordinate system.
-    const INTERIOR_CAMERA_POSITION = [0.775, 1.424, 0.745];
+    const INTERIOR_CAMERA_POSITION = [0.775, 1.024, 0.745];
     const ZOOM_ARC_RIGHT = 0.3;
-    const BALL_RADIUS = 0.3;
+    const ARTWORK_RADIUS = 1.5;
+    const ARTWORK_ROTATION_X_DEGREES = 15;
+    const ARTWORK_ROTATION_Y_DEGREES = 12;
+    const ARTWORK_ROTATION_Z_DEGREES = 90;
 
     class CsltPointCloud extends HTMLElement {
       #mobileLayout = window.matchMedia('(max-width: 767px), (pointer: coarse)');
@@ -195,8 +198,10 @@
       #viewUp;
       #openingPosition;
       #interiorPosition;
-      #ball;
-      #ballMaterial;
+      #artwork;
+      #points;
+      #fireOverlay;
+      #reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
       #renderer;
       #scene;
       #camera;
@@ -260,6 +265,7 @@
         points.rotateOnWorldAxis(this.#right, THREE.MathUtils.degToRad(VIEW_Y_ROTATION_DEGREES));
         points.rotateOnWorldAxis(this.#direction, THREE.MathUtils.degToRad(VIEW_X_ROTATION_DEGREES));
         scene.add(points);
+        this.#points = points;
         this.#interiorPosition = new THREE.Vector3(...INTERIOR_CAMERA_POSITION).applyQuaternion(points.quaternion);
 
         this.#bounds = this.#robustBounds(THREE, geometry.getAttribute('position'), points.quaternion);
@@ -272,10 +278,10 @@
         window.addEventListener('resize', () => this.#resize());
         document.addEventListener('visibilitychange', () => this.#render());
         this.#resize();
-        this.#loadBall(THREE, mobile).catch(error => console.warn('Could not load CSLT placeholder ball', error));
+        this.#loadArtwork(THREE, mobile).catch(error => console.warn('Could not load CSLT artwork', error));
       }
 
-      async #loadBall(THREE, mobile) {
+      async #loadArtwork(THREE, mobile) {
         const [{ GLTFLoader }, { DRACOLoader }] = await Promise.all([
           import('three/addons/loaders/GLTFLoader.js'),
           import('three/addons/loaders/DRACOLoader.js')
@@ -283,28 +289,44 @@
         const draco = new DRACOLoader();
         draco.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.174.0/examples/jsm/libs/draco/');
         try {
-          const src = mobile ? '../mesh_test.mobile.glb' : '../mesh_test.glb';
-          const { scene: model } = await new GLTFLoader().setDRACOLoader(draco).loadAsync(src);
+          const src = mobile ? 'Artwork.mobile.glb' : 'Artwork.glb';
+          const [{ scene: model }, { createFireMaterialApplier }, { FIRE_EFFECT_OPTIONS }, { createFireOverlay }] = await Promise.all([
+            new GLTFLoader().setDRACOLoader(draco).loadAsync(src),
+            import('../fire-effect.js'),
+            import('../fire-effect-options.js'),
+            import('./fire-overlay.js')
+          ]);
           const bounds = new THREE.Box3().setFromObject(model).getBoundingSphere(new THREE.Sphere());
           if (bounds.radius <= 0) return;
-          const material = new THREE.MeshBasicMaterial({
-            color: 0xff8800,
-            side: THREE.DoubleSide,
-            transparent: true,
-            depthWrite: false
+          const applyFire = createFireMaterialApplier({
+            ...FIRE_EFFECT_OPTIONS.material,
+            vertexUrl: '../Fire2.vert',
+            fragmentUrl: '../Fire2.frag'
           });
-          model.traverse(object => {
-            if (object.isMesh) object.material = material;
+          const material = await applyFire(model);
+          if (!material) return;
+          this.#fireOverlay = createFireOverlay({
+            renderer: this.#renderer,
+            scene: this.#scene,
+            camera: this.#camera,
+            occluders: [this.#points],
+            bloomTint: '#ff8800',
+            reducedMotion: this.#reducedMotion,
+            onFrame: () => this.#render()
           });
+          if (!this.#fireOverlay) return;
 
-          const ball = new THREE.Group();
+          const artwork = new THREE.Group();
           model.position.sub(bounds.center);
-          ball.add(model);
-          ball.scale.setScalar(BALL_RADIUS / bounds.radius);
-          ball.position.copy(this.#interiorPosition);
-          this.#ball = ball;
-          this.#ballMaterial = material;
-          this.#scene.add(ball);
+          artwork.add(model);
+          artwork.scale.setScalar(ARTWORK_RADIUS / bounds.radius);
+          artwork.rotateOnWorldAxis(this.#right, THREE.MathUtils.degToRad(ARTWORK_ROTATION_X_DEGREES));
+          artwork.rotateOnWorldAxis(this.#viewUp, THREE.MathUtils.degToRad(ARTWORK_ROTATION_Y_DEGREES));
+          artwork.rotateOnWorldAxis(this.#direction, THREE.MathUtils.degToRad(ARTWORK_ROTATION_Z_DEGREES));
+          artwork.position.copy(this.#interiorPosition);
+          this.#artwork = artwork;
+          this.#scene.add(artwork);
+          this.#fireOverlay.attach(artwork, material);
           this.#render();
         } finally {
           draco.dispose();
@@ -345,6 +367,7 @@
         this.#camera.up.copy(this.#viewUp);
         this.#camera.lookAt(this.#center);
         this.#camera.updateProjectionMatrix();
+        this.#fireOverlay?.setSize();
         this.#applyPose(this.#progress);
       }
 
@@ -367,14 +390,19 @@
       }
 
       #render() {
-        if (!this.#renderer || document.hidden) return;
-        if (this.#ball) {
-          // The camera finishes at the ball's center, so fade it before arrival.
-          const distance = this.#camera.position.distanceTo(this.#ball.position);
-          this.#ballMaterial.opacity = Math.max(0, Math.min(1, (distance - 0.65) / 0.85));
-          this.#ball.visible = this.#ballMaterial.opacity > 0;
+        if (!this.#renderer || document.hidden) {
+          this.#fireOverlay?.cancel();
+          return;
+        }
+        let artworkFade = 0;
+        if (this.#artwork) {
+          // The camera finishes at the artwork's center, so fade it before arrival.
+          const distance = this.#camera.position.distanceTo(this.#artwork.position);
+          artworkFade = Math.max(0, Math.min(1, (distance - 0.65) / 0.85));
+          this.#artwork.visible = artworkFade > 0;
         }
         this.#renderer.render(this.#scene, this.#camera);
+        this.#fireOverlay?.render(artworkFade);
       }
     }
 

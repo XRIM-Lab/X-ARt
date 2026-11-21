@@ -7,6 +7,7 @@ import { loadSourceModule } from './helpers/vm-modules.mjs';
 
 const pageScrollSource = readFileSync(new URL('../page-scroll.js', import.meta.url), 'utf8');
 const bootstrapSource = readFileSync(new URL('../page-bootstrap.js', import.meta.url), 'utf8');
+const fireEffectOptionsSource = readFileSync(new URL('../fire-effect-options.js', import.meta.url), 'utf8');
 let runId = 0;
 
 function deferred() {
@@ -49,7 +50,11 @@ async function bootPage(page, { reduced = false, importFailure = false, initFail
     },
     './background3d.js': importFailure
       ? { error: new Error('background module unavailable') }
-      : { exports: { initBackground3D } }
+      : { exports: { initBackground3D } },
+    './fire-effect-options.js': {
+      source: fireEffectOptionsSource,
+      identifier: `file:///fire-effect-options-${++runId}.mjs`
+    }
   };
 
   await loadSourceModule(script, {
