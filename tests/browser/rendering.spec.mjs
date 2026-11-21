@@ -458,7 +458,7 @@ test('CSLT releases the splash and keeps content usable while the point cloud is
   await page.waitForFunction(count => window.__webglDiagnostics?.pointDraws?.some(draw => draw.count === count), pointCount, { timeout: 30000 });
 });
 
-test('CSLT strand occlusion blocks rear points while gaps and halo stay additive', async ({ page }) => {
+test('CSLT fire alpha lets rear points show through while foreground points still occlude', async ({ page }) => {
   await blockExternalAndServePackages(page);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.route('**/strand-occlusion', route => route.fulfill({
@@ -521,7 +521,7 @@ test('CSLT strand occlusion blocks rear points while gaps and halo stay additive
     };
     front.visible = false;
     draw(1);
-    const occluded = pixel(64, 64);
+    const rearThroughFire = pixel(64, 64);
     const gap = pixel(90, 64);
     const haloWithGreen = pixel(80, 64);
     rear.visible = false;
@@ -537,19 +537,18 @@ test('CSLT strand occlusion blocks rear points while gaps and halo stay additive
     const halfFade = pixel(64, 64);
     draw(0);
     const noFade = pixel(64, 64);
-    return { occluded, gap, haloWithGreen, foreground, fireOnly, haloOnBlack, halfFade, noFade };
+    return { rearThroughFire, gap, haloWithGreen, foreground, fireOnly, haloOnBlack, halfFade, noFade };
   });
   expect(samples).not.toBeNull();
-  expect(samples.occluded[0]).toBeGreaterThan(80);
-  for (let channel = 0; channel < 3; channel++) {
-    expect(Math.abs(samples.occluded[channel] - samples.fireOnly[channel])).toBeLessThanOrEqual(1);
-  }
+  expect(samples.rearThroughFire[0]).toBeGreaterThan(80);
+  expect(Math.abs(samples.rearThroughFire[0] - samples.fireOnly[0])).toBeLessThanOrEqual(1);
+  expect(samples.rearThroughFire[1]).toBeGreaterThan(250);
+  expect(Math.abs(samples.fireOnly[3] - 102)).toBeLessThanOrEqual(2);
   expect(samples.foreground).toEqual([0, 255, 0, 255]);
   expect(samples.gap[1]).toBeGreaterThan(240);
   expect(samples.haloWithGreen[1]).toBeGreaterThan(240);
   expect(samples.haloOnBlack[0] + samples.haloOnBlack[1]).toBeGreaterThan(0);
-  expect(samples.halfFade[1]).toBeGreaterThan(40);
-  expect(samples.halfFade[1]).toBeLessThan(220);
+  expect(samples.halfFade[1]).toBeGreaterThan(250);
   expect(samples.noFade).toEqual([0, 255, 0, 255]);
 });
 

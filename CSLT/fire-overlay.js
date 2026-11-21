@@ -18,16 +18,13 @@ const COMPOSITE_FRAGMENT = `
   uniform sampler2D tDiffuse;
   uniform sampler2D tBloom;
   uniform float uFade;
-  uniform float uStrandThreshold;
   varying vec2 vUv;
 
   #include <tonemapping_pars_fragment>
 
   void main() {
     vec4 fire = texture2D(tDiffuse, vUv);
-    float strandLight = dot(fire.rgb, vec3(0.299, 0.587, 0.114));
-    float strandCoverage = smoothstep(0.25 * uStrandThreshold, uStrandThreshold, strandLight);
-    gl_FragColor = vec4(linearToOutputTexel(vec4(ACESFilmicToneMapping(fire.rgb + texture2D(tBloom, vUv).rgb), 1.0)).rgb, max(fire.a, strandCoverage)) * uFade;
+    gl_FragColor = vec4(linearToOutputTexel(vec4(ACESFilmicToneMapping(fire.rgb + texture2D(tBloom, vUv).rgb), 1.0)).rgb, fire.a) * uFade;
   }
 `;
 
@@ -55,7 +52,6 @@ export function createFireOverlay({ renderer, scene, camera, occluders, bloomTin
       tDiffuse: { value: capture.texture },
       tBloom: { value: bloom.renderTargetsHorizontal[0].texture },
       uFade: { value: 1 },
-      uStrandThreshold: { value: FIRE_EFFECT_OPTIONS.bloom.threshold },
       toneMappingExposure: { value: 1 }
     },
     vertexShader: COMPOSITE_VERTEX,
