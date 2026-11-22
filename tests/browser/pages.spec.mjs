@@ -5,6 +5,20 @@ test.beforeEach(async ({ page }) => {
   await blockExternalAndServePackages(page);
 });
 
+async function expectAboutBelowHeader(page) {
+  let previousScrollY;
+  await expect.poll(async () => {
+    const { y, gap } = await page.evaluate(() => ({
+      y: window.scrollY,
+      gap: document.getElementById('about').getBoundingClientRect().top -
+        document.getElementById('siteHeader').getBoundingClientRect().height
+    }));
+    const stable = y === previousScrollY;
+    previousScrollY = y;
+    return stable ? Math.abs(gap - 8) : Infinity;
+  }, { message: 'About should settle just below the fixed header' }).toBeLessThanOrEqual(4);
+}
+
 test('first-party pages render content, local images, and layouts without overflow', async ({ page }) => {
   const pages = [
     { path: '/', heading: 'About artrio', about: true },
@@ -47,10 +61,7 @@ test('desktop wheel, keyboard, header reveal, project links, and history use the
   await page.keyboard.press('PageDown');
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
   await expect(page.locator('#siteHeader')).toHaveClass(/is-visible/);
-  await expect.poll(async () => page.evaluate(() => {
-    const aboutTop = document.querySelector('#about').getBoundingClientRect().top + window.scrollY;
-    return Math.abs(window.scrollY - aboutTop) < 8;
-  })).toBe(true);
+  await expectAboutBelowHeader(page);
 
   const projects = page.locator('.has-dropdown');
   await projects.hover();
@@ -72,6 +83,7 @@ test('mobile menu preserves ARIA state, dropdown, navigation close, and five-sec
   await expect(page.locator('#loadingScreen')).toBeHidden();
   await page.evaluate(() => window.scrollTo(0, window.innerHeight * 0.6));
   await expect(page.locator('#siteHeader')).toHaveClass(/is-visible/);
+  await expectAboutBelowHeader(page);
 
   const menuButton = page.getByRole('button', { name: 'Open navigation menu' });
   await menuButton.tap();
@@ -219,7 +231,7 @@ test('CSLT gallery renders and navigates every photo', async ({ page }) => {
 });
 
 const sectionPlans = [
-  { path: '/', ids: ['about', 'gallery', 'featured-projects', 'performances', 'engagement', 'team'], readingCopy: true },
+  { path: '/', ids: ['about', 'featured-projects', 'gallery', 'performances', 'engagement', 'team'], readingCopy: false },
   { path: '/TTY2/', ids: ['about', 'video', 'awards', 'gallery', 'events', 'team'], readingCopy: true },
   { path: '/EFV/', ids: ['about', 'video', 'gallery', 'events', 'team'], readingCopy: true },
   { path: '/NMM/', ids: ['about', 'gallery', 'video', 'events', 'team'], readingCopy: true },

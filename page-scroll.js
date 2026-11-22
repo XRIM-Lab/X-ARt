@@ -23,8 +23,10 @@ export function initPageScroll({ contentStart, onUpdate } = {}) {
   function getEntranceZones() {
     if (!contentStart?.getBoundingClientRect) return null;
     const aboutTop = contentStart.getBoundingClientRect().top + window.scrollY;
+    const headerHeight = document.getElementById('siteHeader')?.getBoundingClientRect().height ?? 0;
+    const landingTop = Math.max(0, aboutTop - (headerHeight > 0 ? Math.ceil(headerHeight) + 8 : 0));
     const buffer = Math.min(window.innerHeight * 0.2, aboutTop * 0.25);
-    return { aboutTop, heroEnd: buffer, contentStart: aboutTop - buffer };
+    return { aboutTop, landingTop, heroEnd: buffer, contentStart: landingTop - buffer };
   }
 
   function getEntrancePhase() {
@@ -106,7 +108,7 @@ export function initPageScroll({ contentStart, onUpdate } = {}) {
     if (zones && window.scrollY <= zones.heroEnd) {
       event.preventDefault();
       lastScrollY = window.scrollY;
-      runEntranceScroll(zones.aboutTop);
+      runEntranceScroll(zones.landingTop);
     }
   }
 
@@ -145,10 +147,10 @@ export function initPageScroll({ contentStart, onUpdate } = {}) {
         const entering = entrancePhase === 'hero' && currentScrollY > previousScrollY &&
           previousScrollY <= zones.heroEnd && currentScrollY > 0 && currentScrollY < zones.aboutTop;
         const leaving = entrancePhase === 'content' && currentScrollY < previousScrollY &&
-          previousScrollY >= zones.contentStart && previousScrollY <= zones.aboutTop + window.innerHeight &&
-          currentScrollY < zones.aboutTop && currentScrollY > 0;
+          previousScrollY >= zones.contentStart && previousScrollY <= zones.landingTop + window.innerHeight &&
+          currentScrollY < zones.landingTop && currentScrollY > 0;
         if (entering) {
-          runEntranceScroll(zones.aboutTop);
+          runEntranceScroll(zones.landingTop);
         } else if (leaving) {
           runEntranceScroll(0);
         } else if (currentScrollY <= zones.heroEnd) {

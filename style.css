@@ -218,6 +218,9 @@ a:hover {
   grid-template-columns: 1fr;
   gap: 2rem;
 }
+.home-page #about .two-col > .lead {
+  margin-block-end: 0;
+}
 @media (min-width: 992px) {
   .two-col {
     grid-template-columns: 1fr 1fr;
@@ -227,6 +230,7 @@ a:hover {
 }
 
 .site-content > .site-section {
+  background-color: rgba(0, 0, 0, 0.25);
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
   padding: 1.5rem clamp(1rem, 3vw, 2rem);

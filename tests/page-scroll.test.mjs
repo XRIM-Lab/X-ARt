@@ -52,20 +52,21 @@ test('progress clamps safely, coalesces frames, and refreshes the header initial
 
 test('native entry/return transitions preserve input guards and ordinary scrolling', async () => {
   const browser = new FakeBrowser();
+  browser.element('siteHeader').getBoundingClientRect = () => ({ height: 64, bottom: 0 });
   await withBrowser(browser, async initPageScroll => {
     const controller = initPageScroll({ contentStart: browser.contentStart() });
     browser.runFrame();
 
     const wheel = browser.dispatch('wheel', { deltaY: 12 });
     assert.equal(wheel.defaultPrevented, true);
-    assert.equal(browser.scrollCalls[0][0].top, 1000);
+    assert.equal(browser.scrollCalls[0][0].top, 928);
     assert.equal(browser.scrollCalls[0][0].behavior, 'smooth');
     assert.equal(browser.dispatch('wheel', { deltaY: 20, ctrlKey: true }).defaultPrevented, false);
     assert.equal(browser.dispatch('wheel', { deltaY: 20 }).defaultPrevented, true);
     assert.equal(browser.dispatch('keydown', { key: 'PageDown' }).defaultPrevented, true);
     assert.equal(browser.dispatch('touchmove').defaultPrevented, true);
 
-    browser.window.scrollY = 999;
+    browser.window.scrollY = 927;
     browser.dispatch('scroll');
     browser.advance(159);
     assert.equal(browser.dispatch('keydown', { key: 'ArrowDown' }).defaultPrevented, true);
@@ -78,7 +79,11 @@ test('native entry/return transitions preserve input guards and ordinary scrolli
     assert.equal(ordinaryWheel.defaultPrevented, false);
     assert.equal(browser.scrollCalls.length, 1);
 
-    browser.window.scrollY = 500;
+    browser.window.scrollY = 960;
+    browser.dispatch('scroll');
+    assert.equal(browser.scrollCalls.length, 1);
+
+    browser.window.scrollY = 920;
     browser.dispatch('scroll');
     assert.equal(browser.scrollCalls.at(-1)[0].top, 0);
     assert.equal(browser.scrollCalls.at(-1)[0].behavior, 'smooth');
@@ -88,6 +93,7 @@ test('native entry/return transitions preserve input guards and ordinary scrolli
 
 test('Firefox uses the existing cubic 600ms path and settles at the measured content target', async () => {
   const browser = new FakeBrowser({ firefox: true });
+  browser.element('siteHeader').getBoundingClientRect = () => ({ height: 64, bottom: 0 });
   await withBrowser(browser, async initPageScroll => {
     const controller = initPageScroll({ contentStart: browser.contentStart() });
     browser.runFrame();
@@ -95,9 +101,9 @@ test('Firefox uses the existing cubic 600ms path and settles at the measured con
     browser.dispatch('scroll');
 
     browser.runFrame(300);
-    assert.ok(Math.abs(browser.scrollCalls.at(-1)[1] - 887.5) < 0.001);
+    assert.ok(Math.abs(browser.scrollCalls.at(-1)[1] - 824.5) < 0.001);
     browser.runFrame(600);
-    assert.equal(browser.window.scrollY, 1000);
+    assert.equal(browser.window.scrollY, 928);
     browser.advance(160);
     assert.equal(browser.dispatch('keydown', { key: 'PageDown' }).defaultPrevented, false);
     controller.destroy();
@@ -208,12 +214,15 @@ test('reduced motion, missing content, and destroy bypass or cancel entrance wor
 
 test('entrance destinations use the content element position measured at trigger time', async () => {
   const browser = new FakeBrowser();
+  const header = browser.element('siteHeader');
+  header.getBoundingClientRect = () => ({ height: 64, bottom: 0 });
   await withBrowser(browser, async initPageScroll => {
     const controller = initPageScroll({ contentStart: browser.contentStart() });
     browser.runFrame();
+    header.getBoundingClientRect = () => ({ height: 72, bottom: 0 });
     browser.contentTop = 1600;
     browser.dispatch('wheel', { deltaY: 10 });
-    assert.equal(browser.scrollCalls.at(-1)[0].top, 1600);
+    assert.equal(browser.scrollCalls.at(-1)[0].top, 1520);
     assert.equal(browser.scrollCalls.at(-1)[0].behavior, 'smooth');
     controller.destroy();
   });
