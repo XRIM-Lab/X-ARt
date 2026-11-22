@@ -124,3 +124,89 @@ test('reduced motion keeps EFV scroll native and avoids opacity changes', async 
   expect(await page.locator('#bgViewer').evaluate(viewer => viewer.style.opacity)).toBe('');
   await context.close();
 });
+
+test('CSLT shows a responsive YouTube video', async ({ page }) => {
+  await page.route('https://www.youtube.com/embed/DGYPoJG8ZhY', route => route.fulfill({
+    contentType: 'text/html',
+    body: '<!DOCTYPE html><html><body><p>Stub YouTube embed</p></body></html>'
+  }));
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto(pageUrl('/CSLT/'));
+  await expect(page.locator('#loadingScreen')).toBeHidden();
+  const videoSection = page.locator('#video');
+  await videoSection.scrollIntoViewIfNeeded();
+  const iframe = videoSection.locator('.video-container iframe');
+  await expect(iframe).toHaveAttribute('src', 'https://www.youtube.com/embed/DGYPoJG8ZhY');
+  await expect(iframe).toHaveAttribute('loading', 'lazy');
+  await expect(videoSection.locator('a')).toHaveAttribute('href', 'https://www.youtube.com/watch?v=DGYPoJG8ZhY');
+  await expect(page.frameLocator('#video .video-container iframe').getByText('Stub YouTube embed')).toBeVisible();
+  const box = await videoSection.locator('.video-container').boundingBox();
+  expect(box).not.toBeNull();
+  expect(Math.abs(box.height - (box.width * 9) / 16)).toBeLessThanOrEqual(2);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+});
+
+test('CSLT gallery renders and navigates every photo', async ({ page }) => {
+  const expectedSources = [
+    '../images/CSLT.jpeg',
+    'images/L1000968-web.jpg',
+    'images/L1000988-web.jpg',
+    'images/L1010032-web.jpg',
+    'images/L1010094-web.jpg',
+    'images/L1010103-web.jpg'
+  ];
+  await page.goto(pageUrl('/CSLT/'));
+
+  await page.evaluate(() => {
+    const element = document.querySelector('#csltCarousel');
+    const instance = window.bootstrap.Carousel.getInstance(element);
+    if (instance) {
+      instance.pause();
+      instance.dispose();
+    }
+    window.bootstrap.Carousel.getOrCreateInstance(element, { ride: false });
+  });
+  await expect(page.locator('#loadingScreen')).toBeHidden();
+
+  const carousel = page.locator('#csltCarousel');
+  const items = carousel.locator('.carousel-item');
+  const indicators = carousel.locator('.carousel-indicators button');
+  await expect(items).toHaveCount(expectedSources.length);
+  await expect(indicators).toHaveCount(expectedSources.length);
+  expect(await items.locator('img').evaluateAll(images => images.map(image => image.getAttribute('src'))))
+    .toEqual(expectedSources);
+  const captions = (await items.locator('.home-gallery-caption').allTextContents()).map(text => text.trim());
+  expect(captions).toHaveLength(expectedSources.length);
+  expect(captions.every(caption => caption.length > 0)).toBe(true);
+  expect(await indicators.evaluateAll(buttons => buttons.map(button => ({
+    slideTo: button.getAttribute('data-bs-slide-to'),
+    label: button.getAttribute('aria-label')
+  })))).toEqual(captions.map((caption, index) => ({ slideTo: String(index), label: `Show ${caption}` })));
+  await expect(items.first()).toHaveClass(/active/);
+  await expect(indicators.first()).toHaveAttribute('aria-current', 'true');
+
+  const activeIndex = () => items.evaluateAll(elements =>
+    elements.findIndex(element => element.classList.contains('active')));
+  const expectSlideLoaded = async index => {
+    const image = items.nth(index).locator('img');
+    await expect.poll(() => image.evaluate(element => element.complete && element.naturalWidth > 0)).toBe(true);
+    await image.evaluate(element => element.decode());
+  };
+
+  await carousel.scrollIntoViewIfNeeded();
+  await expectSlideLoaded(0);
+
+  await carousel.locator('.carousel-control-next').click();
+  await expect.poll(activeIndex).toBe(1);
+  await carousel.locator('.carousel-control-prev').click();
+  await expect.poll(activeIndex).toBe(0);
+
+  for (let index = 1; index < expectedSources.length; index++) {
+    await indicators.nth(index).click();
+    await expect.poll(activeIndex).toBe(index);
+    await expect(indicators.nth(index)).toHaveAttribute('aria-current', 'true');
+    await expectSlideLoaded(index);
+  }
+
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+});

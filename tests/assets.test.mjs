@@ -244,3 +244,35 @@ test('CSLT artwork GLBs are embedded draco fire models within size and triangle 
   assert.ok(stats['CSLT/Artwork.mobile.glb'].bytes < stats['CSLT/Artwork.glb'].bytes, 'mobile artwork should be smaller than desktop');
   assert.ok(stats['CSLT/Artwork.mobile.glb'].triangles < stats['CSLT/Artwork.glb'].triangles, 'mobile artwork should have fewer faces than desktop');
 });
+
+test('every non-archived index page credits XRIM-Lab once under a single Technology heading', () => {
+  const labLink = /<a\b[^>]*href="https:\/\/xrim\.hkust\.edu\.hk\/"[^>]*>\s*XRIM-Lab\s*<\/a>/gi;
+  const anyLabReference = /href="[^"]*xrim\.hkust\.edu\.hk[^"]*"/gi;
+  for (const pagePath of pages) {
+    const html = readFileSync(path.join(repoRoot, pagePath), 'utf8');
+    const heading = /<h2[^>]*>\s*Technology\s*<\/h2>/gi;
+    const headings = html.match(heading) ?? [];
+    assert.equal(headings.length, 1, `${pagePath} must have exactly one Technology heading`);
+    const block = html.slice(html.search(heading) + headings[0].length);
+    const nextHeading = block.search(/<h2/i);
+    const section = nextHeading === -1 ? block : block.slice(0, nextHeading);
+    assert.equal((section.match(labLink) ?? []).length, 1, `${pagePath} Technology section must contain the XRIM-Lab credit link`);
+    assert.equal((html.match(anyLabReference) ?? []).length, 1, `${pagePath} must not duplicate the XRIM-Lab link`);
+    const anchor = section.match(labLink)[0];
+    assert.match(anchor, /target="_blank"/i, `${pagePath} lab link must open in a new tab`);
+    assert.match(anchor, /rel="noopener noreferrer"/i, `${pagePath} lab link must use noopener noreferrer`);
+  }
+});
+
+test('live pages render team credit lists as styled rows', () => {
+  for (const pagePath of pages) {
+    const html = readFileSync(path.join(repoRoot, pagePath), 'utf8');
+    const teamMatch = html.match(/<section id="team"[^>]*>([\s\S]*?)<\/section>/i);
+    assert.ok(teamMatch, `${pagePath} must have a team section`);
+    const listTags = teamMatch[1].match(/<ul\b[^>]*>/gi) ?? [];
+    assert.ok(listTags.length > 0, `${pagePath} team section must contain lists`);
+    for (const tag of listTags) {
+      assert.match(tag, /class="[^"]*styled-list[^"]*"/i, `${pagePath} team list must use styled-list rows: ${tag}`);
+    }
+  }
+});
