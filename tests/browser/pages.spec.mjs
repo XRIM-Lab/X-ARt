@@ -210,3 +210,95 @@ test('CSLT gallery renders and navigates every photo', async ({ page }) => {
 
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
+
+test('CSLT sections share aligned blurred panels and even spacing', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto(pageUrl('/CSLT/'));
+  await expect(page.locator('#loadingScreen')).toBeHidden();
+
+  const sectionIds = ['about', 'video', 'textbox', 'gallery', 'events', 'team'];
+  const metrics = await page.evaluate(ids => {
+    const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+    const expectedGap = Math.min(Math.max(3 * rootFontSize, 0.06 * window.innerWidth), 5 * rootFontSize);
+    return {
+      expectedGap,
+      sections: ids.map(id => {
+        const element = document.getElementById(id);
+        const rect = element.getBoundingClientRect();
+        const styles = getComputedStyle(element);
+        return {
+          id,
+          left: rect.left,
+          right: rect.right,
+          top: rect.top,
+          bottom: rect.bottom,
+          paddingInlineStart: parseFloat(styles.paddingInlineStart),
+          paddingInlineEnd: parseFloat(styles.paddingInlineEnd),
+          backdropFilter: styles.backdropFilter
+        };
+      })
+    };
+  }, sectionIds);
+
+  const reference = metrics.sections[0];
+  for (const section of metrics.sections) {
+    expect(section.backdropFilter, `${section.id} should blur its own background`).toBe('blur(3px)');
+    expect(section.left, `${section.id} left edge`).toBeGreaterThanOrEqual(reference.left - 1);
+    expect(section.left, `${section.id} left edge`).toBeLessThanOrEqual(reference.left + 1);
+    expect(section.right, `${section.id} right edge`).toBeGreaterThanOrEqual(reference.right - 1);
+    expect(section.right, `${section.id} right edge`).toBeLessThanOrEqual(reference.right + 1);
+    expect(section.paddingInlineStart, `${section.id} padding-inline-start`).toBeGreaterThanOrEqual(reference.paddingInlineStart - 1);
+    expect(section.paddingInlineStart, `${section.id} padding-inline-start`).toBeLessThanOrEqual(reference.paddingInlineStart + 1);
+    expect(section.paddingInlineEnd, `${section.id} padding-inline-end`).toBeGreaterThanOrEqual(reference.paddingInlineEnd - 1);
+    expect(section.paddingInlineEnd, `${section.id} padding-inline-end`).toBeLessThanOrEqual(reference.paddingInlineEnd + 1);
+  }
+  for (let index = 1; index < metrics.sections.length; index++) {
+    const gap = metrics.sections[index].top - metrics.sections[index - 1].bottom;
+    expect(gap, `gap before #${metrics.sections[index].id}`).toBeGreaterThanOrEqual(metrics.expectedGap - 1);
+    expect(gap, `gap before #${metrics.sections[index].id}`).toBeLessThanOrEqual(metrics.expectedGap + 1);
+  }
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+});
+
+test('CSLT illustrates About and Behind the Piece responsively', async ({ page }, testInfo) => {
+  const isMobile = testInfo.project.name === 'mobile-chromium';
+  const expected = [
+    { id: 'about', src: 'images/tsunglun-web.jpg' },
+    { id: 'textbox', src: 'images/pointcloud-web.png' }
+  ];
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto(pageUrl('/CSLT/'));
+  await expect(page.locator('#loadingScreen')).toBeHidden();
+
+  for (const entry of expected) {
+    const section = page.locator(`#${entry.id}`);
+    const figure = section.locator('figure');
+    const image = figure.locator('img');
+    await expect(figure).toHaveCount(1);
+    await expect(image).toHaveAttribute('src', entry.src);
+    expect(await image.getAttribute('alt')).toBeTruthy();
+    await expect(figure.locator('figcaption')).toHaveCount(0);
+    await section.scrollIntoViewIfNeeded();
+    await expect.poll(() => image.evaluate(element => element.complete && element.naturalWidth > 0)).toBe(true);
+    const geometry = await section.evaluate(element => {
+      const copy = element.querySelector('.cslt-story-copy').getBoundingClientRect();
+      const fig = element.querySelector('figure').getBoundingClientRect();
+      return {
+        copyTop: copy.top,
+        copyBottom: copy.bottom,
+        copyLeft: copy.left,
+        copyRight: copy.right,
+        figTop: fig.top,
+        figLeft: fig.left
+      };
+    });
+    if (isMobile) {
+      expect(geometry.figTop, `${entry.id} figure should sit below the copy`).toBeGreaterThanOrEqual(geometry.copyBottom - 1);
+      expect(Math.abs(geometry.figLeft - geometry.copyLeft), `${entry.id} figure should share the copy left edge`).toBeLessThanOrEqual(1);
+    } else {
+      expect(geometry.figLeft, `${entry.id} figure should sit right of the copy`).toBeGreaterThan(geometry.copyRight);
+      expect(Math.abs(geometry.figTop - geometry.copyTop), `${entry.id} figure should share the copy top edge`).toBeLessThanOrEqual(1);
+    }
+  }
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+});

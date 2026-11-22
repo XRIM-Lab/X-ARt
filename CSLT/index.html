@@ -34,6 +34,41 @@
       --bg-gradient:
         radial-gradient(120% 120% at 50% 50%, rgba(0,0,0,0.275), rgba(0,0,0,0.375));
     }
+    .cslt-content {
+      max-width: 1040px;
+    }
+    .cslt-content > section.raised {
+      padding-inline: clamp(1rem, 3vw, 2rem);
+    }
+    .cslt-content > section:not(.intro-hero) + section {
+      margin-block-start: clamp(3rem, 6vw, 5rem);
+    }
+    .cslt-story {
+      display: grid;
+      align-items: start;
+      gap: 1.25rem;
+    }
+    .cslt-story-copy > :last-child {
+      margin-block-end: 0;
+    }
+    .cslt-story figure {
+      margin: 0;
+      max-inline-size: 32rem;
+    }
+    .cslt-story img {
+      display: block;
+      inline-size: 100%;
+      block-size: auto;
+    }
+    @media (min-width: 992px) {
+      .cslt-story {
+        grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr);
+        gap: 2rem;
+      }
+    }
+    #csltCarousel {
+      border: 0;
+    }
   </style>
 </head>
 
@@ -62,7 +97,7 @@
     <cslt-point-cloud id="bgViewer" data-src="pointcloud/shop.ply" data-mobile-src="pointcloud/shop.mobile.ply"></cslt-point-cloud>
   </div>
 
-  <main class="site-container content-hidden">
+  <main class="site-container content-hidden cslt-content">
     <!-- 1) Intro screen: only title on the full viewport, background artwork visible -->
     <section class="intro-hero" id="intro">
       <div class="intro-title" aria-label="Site Title">
@@ -78,22 +113,17 @@
     </section>
 
     <!-- 2) Project description -->
-    <section id="about" class="about-intro">
-      <div class="content-panel raised">
-        <h2>About this Project</h2>
-        <p class="lead">A farewell performance for Tsung Lun Shoe Shop, a 70-year-old family business facing the former Kowloon Walled City.</p>
-
-<p>Come. Stay. Linger. Time. is an ephemeral piece commemorating the closing of Tsung Lun Shoe Shop. 
-  Located right across the former Kowloon Walled City, it witnessed over 60 years of a changing Kowloon City, from the Walled City's dismantling and Kai Tak Airport's coming and going, to its own relocation under urban renewal. 
-  Three generations have woven themselves into the fabric of this iconic Hong Kong neighbourhood.</p>
-
-<p>As the block gives way to urban redevelopment, we spent a month collecting audio and visual data, assembling 3D scans and point clouds of its diverse shops.</p>
-
-<p>C.S.L.T. took place inside Tsung Lun shop on its final day at that address. Nearly 200 traditional Chinese embroidered slippers, one of the first products sold when it opened in 1967, 
-  formed a curtain behind a wooden chair from the founder's time. On this stage, the founder's granddaughter sat while her mother, the second-generation proprietor, 
-  read her own poem and shared stories of growing up and watching her daughter grow up there. 
-  As she recited the poem, her words were inscribed into the shop as an expressive piece of 3D grass-script Chinese calligraphy via augmented reality.</p>
-     </div>
+    <section id="about" class="site-section raised">
+      <h2>About this Project</h2>
+      <div class="cslt-story">
+        <div class="cslt-story-copy">
+          <p class="lead">A farewell performance for Tsung Lun Shoe Shop, a 70-year-old family business facing the former Kowloon Walled City.</p>
+          <p>Come. Stay. Linger. Time. is an ephemeral piece commemorating the closing of Tsung Lun Shoe Shop. Located right across from the former Kowloon Walled City, it witnessed over 60 years of a changing Kowloon City, from the Walled City's dismantling and Kai Tak Airport's coming and going, to its own relocation under urban renewal. Three generations have woven themselves into the fabric of this iconic Hong Kong neighbourhood.</p>
+        </div>
+        <figure>
+          <img src="images/tsunglun-web.jpg" alt="Street view of Tsung Lun Shoe Shop, with shoe racks under the storefront sign" width="1200" height="1031" loading="lazy" decoding="async">
+        </figure>
+      </div>
     </section>
 
     <section id="video" class="site-section raised">
@@ -104,15 +134,26 @@
       <p><a href="https://www.youtube.com/watch?v=DGYPoJG8ZhY">Watch on YouTube</a></p>
     </section>
 
-    <!-- 3) Image gallery -->
-    <section id="gallery" class="home-gallery">
-      <div class="section-heading">
-        <h2>Image Gallery</h2>
+
+    <section id="textbox" class="site-section raised">
+      <h2>Behind the Piece</h2>
+      <div class="cslt-story">
+        <div class="cslt-story-copy">
+          <p>C.S.L.T. took place inside Tsung Lun Shoe Shop on its final day at that address. Nearly 200 traditional Chinese embroidered slippers, one of the first products sold when it opened in 1967, formed a curtain behind a wooden chair from the founder's time. On this stage, the founder's granddaughter sat while her mother, the second-generation proprietor, read her own poem and shared stories of growing up and watching her daughter grow up there. As she recited the poem, her words were inscribed into the shop as an expressive piece of 3D grass-script Chinese calligraphy via augmented reality.</p>
+          <p>As the block gives way to urban redevelopment, we spent a month collecting audio and visual data, assembling point clouds and 3D Gaussian Splatting models of its diverse shops.</p>
+        </div>
+        <figure>
+          <img src="images/pointcloud-web.png" alt="Point-cloud rendering of a city block and a tall tower against a black background" width="1000" height="810" loading="lazy" decoding="async">
+        </figure>
       </div>
+    </section>
+    <!-- 3) Image gallery -->
+    <section id="gallery" class="site-section raised">
+      <h2>Image Gallery</h2>
       <div id="csltCarousel" class="carousel slide home-gallery-carousel" data-bs-ride="carousel" data-bs-interval="5000">
         <div class="carousel-indicators">
-          <button type="button" data-bs-target="#csltCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Show CSLT — Tsun Lun Shoe Shop, Kowloon City"></button>
-          <button type="button" data-bs-target="#csltCarousel" data-bs-slide-to="1" aria-label="Show Inside Tsun Lun Shoe Shop"></button>
+          <button type="button" data-bs-target="#csltCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Show CSLT — Tsung Lun Shoe Shop, Kowloon City"></button>
+          <button type="button" data-bs-target="#csltCarousel" data-bs-slide-to="1" aria-label="Show Inside Tsung Lun Shoe Shop"></button>
           <button type="button" data-bs-target="#csltCarousel" data-bs-slide-to="2" aria-label="Show Lai Hing Stella KWOK, Owner of Tsun Lun Shoe Shop"></button>
           <button type="button" data-bs-target="#csltCarousel" data-bs-slide-to="3" aria-label="Show Performance at Tsun Lun Shoe Shop"></button>
           <button type="button" data-bs-target="#csltCarousel" data-bs-slide-to="4" aria-label="Show 2 Generations Among the Shoes Display"></button>
@@ -172,8 +213,8 @@
     </section>
 
     <!-- 5) Team & Thanks -->
-    <section id="team" class="site-section two-col">
-      <div class="col raised">
+    <section id="team" class="site-section two-col raised">
+      <div class="col">
         <div class="artists-list">
           <h2>Artists</h2>
           <ul class="styled-list">
@@ -194,7 +235,7 @@
         </div>
         </div>
 
-      <div class="col raised">
+      <div class="col">
       <div class="thanks-list">
         <h2>Photography & Videography</h2>
         <ul class="styled-list">
