@@ -29,15 +29,9 @@
   <!-- Shared Web Components (header, footer) -->
   <script src="../components.js"></script>
 
-  <style>
-    :root {
-      --bg-gradient:
-        radial-gradient(120% 120% at 50% 50%, rgba(0,0,0,0.275), rgba(0,0,0,0.375));
-    }
-  </style>
 </head>
 
-<body>
+<body class="project-page">
 
 <site-header page="nmm"></site-header>
 
@@ -47,7 +41,7 @@
       <h1 class="loading-title">Nature Series</h1>
       <h2> by 「ARtrio」</h2>
       <h3> (Formerly 「X-ARt」) </h3>
-      <div class="subtitle" style="font-family: var(--font-mono); letter-spacing:0.25em; margin-top:0.5rem;">
+      <div class="subtitle">
         Man, Nature, Technology, Art
       </div>
       <div class="loading-spinner">
@@ -62,7 +56,7 @@
     <div id="bgViewer" data-src="NCB.glb" data-mobile-src="NCB.mobile.glb"></div>
   </div>
 
-  <main class="site-container content-hidden">
+  <main class="site-container content-hidden site-content">
     <!-- 1) Intro screen: only title on the full viewport, background artwork visible -->
     <section class="intro-hero" id="intro">
       <div class="intro-title" aria-label="Site Title">
@@ -70,7 +64,7 @@
         <h2> by 「ARtrio」</h2>
         <h3> (Formerly 「X-ARt」) </h3>
 
-        <div class="subtitle" style="font-family: var(--font-mono); letter-spacing:0.25em; margin-top:0.5rem;">
+        <div class="subtitle">
           Man, Nature, Technology, Art
         </div>
         <div class="intro-hint" aria-hidden="true">Scroll to enter</div>
@@ -78,9 +72,9 @@
     </section>
 
     <!-- 2) Project description -->
-    <section id="about" class="about-intro">
-      <div class="content-panel raised">
-        <h2>About this Series</h2>
+    <section id="about" class="site-section">
+      <h2>About this Series</h2>
+      <div class="reading-copy">
         <p class="lead">An ongoing exploration of Nature's invisible forces through performance and augmented reality.</p>
         <p>The Nature Series is a sequence of performances and installations that use augmented reality to make visible the "fields of force" and "flows of materials" of Nature — the invisible energies that affect every aspect of our lives.</p>
         <p>Each performance is site-specific, combining ephemeral land art with digital augmentations in AR.</p>
@@ -88,10 +82,8 @@
     </section>
 
     <!-- 3) Image gallery -->
-    <section id="gallery" class="home-gallery">
-      <div class="section-heading">
-        <h2>Image Gallery</h2>
-      </div>
+    <section id="gallery" class="home-gallery site-section">
+      <h2>Image Gallery</h2>
       <div id="natureCarousel" class="carousel slide home-gallery-carousel" data-bs-ride="carousel" data-bs-interval="5000">
         <div class="carousel-indicators">
           <button type="button" data-bs-target="#natureCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Show Nature: Consciousness + Being"></button>
@@ -134,7 +126,7 @@
     </section>
 
     <!-- 4) Video -->
-    <section id="video" class="site-section raised">
+    <section id="video" class="site-section">
       <h2>Video</h2>
       <div class="video-container">
         <iframe width="560" height="315" src="https://www.youtube.com/embed/G7kq82vVii0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
@@ -142,7 +134,7 @@
     </section>
 
     <!-- 5) Events -->
-    <section id="events" class="detail-section raised event-list">
+    <section id="events" class="detail-section event-list site-section">
       <h2>Events</h2>
       <ul>
         <li>
@@ -213,7 +205,7 @@
 
     <!-- 6) Team & Thanks -->
     <section id="team" class="site-section two-col">
-      <div class="col raised">
+      <div class="col">
         <div class="artists-list">
           <h2>Artists</h2>
           <ul class="styled-list">
@@ -233,7 +225,7 @@
         </ul>
       </div>
             </div>
-      <div class="col raised">
+      <div class="col">
         
       <div class="thanks-list">
         <h2>Photography & Videography</h2>

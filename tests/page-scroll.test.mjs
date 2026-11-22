@@ -252,8 +252,8 @@ test('home, TTY2, EFV, NMM, and CSLT share the controller without duplicate page
   for (const html of [home, tty, efv, nmm, cslt]) {
     assert.match(html, /id="loadingScreen"/);
     assert.match(html, /content-hidden/);
+    assert.equal((html.match(/<section\b[^>]*\bid="about"/g) ?? []).length, 1);
   }
-  assert.match(efv, /<section id="about" class="about-intro">/);
   assert.match(efv, /<div id="bgViewer" data-src="writing\.glb" data-mobile-src="writing\.mobile\.glb"><\/div>/);
   assert.equal((efv.match(/id="bgViewer"/g) ?? []).length, 1);
   assert.doesNotMatch(efv, /horse\.glb|writingViewer/);
@@ -263,10 +263,8 @@ test('home, TTY2, EFV, NMM, and CSLT share the controller without duplicate page
   assert.match(efv, /modelRotation: \{ x: 90, z: 90 \},[\s\S]*?cameraElevation: 0,[\s\S]*?cameraAzimuthStart: 0,[\s\S]*?cameraAzimuthMid: null,[\s\S]*?cameraAzimuthRange: 0,[\s\S]*?cameraOscillates: false/);
   assert.match(efv, /emissionGain:\s*[0-9.]+/);
   assert.match(bootstrap, /onUpdate\(progress, prefersReducedMotion\) \{\s*if \(prefersReducedMotion\) return;\s*background\?\.setProgress\(progress\);\s*viewer\.style\.opacity = String\(0\.9 - progress \* 0\.2\);/);
-  assert.match(nmm, /<section id="about" class="about-intro">/);
   assert.match(nmm, /<div id="bgViewer" data-src="NCB\.glb" data-mobile-src="NCB\.mobile\.glb"><\/div>/);
   assert.equal((nmm.match(/id="bgViewer"/g) ?? []).length, 1);
-  assert.match(cslt, /<section id="about" class="about-intro">/);
   assert.match(cslt, /<cslt-point-cloud id="bgViewer" data-src="pointcloud\/shop\.ply" data-mobile-src="pointcloud\/shop\.mobile\.ply"><\/cslt-point-cloud>/);
   assert.equal((cslt.match(/id="bgViewer"/g) ?? []).length, 1);
   assert.equal((cslt.match(/<cslt-point-cloud\b/g) ?? []).length, 1);

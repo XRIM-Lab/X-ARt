@@ -29,16 +29,9 @@
 
   <!-- Shared Web Components (header, footer) -->
   <script src="../components.js"></script>
-
-    <style>
-    :root {
-      --bg-gradient: 
-        radial-gradient(120% 120% at 50% 50%, rgba(0,0,0,0.275), rgba(0,0,0,0.375));
-    }
-  </style>
 </head>
 
-<body>
+<body class="project-page">
 
 <site-header page="tty2"></site-header>
 
@@ -49,7 +42,7 @@
         <h1 class="loading-title">Through the Years, To Touch You</h1>
         <h2> by 「ARtrio」</h2>
         <h3> (Formerly 「X-ARt」) </h3>
-                <div class="subtitle" style="font-family: var(--font-mono); letter-spacing:0.25em; margin-top:0.5rem;">
+                <div class="subtitle">
           Man, Nature, Technology, Art
         </div>
       <div class="loading-spinner">
@@ -66,7 +59,7 @@
     <div id="bgViewer" data-src="400kArtworkonly_glb.glb" data-mobile-src="400kArtworkonly_mobile.glb"></div>
   </div>
 
-  <main class="site-container content-hidden">
+  <main class="site-container content-hidden site-content">
     <!-- 1) Intro screen: only title on the full viewport, background artwork visible -->
     <section class="intro-hero" id="intro">
       <div class="intro-title" aria-label="Site Title">
@@ -74,7 +67,7 @@
         <h2> by 「ARtrio」</h2>
         <h3> (Formerly 「X-ARt」) </h3>
 
-        <div class="subtitle" style="font-family: var(--font-mono); letter-spacing:0.25em; margin-top:0.5rem;">
+        <div class="subtitle">
           Man, Nature, Technology, Art
         </div>
         <div class="intro-hint" aria-hidden="true">Scroll to enter</div>
@@ -82,9 +75,9 @@
     </section>
 
     <!-- 2) Text description left, image gallery right -->
-    <section id="about" class="about-intro">
-      <div class="content-panel raised">
-        <h2>About this Project</h2>
+    <section id="about" class="site-section">
+      <h2>About this Project</h2>
+      <div class="reading-copy">
         <p class="lead">
 ‘Through The Tears, To Touch You (TTY2)’ (流 穿越 ) is a site-specific art installation and performance  taking place on the old pier of Tim Tin Tsai, a 300 years-old Hakka island village in Hong Kong.        </p>
         <p>
@@ -93,19 +86,18 @@ TTY2 bridges past and future by combining traditional craftsmanship with self-de
 This project offers a site-specific multi sensory experience, at the intersection between heritage, technology, and storytelling.        </p>
       
 <p><a href="/TTY2/SKHAF/">Festival Website (Archived copy 18/07/2005) </a></p>
-</div>
-
+      </div>
     </section>
 
         <!-- 3) Video -->
-    <section id="video" class="site-section raised">
+    <section id="video" class="site-section">
       <h2>Video</h2>
       <div class="video-container">
 <iframe width="560" height="315" src="https://www.youtube.com/embed/w2eAQPp25aQ?si=GyMv4JNVFht0VKh4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
       </div>
     </section>
 
-    <section id="awards" class="detail-section raised">
+    <section id="awards" class="detail-section site-section">
       <h2>Awards</h2>
       <ul>
         <li><span class="mono-label">2026</span> Finalist, Lumen Prize (Systems and Structures) <span class="annotation">Norway</span></li>
@@ -116,10 +108,8 @@ This project offers a site-specific multi sensory experience, at the intersectio
       </ul>
     </section>
 
-    <section id="gallery" class="home-gallery">
-      <div class="section-heading">
-        <h2>Image Gallery</h2>
-      </div>
+    <section id="gallery" class="home-gallery site-section">
+      <h2>Image Gallery</h2>
       <div id="projectCarousel" class="carousel slide home-gallery-carousel" data-bs-ride="carousel" data-bs-interval="5000">
         <div class="carousel-indicators">
           <button type="button" data-bs-target="#projectCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Show performance with augmented reality"></button>
@@ -168,7 +158,7 @@ This project offers a site-specific multi sensory experience, at the intersectio
 
 
 
-    <section id="events" class="detail-section raised event-list">
+    <section id="events" class="detail-section event-list site-section">
       <h2>Events</h2>
       <ul>
         <li>
@@ -223,7 +213,7 @@ This project offers a site-specific multi sensory experience, at the intersectio
 
     <!-- 4) Team & Thanks -->
     <section id="team" class="site-section two-col">
-      <div class="col raised">
+      <div class="col">
       <div class="artists-list">
         <h2>Artists</h2>
         <ul class="styled-list">
@@ -260,7 +250,7 @@ This project offers a site-specific multi sensory experience, at the intersectio
       </div>
 
       </div>
-<div class="col raised">
+<div class="col">
 
            <div class="thanks-list">
         <h2>Soundtrack</h2>

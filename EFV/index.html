@@ -28,15 +28,9 @@
   <!-- Shared Web Components (header, footer) -->
   <script src="../components.js"></script>
 
-  <style>
-    :root {
-      --bg-gradient:
-        radial-gradient(120% 120% at 50% 50%, rgba(0,0,0,0.275), rgba(0,0,0,0.375));
-    }
-  </style>
 </head>
 
-<body>
+<body class="project-page">
 
 <site-header page="efv"></site-header>
 
@@ -46,7 +40,7 @@
         <h1 class="loading-title">EQUUS: FORM + VOID</h1>
         <h2> by 「ARtrio」</h2>
         <h3> (Formerly 「X-ARt」) </h3>
-        <div class="subtitle" style="font-family: var(--font-mono); letter-spacing:0.25em; margin-top:0.5rem;">
+        <div class="subtitle">
           Man, Nature, Technology, Art
         </div>
       <div class="loading-spinner">
@@ -63,7 +57,7 @@
     <div id="bgViewer" data-src="writing.glb" data-mobile-src="writing.mobile.glb"></div>
   </div>
 
-  <main class="site-container content-hidden">
+  <main class="site-container content-hidden site-content">
     <!-- 1) Intro screen: only title on the full viewport, background artwork visible -->
     <section class="intro-hero" id="intro">
       <div class="intro-title" aria-label="Site Title">
@@ -72,7 +66,7 @@
         <h3> (Formerly 「X-ARt」) </h3>
         <h2> with Henry Ho</h2>
 
-        <div class="subtitle" style="font-family: var(--font-mono); letter-spacing:0.25em; margin-top:0.5rem;">
+        <div class="subtitle">
           Man, Nature, Technology, Art
         </div>
         <div class="intro-hint" aria-hidden="true">Scroll to enter</div>
@@ -80,9 +74,9 @@
     </section>
 
     <!-- 2) Project description -->
-    <section id="about" class="about-intro">
-      <div class="content-panel raised">
-        <h2>About this Project</h2>
+    <section id="about" class="site-section">
+      <h2>About this Project</h2>
+      <div class="reading-copy">
         <p class="lead">Fringe Festival 2026 | Fringe Underground</p>
         <p>EQUUS: FORM + VOID is an immersive performance exploring the dialogue between two energies: the physical immediacy of Tai Chi and Chinese calligraphy, and the invisible forces revealed through augmented reality.</p>
         <p>Created by ARtrio (formerly X-Art) in collaboration with renowned Tai Chi Master and calligrapher Henry Ho (Canada), the work brings together classical brushwork, deeply rooted in the Eastern understanding of qi, and specially developed AR technologies that visualise digital fields and flows. Under the same human consciousness, bodily movement, brush strokes, and digital vibrations resonate within a shared time and space.</p>
@@ -93,7 +87,7 @@
     </section>
 
     <!-- 3) Video -->
-    <section id="video" class="site-section raised">
+    <section id="video" class="site-section">
       <h2>Video</h2>
       <div class="video-container">
         <iframe width="560" height="315" src="https://www.youtube.com/embed/OpAoqNosn1g" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
@@ -101,10 +95,8 @@
     </section>
 
 
-    <section id="gallery" class="home-gallery">
-      <div class="section-heading">
-        <h2>Image Gallery</h2>
-      </div>
+    <section id="gallery" class="home-gallery site-section">
+      <h2>Image Gallery</h2>
       <div id="equusCarousel" class="carousel slide home-gallery-carousel" data-bs-ride="carousel" data-bs-interval="5000">
         <div class="carousel-indicators">
           <button type="button" data-bs-target="#equusCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Show EQUUS cover artwork"></button>
@@ -166,7 +158,7 @@
       </div>
     </section>
 
-    <section id="events" class="detail-section raised event-list">
+    <section id="events" class="detail-section event-list site-section">
       <h2>Events</h2>
       <ul>
         <li>
@@ -196,7 +188,7 @@
 
     <!-- 4) Team & Thanks -->
     <section id="team" class="site-section two-col">
-      <div class="col raised">
+      <div class="col">
         <div class="artists-list">
           <h2>Artists</h2>
           <ul class="styled-list">
@@ -230,7 +222,7 @@
           </ul>
         </div>
         </div>
-      <div class="col raised">
+      <div class="col">
 
                 <div class="thanks-list">
           <h2>Helpers</h2>

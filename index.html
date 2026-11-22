@@ -31,13 +31,6 @@
 
   <!-- Three.js background renderer -->
 
-  <style>
-    :root {
-      --bg-gradient: 
-        radial-gradient(120% 120% at 50% 50%, rgba(0,0,0,0.3), rgba(0,0,0,0));
-    }
-  </style>
-
 </head>
 
 <body class="home-page">
@@ -47,10 +40,10 @@
   <!-- Loading screen -->
   <div id="loadingScreen" class="loading-screen">
     <div class="loading-content">
-      <img src="images/ARtrio_logo_white-01.png" alt="artrio Logo" style="width: 350px; height: auto;">
+      <img src="images/ARtrio_logo_white-01.png" alt="artrio Logo" class="site-logo">
       <h2> (Formerly 「X-ARt」) </h2>
 
-      <div class="subtitle" style="letter-spacing:0.25em; margin-top:0.5rem;">
+      <div class="subtitle">
         Man, Nature, Technology, Art
       </div>
       <div class="loading-spinner">
@@ -65,11 +58,11 @@
     <div id="bgViewer" data-src="mesh_test.glb" data-mobile-src="mesh_test.mobile.glb"></div>
   </div>
 
-  <main class="site-container content-hidden">
+  <main class="site-container content-hidden site-content">
     <!-- 1) Intro screen with title -->
     <section class="intro-hero" id="intro">
       <div class="intro-title" aria-label="Site Title">
-      <img src="images/ARtrio_logo_white-01.png" alt="artrio Logo" style="width: 350px; height: auto;">
+      <img src="images/ARtrio_logo_white-01.png" alt="artrio Logo" class="site-logo">
       <h2> (Formerly 「X-ARt」) </h2>
 
         <div class="subtitle">
@@ -79,11 +72,10 @@
       </div>
     </section>
 
-    <div class="content-flow">
     <!-- 2) About section -->
-    <section id="about" class="about-intro">
-      <div class="content-panel">
-        <h2>About artrio</h2>
+    <section id="about" class="site-section">
+      <h2>About artrio</h2>
+      <div class="reading-copy">
         <p class="lead">
           Using augmented reality technologies, we metaphorically reveal the ‘fields of force’ and ‘flows of materials’ of Nature, to arouse a greater appreciation of Nature and its invisible forces that affect every aspect of our lives.
         </p>
@@ -95,11 +87,8 @@
     </section>
 
     <!-- 3) Image gallery -->
-    <section id="gallery" class="home-gallery">
-      <div class="section-heading">
-        <h2>Image Gallery</h2>
-      </div>
-
+    <section id="gallery" class="home-gallery site-section">
+      <h2>Image Gallery</h2>
       <div id="homeGalleryCarousel" class="carousel slide home-gallery-carousel" data-bs-ride="carousel" data-bs-interval="5000">
         <div class="carousel-indicators">
           <button type="button" data-bs-target="#homeGalleryCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Show EQUUS: Form + Void"></button>
@@ -158,10 +147,8 @@
     </section>
 
     <!-- 4) Featured projects -->
-    <section id="featured-projects" class="featured-projects">
-      <div class="section-heading">
-        <h2>Featured Projects</h2>
-      </div>
+    <section id="featured-projects" class="featured-projects site-section">
+      <h2>Featured Projects</h2>
       <div class="featured-project-grid">
         <a class="featured-project-card" href="/TTY2/">
           <div class="featured-project-image">
@@ -187,9 +174,8 @@
     </section>
 
     <!-- 5) Performances & Experimentations -->
-    <section id="performances" class="detail-section event-list">
-      <div class="content-panel">
-        <h2>Performances & Experimentations</h2>
+    <section id="performances" class="detail-section event-list site-section">
+      <h2>Performances & Experimentations</h2>
         <ul>
           <li>
             <time class="mono-label" datetime="2026-01-10">2026.01.10</time>
@@ -267,13 +253,11 @@
             <div class="event-info"><strong class="event-title">N:M+M: Nature: Metaphysics + Metaphor</strong><span class="event-venue">Heath, Tsim Sha Tsui, HK</span></div>
           </li>
         </ul>
-      </div>
     </section>
 
     <!-- 6) Engagement -->
-    <section id="engagement" class="detail-section event-list">
-      <div class="content-panel">
-        <h2>Engagement</h2>
+    <section id="engagement" class="detail-section event-list site-section">
+      <h2>Engagement</h2>
         <ul>
           <li>
             <time class="mono-label" datetime="2026-04-09">2026.04.09</time>
@@ -285,12 +269,11 @@
             <span class="annotation">(3 workshops)</span>
           </li>
         </ul>
-      </div>
     </section>
 
     <!-- 7) Team -->
-    <section id="team" class="two-col">
-      <div class="col raised">
+    <section id="team" class="two-col site-section">
+      <div class="col">
         <div class="thanks-list">
         <h2>Artists</h2>
         <ul class="styled-list">
@@ -309,7 +292,7 @@
         </div>
               </div>
 
-      <div class="col raised">
+      <div class="col">
         <div class="thanks-list">
           <h2>Technical Team (XRIM-Lab)</h2>
           <ul class="styled-list">
@@ -330,7 +313,6 @@
       </div>
       </div>
     </section>
-    </div>
   </main>
 
 <site-footer year="2026" name="artrio"></site-footer>
