@@ -181,6 +181,10 @@ h2 {
   margin-top: 2rem;
 }
 h2:first-child { margin-top: 0; }
+.home-page .site-section h2 {
+  letter-spacing: clamp(0.14em, 1.5vw - 0.125rem, 0.2em);
+  overflow-wrap: anywhere;
+}
 h3 {
   font-size: 1.1rem;
   letter-spacing: 0.2em;
@@ -246,7 +250,7 @@ a:hover {
   margin-block-end: 1em;
 }
 .home-page .about-copy .lead {
-  font-size: clamp(1.375rem, 1.15rem + 0.9vw, 1.75rem);
+  font-size: 1.1875rem;
   line-height: 1.35;
   margin-block-end: 0.85em;
 }
