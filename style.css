@@ -51,6 +51,7 @@ main.site-content {
 }
 
 .home-page {
+  --home-grid-width: 50rem;
   --bg-gradient:
     radial-gradient(120% 120% at 50% 50%, rgba(0,0,0,0.3), rgba(0,0,0,0));
 }
@@ -218,9 +219,6 @@ a:hover {
   grid-template-columns: 1fr;
   gap: 2rem;
 }
-.home-page #about .two-col > .lead {
-  margin-block-end: 0;
-}
 @media (min-width: 992px) {
   .two-col {
     grid-template-columns: 1fr 1fr;
@@ -237,6 +235,23 @@ a:hover {
 }
 .site-content > .site-section + .site-section {
   margin-block-start: clamp(3rem, 6vw, 5rem);
+}
+.home-page .about-copy {
+  max-inline-size: 43rem;
+  margin-inline-start: max(0px, (100% - var(--home-grid-width)) / 2);
+}
+.home-page .about-copy p {
+  font-size: clamp(1.0625rem, 0.95rem + 0.32vw, 1.1875rem);
+  line-height: 1.65;
+  margin-block-end: 1em;
+}
+.home-page .about-copy .lead {
+  font-size: clamp(1.375rem, 1.15rem + 0.9vw, 1.75rem);
+  line-height: 1.35;
+  margin-block-end: 0.85em;
+}
+.home-page .about-copy > :last-child {
+  margin-block-end: 0;
 }
 @media (min-width: 992px) {
   .reading-copy {
@@ -275,7 +290,7 @@ a:hover {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 2.5rem 1.5rem;
-  max-inline-size: 50rem;
+  max-inline-size: var(--home-grid-width);
   margin-inline: auto;
 }
 .featured-project-card {
