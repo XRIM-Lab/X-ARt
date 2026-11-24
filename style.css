@@ -14,7 +14,8 @@
   --hover-bg: rgba(26, 26, 26, 0.6);
   --border-color: rgba(255, 255, 255, 0.1);
 
-  --font-main: 'Inter', sans-serif;
+  --font-main: 'Archivo', sans-serif;
+  --font-heading: 'Inter', sans-serif;
   --font-mono: 'Space Mono', monospace;
 
   --bg-gradient: 
@@ -29,6 +30,7 @@ body {
   background-color: var(--bg-color);
   color: var(--text-color);
   font-family: var(--font-main);
+  font-stretch: 110%;
   font-size: 16px;
   line-height: 1.6;
   margin: 0;
@@ -73,6 +75,7 @@ section:last-of-type {
   border-bottom: none;
 }
 .home-page .site-footer {
+  background-color: rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
 }
@@ -126,7 +129,7 @@ section:last-of-type {
   text-shadow: 0 2px 12px rgba(0,0,0,0.6);
 }
 .intro-title h1 {
-  font-family: var(--font-main);
+  font-family: var(--font-heading);
   font-weight: 700;
   font-size: clamp(2.5rem, 6vw, 6rem);
   margin: 0;
@@ -169,7 +172,8 @@ section:last-of-type {
 /* ===     TYPOGRAPHY       === */
 /* ============================ */
 h1, h2, h3 {
-  font-family: var(--font-main);
+  font-family: var(--font-heading);
+  font-stretch: normal;
   font-weight: 700;
   text-transform: uppercase;
   color: var(--accent-color);
@@ -197,6 +201,10 @@ p.lead {
   line-height: 1.5;
   margin-bottom: 2rem;
   font-weight: 600;
+}
+
+main.site-container p:not(.lead) {
+  letter-spacing: 0.025em;
 }
 
 a { 
@@ -232,7 +240,7 @@ a:hover {
 }
 
 .site-content > .site-section {
-  background-color: rgba(0, 0, 0, 0.25);
+  background-color: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
   padding: 1.5rem clamp(1rem, 3vw, 2rem);
@@ -250,7 +258,9 @@ a:hover {
   margin-block-end: 1em;
 }
 .home-page .about-copy .lead {
-  font-size: 1.1875rem;
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  font-weight: 400;
   line-height: 1.35;
   margin-block-end: 0.85em;
 }
@@ -511,7 +521,7 @@ p.support { margin-top: 1.5rem; color: var(--text-secondary); font-size: 0.9rem;
   z-index: 100;
   padding: 0rem 0;
   
-  background-color: rgba(10, 10, 10, 0.6);
+  background-color: rgba(10, 10, 10, 0.75);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--border-color);
@@ -535,7 +545,8 @@ p.support { margin-top: 1.5rem; color: var(--text-secondary); font-size: 0.9rem;
 }
 
 .header-brand {
-  font-family: var(--font-main);
+  font-family: var(--font-heading);
+  font-stretch: normal;
   font-weight: 700;
   font-size: 1.25rem;
   letter-spacing: 0.1em;
@@ -837,7 +848,7 @@ li.dropdown-open .dropdown-menu {
   font-family: var(--font-mono);
 }
 .loading-title {
-  font-family: var(--font-main);
+  font-family: var(--font-heading);
   font-weight: 700;
   font-size: clamp(2rem, 5vw, 4rem);
   margin: 0;
