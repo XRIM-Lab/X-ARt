@@ -346,6 +346,7 @@
           if (bounds.radius <= 0) return;
           const applyFire = createFireMaterialApplier({
             ...FIRE_EFFECT_OPTIONS.material,
+            textureCropX: 0.10,
             vertexUrl: '../Fire2.vert',
             fragmentUrl: '../Fire2.frag'
           });
