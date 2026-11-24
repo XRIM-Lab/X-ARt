@@ -18,6 +18,7 @@
   --font-heading: 'Inter', sans-serif;
   --font-mono: 'Space Mono', monospace;
   --reading-width: 43rem;
+  --content-grid-width: 50rem;
 
   --bg-gradient: 
     radial-gradient(120% 120% at 50% 50%, rgba(0,0,0,0.1), rgba(0,0,0,0.25) 70%),
@@ -54,7 +55,6 @@ main.site-content {
 }
 
 .home-page {
-  --home-grid-width: 50rem;
   --bg-gradient:
     radial-gradient(120% 120% at 50% 50%, rgba(0,0,0,0.3), rgba(0,0,0,0));
 }
@@ -204,7 +204,8 @@ p.lead {
   font-weight: 600;
 }
 
-main.site-container p:not(.lead) {
+main.site-container p:not(.lead),
+.reading-copy > ul {
   letter-spacing: 0.025em;
 }
 
@@ -252,10 +253,12 @@ a:hover {
 :is(.about-copy, .reading-copy) {
   max-inline-size: var(--reading-width);
 }
-.home-page .about-copy {
-  margin-inline-start: max(0px, (100% - var(--home-grid-width)) / 2);
+.home-page .about-copy,
+.reading-copy--inset {
+  margin-inline-start: max(0px, (100% - var(--content-grid-width)) / 2);
 }
-:is(.about-copy, .reading-copy) p {
+:is(.about-copy, .reading-copy) p,
+.reading-copy > ul {
   font-size: clamp(1.0625rem, 0.95rem + 0.32vw, 1.1875rem);
   line-height: 1.65;
   margin-block-end: 1em;
@@ -277,7 +280,7 @@ a:hover {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 2.5rem 1.5rem;
-  max-inline-size: var(--home-grid-width);
+  max-inline-size: var(--content-grid-width);
   margin-inline: auto;
 }
 .featured-project-card {

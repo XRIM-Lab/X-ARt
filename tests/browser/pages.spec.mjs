@@ -232,7 +232,7 @@ test('CSLT gallery renders and navigates every photo', async ({ page }) => {
 
 const sectionPlans = [
   { path: '/', ids: ['about', 'featured-projects', 'gallery', 'performances', 'engagement', 'team'], readingCopy: false },
-  { path: '/TTY2/', ids: ['about', 'video', 'awards', 'gallery', 'events', 'team'], readingCopy: true },
+  { path: '/TTY2/', ids: ['about', 'video', 'artwork', 'awards', 'gallery', 'events', 'team'], readingCopy: true, insetReadingCopy: true },
   { path: '/EFV/', ids: ['about', 'video', 'gallery', 'events', 'team'], readingCopy: true },
   { path: '/NMM/', ids: ['about', 'gallery', 'video', 'events', 'team'], readingCopy: true },
   { path: '/CSLT/', ids: ['about', 'video', 'textbox', 'gallery', 'events', 'team'], readingCopy: true }
@@ -270,6 +270,7 @@ for (const plan of sectionPlans) {
         const rect = element.getBoundingClientRect();
         const styles = getComputedStyle(element);
         const heading = element.querySelector('h2');
+        const copy = element.querySelector(':scope > .reading-copy')?.getBoundingClientRect();
         return {
           id: element.id,
           left: rect.left,
@@ -281,7 +282,8 @@ for (const plan of sectionPlans) {
           paddingInlineStart: parseFloat(styles.paddingInlineStart),
           paddingInlineEnd: parseFloat(styles.paddingInlineEnd),
           backdropFilter: styles.backdropFilter,
-          headingLeft: heading ? heading.getBoundingClientRect().left : null
+          headingLeft: heading ? heading.getBoundingClientRect().left : null,
+          readingCopy: copy && { left: copy.left, width: copy.width }
         };
       });
       const team = document.getElementById('team');
@@ -296,8 +298,6 @@ for (const plan of sectionPlans) {
           paddingInlineEnd: parseFloat(styles.paddingInlineEnd)
         };
       });
-      const readingCopy = main.querySelector('#about .reading-copy');
-      const readingCopyRect = readingCopy && readingCopy.getBoundingClientRect();
       const videoContainer = main.querySelector('.video-container');
       const videoRect = videoContainer && videoContainer.getBoundingClientRect();
       const frame = main.querySelector('.home-gallery-carousel');
@@ -328,7 +328,6 @@ for (const plan of sectionPlans) {
           cols: teamCols,
           tracks: teamStyles.gridTemplateColumns.split(' ').filter(Boolean).length
         },
-        readingCopy: readingCopyRect && { left: readingCopyRect.left, width: readingCopyRect.width },
         video: videoRect && { width: videoRect.width, height: videoRect.height },
         carousel: {
           frame: { left: frameRect.left, top: frameRect.top, right: frameRect.right, bottom: frameRect.bottom, width: frameRect.width, height: frameRect.height },
@@ -370,11 +369,16 @@ for (const plan of sectionPlans) {
     expect(metrics.team.tracks, 'team grid column count').toBe(metrics.viewport >= 992 ? 2 : 1);
 
     if (plan.readingCopy) {
-      const about = metrics.sections[0];
-      const available = about.right - about.left - about.paddingInlineStart - about.paddingInlineEnd;
-      const expectedWidth = Math.min(available, 43 * metrics.rem);
-      expect(Math.abs(metrics.readingCopy.left - (about.left + about.paddingInlineStart)), 'reading-copy shares the heading inset').toBeLessThanOrEqual(1);
-      expect(Math.abs(metrics.readingCopy.width - expectedWidth), 'reading-copy width').toBeLessThanOrEqual(1);
+      const copyIds = plan.insetReadingCopy ? ['about', 'artwork'] : ['about'];
+      for (const id of copyIds) {
+        const section = metrics.sections.find(entry => entry.id === id);
+        const available = section.right - section.left - section.paddingInlineStart - section.paddingInlineEnd;
+        const inset = plan.insetReadingCopy ? Math.max(0, (available - 50 * metrics.rem) / 2) : 0;
+        const expectedWidth = Math.min(available - inset, 43 * metrics.rem);
+        expect(section.readingCopy, `#${id} reading column`).toBeDefined();
+        expect(Math.abs(section.readingCopy.left - (section.headingLeft + inset)), `#${id} reading-copy inset`).toBeLessThanOrEqual(1);
+        expect(Math.abs(section.readingCopy.width - expectedWidth), `#${id} reading-copy width`).toBeLessThanOrEqual(1);
+      }
     }
 
     if (metrics.video) {
