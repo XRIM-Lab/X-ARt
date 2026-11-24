@@ -126,7 +126,6 @@ section:last-of-type {
 .intro-title {
   text-align: center;
   color: var(--text-color);
-  text-shadow: 0 2px 12px rgba(0,0,0,0.6);
 }
 .intro-title h1 {
   font-weight: 700;
@@ -159,11 +158,17 @@ section:last-of-type {
 .loading-content {
   min-inline-size: 0;
   max-inline-size: 100%;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95), 0 3px 12px rgba(0, 0, 0, 0.8);
 }
 .site-logo {
   inline-size: 350px;
   max-inline-size: 100%;
   block-size: auto;
+}
+.intro-title .site-logo,
+.loading-content .site-logo,
+.loading-spinner {
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.9)) drop-shadow(0 3px 12px rgba(0, 0, 0, 0.7));
 }
 
 
