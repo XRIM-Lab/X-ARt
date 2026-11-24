@@ -65,6 +65,7 @@ class SiteHeader extends HTMLElement {
         <ul class="dropdown-menu">
           <li><a href="${links.nmm}"${page  === 'nmm'  ? ' aria-current="page"' : ''}>Nature Series</a></li>
           <li><a href="${links.tty2}"${page === 'tty2' ? ' aria-current="page"' : ''}>Through The Years, To Touch You</a></li>
+          <li><a href="${links.cslt}"${page === 'cslt' ? ' aria-current="page"' : ''}>Come, Stay, Linger, Time</a></li>
           <li><a href="${links.efv}"${page  === 'efv'  ? ' aria-current="page"' : ''}>EQUUS: FORM + VOID</a></li>
         </ul>
       </li>
