@@ -16,6 +16,7 @@
 
   --font-main: 'Inter', sans-serif;
   --font-mono: 'Space Mono', monospace;
+  --font-size-copy: clamp(1.0625rem, 0.95rem + 0.32vw, 1.1875rem);
   --reading-width: 43rem;
   --content-grid-width: 50rem;
 
@@ -249,7 +250,7 @@ a:hover {
 }
 :is(.about-copy, .reading-copy) p,
 .reading-copy > ul {
-  font-size: clamp(1.0625rem, 0.95rem + 0.32vw, 1.1875rem);
+  font-size: var(--font-size-copy);
   line-height: 1.65;
   margin-block-end: 1em;
 }
@@ -415,6 +416,7 @@ a:hover {
     list-style: none;
     padding-left: 0;
     margin: 0;
+    font-size: var(--font-size-copy);
     border-top: 1px solid var(--border-color);
 }
 .detail-section li, ul.styled-list li {
@@ -457,15 +459,15 @@ p.support { margin-top: 1.5rem; color: var(--text-secondary); font-size: 0.9rem;
 }
 .event-list .event-venue {
   color: var(--text-secondary);
-  font-size: 0.9rem;
+  font-size: 0.9em;
 }
 .event-list .event-link {
   align-self: flex-start;
-  font-size: 0.9rem;
+  font-size: 0.9em;
 }
 .event-list .annotation {
   white-space: nowrap;
-  font-size: 0.85rem;
+  font-size: 0.85em;
 }
 @media (max-width: 767px) {
   .event-list li {
