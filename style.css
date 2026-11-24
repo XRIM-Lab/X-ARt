@@ -14,8 +14,7 @@
   --hover-bg: rgba(26, 26, 26, 0.6);
   --border-color: rgba(255, 255, 255, 0.1);
 
-  --font-main: 'Archivo', sans-serif;
-  --font-heading: 'Inter', sans-serif;
+  --font-main: 'Inter', sans-serif;
   --font-mono: 'Space Mono', monospace;
   --reading-width: 43rem;
   --content-grid-width: 50rem;
@@ -32,7 +31,6 @@ body {
   background-color: var(--bg-color);
   color: var(--text-color);
   font-family: var(--font-main);
-  font-stretch: 110%;
   font-size: 16px;
   line-height: 1.6;
   margin: 0;
@@ -130,7 +128,6 @@ section:last-of-type {
   text-shadow: 0 2px 12px rgba(0,0,0,0.6);
 }
 .intro-title h1 {
-  font-family: var(--font-heading);
   font-weight: 700;
   font-size: clamp(2.5rem, 6vw, 6rem);
   margin: 0;
@@ -173,8 +170,6 @@ section:last-of-type {
 /* ===     TYPOGRAPHY       === */
 /* ============================ */
 h1, h2, h3 {
-  font-family: var(--font-heading);
-  font-stretch: normal;
   font-weight: 700;
   text-transform: uppercase;
   color: var(--accent-color);
@@ -202,11 +197,6 @@ p.lead {
   line-height: 1.5;
   margin-bottom: 2rem;
   font-weight: 600;
-}
-
-main.site-container p:not(.lead),
-.reading-copy > ul {
-  letter-spacing: 0.025em;
 }
 
 a { 
@@ -521,8 +511,6 @@ p.support { margin-top: 1.5rem; color: var(--text-secondary); font-size: 0.9rem;
 }
 
 .header-brand {
-  font-family: var(--font-heading);
-  font-stretch: normal;
   font-weight: 700;
   font-size: 1.25rem;
   letter-spacing: 0.1em;
@@ -824,7 +812,6 @@ li.dropdown-open .dropdown-menu {
   font-family: var(--font-mono);
 }
 .loading-title {
-  font-family: var(--font-heading);
   font-weight: 700;
   font-size: clamp(2rem, 5vw, 4rem);
   margin: 0;
