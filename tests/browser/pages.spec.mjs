@@ -235,7 +235,7 @@ const sectionPlans = [
   { path: '/TTY2/', ids: ['about', 'video', 'awards', 'gallery', 'events', 'team'], readingCopy: true },
   { path: '/EFV/', ids: ['about', 'video', 'gallery', 'events', 'team'], readingCopy: true },
   { path: '/NMM/', ids: ['about', 'gallery', 'video', 'events', 'team'], readingCopy: true },
-  { path: '/CSLT/', ids: ['about', 'video', 'textbox', 'gallery', 'events', 'team'], readingCopy: false }
+  { path: '/CSLT/', ids: ['about', 'video', 'textbox', 'gallery', 'events', 'team'], readingCopy: true }
 ];
 
 for (const plan of sectionPlans) {
@@ -372,7 +372,7 @@ for (const plan of sectionPlans) {
     if (plan.readingCopy) {
       const about = metrics.sections[0];
       const available = about.right - about.left - about.paddingInlineStart - about.paddingInlineEnd;
-      const expectedWidth = metrics.viewport >= 992 ? Math.min(available, 36 * metrics.rem) : available;
+      const expectedWidth = Math.min(available, 43 * metrics.rem);
       expect(Math.abs(metrics.readingCopy.left - (about.left + about.paddingInlineStart)), 'reading-copy shares the heading inset').toBeLessThanOrEqual(1);
       expect(Math.abs(metrics.readingCopy.width - expectedWidth), 'reading-copy width').toBeLessThanOrEqual(1);
     }
@@ -407,47 +407,25 @@ for (const plan of sectionPlans) {
   });
 }
 
-test('CSLT illustrates About and Behind the Piece responsively', async ({ page }, testInfo) => {
-  const isMobile = testInfo.project.name === 'mobile-chromium';
-  const expected = [
-    { id: 'about', src: 'images/tsunglun-web.jpg' },
-    { id: 'textbox', src: 'images/pointcloud-web.png' }
-  ];
+test('CSLT textboxes use text-only reading columns', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(pageUrl('/CSLT/'));
   await expect(page.locator('#loadingScreen')).toBeHidden();
 
-  for (const entry of expected) {
-    const section = page.locator(`#${entry.id}`);
-    const figure = section.locator('figure');
-    const image = figure.locator('img');
-    await expect(figure).toHaveCount(1);
-    await expect(image).toHaveAttribute('src', entry.src);
-    expect(await image.getAttribute('alt')).toBeTruthy();
-    await expect(figure.locator('figcaption')).toHaveCount(0);
-    await section.scrollIntoViewIfNeeded();
-    await expect.poll(() => image.evaluate(element => element.complete && element.naturalWidth > 0)).toBe(true);
-    const geometry = await section.evaluate(element => {
-      const copy = element.querySelector('.story-copy').getBoundingClientRect();
-      const fig = element.querySelector('figure').getBoundingClientRect();
-      return {
-        copyTop: copy.top,
-        copyBottom: copy.bottom,
-        copyLeft: copy.left,
-        copyRight: copy.right,
-        figTop: fig.top,
-        figLeft: fig.left
-      };
+  for (const id of ['about', 'textbox']) {
+    const section = page.locator(`#${id}`);
+    await expect(section.locator('img')).toHaveCount(0);
+    const copy = section.locator(':scope > .reading-copy');
+    await expect(copy).toBeVisible();
+    const { width, expectedWidth } = await copy.evaluate(element => {
+      const panel = element.parentElement;
+      const { paddingInlineStart, paddingInlineEnd } = getComputedStyle(panel);
+      const available = panel.clientWidth - parseFloat(paddingInlineStart) - parseFloat(paddingInlineEnd);
+      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+      return { width: element.getBoundingClientRect().width, expectedWidth: Math.min(available, 43 * rem) };
     });
-    if (isMobile) {
-      expect(geometry.figTop, `${entry.id} figure should sit below the copy`).toBeGreaterThanOrEqual(geometry.copyBottom - 1);
-      expect(Math.abs(geometry.figLeft - geometry.copyLeft), `${entry.id} figure should share the copy left edge`).toBeLessThanOrEqual(1);
-    } else {
-      expect(geometry.figLeft, `${entry.id} figure should sit right of the copy`).toBeGreaterThan(geometry.copyRight);
-      expect(Math.abs(geometry.figTop - geometry.copyTop), `${entry.id} figure should share the copy top edge`).toBeLessThanOrEqual(1);
-    }
+    expect(Math.abs(width - expectedWidth), `${id} reading width`).toBeLessThanOrEqual(1);
   }
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
 test('NMM gallery keeps its longest caption inside the carousel frame at 320px', async ({ page }) => {
