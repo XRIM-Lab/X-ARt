@@ -13,6 +13,7 @@ const DEFAULT_FIRE_MATERIAL = {
   displacementIntensity: 1,
   textureScaleX: 1,
   textureOffsetX: 0,
+  textureCropX: 0,
   clampTextureX: false
 };
 
@@ -105,6 +106,7 @@ export function createFireMaterialApplier(options = {}) {
           _ClipStart: { value: 0 },
           _ClipEnd: { value: 0 },
           _MainTex_ST: { value: new THREE.Vector4(fireConfig.textureScaleX, 1, fireConfig.textureOffsetX, 0) },
+          _TextureCropX: { value: fireConfig.textureCropX },
           _Color: { value: new THREE.Color(fireConfig.color) },
           _EmissionGain: { value: fireConfig.emissionGain }
         },

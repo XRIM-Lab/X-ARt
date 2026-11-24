@@ -377,7 +377,10 @@
       mobileBloomRadius: FIRE_EFFECT_OPTIONS.bloom.radius,
       bloomTint: FIRE_EFFECT_OPTIONS.bloom.tint,
       modelScale: 2,
-      fireMaterial: FIRE_EFFECT_OPTIONS.material
+      fireMaterial: {
+        ...FIRE_EFFECT_OPTIONS.material,
+        textureCropX: 0.20
+      }
     }
   });
 </script>

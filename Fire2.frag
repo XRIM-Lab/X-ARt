@@ -9,8 +9,10 @@ uniform float _DisplacementIntensity;
 uniform float _Dissolve;
 uniform float _ClipStart;
 uniform float _ClipEnd;
+uniform float _TextureCropX;
 
 in vec2 vTexcoord;
+in float vRibbonU;
 in vec4 vColor;
 in float vVertexID;
 
@@ -24,6 +26,9 @@ float dither8x8(vec2 screenPos)
 
 void main()
 {
+    if (_TextureCropX > 0.0 && (vRibbonU < _TextureCropX || vRibbonU > 1.0 - _TextureCropX))
+        discard;
+
     if (_ClipEnd > 0.0 && !(vVertexID > _ClipStart && vVertexID < _ClipEnd))
         discard;
 

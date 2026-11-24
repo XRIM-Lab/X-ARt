@@ -11,12 +11,14 @@ uniform vec3 _Color;
 uniform float _EmissionGain;
 
 out vec2 vTexcoord;
+out float vRibbonU;
 out vec4 vColor;
 out float vVertexID;
 
 void main()
 {
     vTexcoord = aTexcoord * _MainTex_ST.xy + _MainTex_ST.zw;
+    vRibbonU = aTexcoord.x;
     vColor = vec4(_Color * (max(0.001, _EmissionGain) * 10.0), aColor.a);
     vVertexID = float(gl_VertexID);
     gl_Position = uModelViewProjection * vec4(aPosition, 1.0);
