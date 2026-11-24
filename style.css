@@ -186,6 +186,7 @@ h2:first-child { margin-top: 0; }
   letter-spacing: clamp(0.14em, 1.5vw - 0.125rem, 0.2em);
   overflow-wrap: anywhere;
 }
+.brand-name { text-transform: none; }
 h3 {
   font-size: 1.1rem;
   letter-spacing: 0.2em;

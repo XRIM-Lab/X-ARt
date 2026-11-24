@@ -1,10 +1,10 @@
 // =============================================================================
-// Shared Web Components for ARtrio / X-ARt site
+// Shared Web Components for artrio / X-ARt site
 // Usage: <script src="/components.js"></script>  (add to every page <head>)
 //
 // Components:
 //   <site-header page="home|tty2|efv|nmm|cslt"></site-header>
-//   <site-footer year="2026" name="「ARtrio」"></site-footer>
+//   <site-footer year="2026" name="artrio"></site-footer>
 //
 // Canonical <head> block to include on every page (adjust paths for depth):
 //   <!-- Three.js import map for pages with 3D backgrounds -->
@@ -48,7 +48,7 @@ class SiteHeader extends HTMLElement {
 <header id="siteHeader" class="site-header">
   <div class="header-container site-container">
     <a href="${homeHref}" class="header-brand">
-      <img src="${logoSrc}" alt="ARtrio Logo"
+      <img src="${logoSrc}" alt="artrio Logo"
            style="width:150px;height:auto;clip-path:inset(20% 0);">
     </a>
     <button class="menu-toggle"
@@ -135,12 +135,12 @@ customElements.define('site-header', SiteHeader);
 
 
 // ---------------------------------------------------------------------------
-// <site-footer year="2026" name="「ARtrio」">
+// <site-footer year="2026" name="artrio">
 // ---------------------------------------------------------------------------
 class SiteFooter extends HTMLElement {
   connectedCallback() {
     const year = this.getAttribute('year') || new Date().getFullYear();
-    const name = this.getAttribute('name') || '「ARtrio」';
+    const name = this.getAttribute('name') || 'artrio';
 
     this.innerHTML = `
 <footer id="contact" class="site-footer">
