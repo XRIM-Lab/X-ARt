@@ -1,0 +1,10 @@
+exclude:
+  - source-assets/
+  - utils/
+  - tests/
+  - AGENTS.md
+  - package.json
+  - package-lock.json
+  - mesh_test.glb
+  - mesh_test.mobile.glb
+  - EFV/horse.glb

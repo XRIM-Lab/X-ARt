@@ -112,6 +112,8 @@ test('selected desktop/mobile GLBs are valid embedded GLB v2 assets', () => {
   const paths = [
     'mesh_test.glb',
     'mesh_test.mobile.glb',
+    'mesh_index.glb',
+    'mesh_index.mobile.glb',
     'TTY2/400kArtworkonly_glb.glb',
     'TTY2/400kArtworkonly_mobile.glb',
     'EFV/writing.glb',
@@ -191,7 +193,7 @@ test('CSLT point clouds are valid binary PLY vertex buffers within desktop/mobil
 });
 
 test('fire shader models provide mapped textures and mesh position/UV attributes', () => {
-  for (const relativePath of ['mesh_test.glb', 'mesh_test.mobile.glb', 'EFV/writing.glb', 'EFV/writing.mobile.glb', 'NMM/NCB.glb', 'NMM/NCB.mobile.glb']) {
+  for (const relativePath of ['mesh_test.glb', 'mesh_test.mobile.glb', 'mesh_index.glb', 'mesh_index.mobile.glb', 'EFV/writing.glb', 'EFV/writing.mobile.glb', 'NMM/NCB.glb', 'NMM/NCB.mobile.glb']) {
     const gltf = parseGlb(path.join(repoRoot, relativePath));
     const texturedMaterials = new Set(
       (gltf.materials ?? [])
@@ -199,6 +201,10 @@ test('fire shader models provide mapped textures and mesh position/UV attributes
         .filter(index => index >= 0)
     );
     assert.ok(texturedMaterials.size, `${relativePath} has no base color textures`);
+    if (relativePath.startsWith('mesh_index')) {
+      assert.equal(gltf.meshes.flatMap(mesh => mesh.primitives).length, 1);
+      assert.ok(gltf.extensionsRequired?.includes('KHR_draco_mesh_compression'));
+    }
     for (const mesh of gltf.meshes) {
       for (const primitive of mesh.primitives ?? []) {
         assert.ok(primitive.attributes.POSITION !== undefined, `${relativePath} primitive has no positions`);

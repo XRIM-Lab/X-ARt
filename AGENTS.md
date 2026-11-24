@@ -7,3 +7,8 @@
 
 - With the locked npm dependencies installed, run `node CSLT/build-artwork.mjs` from the repo root. It merges the geometry from `CSLT/Artwork_Mesh.glb` and builds `CSLT/Artwork.glb` and `CSLT/Artwork.mobile.glb` with the existing homepage fire textures. It leaves the source mesh and homepage GLBs unchanged.
 - Verify the assets with `node --test tests/assets.test.mjs` and the integration with `npm run test:e2e -- --grep "CSLT renders its responsive scan"`.
+
+# Homepage fire mesh
+
+- Store original, unprocessed assets in `source-assets/`. The default homepage input is `source-assets/OfflineLineContainerPrefab(Clone).fbx`.
+- Run `node utils/build-home-mesh.mjs [source.fbx]` after `npm ci` to generate `mesh_index.glb` and `mesh_index.mobile.glb`. The original `mesh_test*.glb` assets supply the embedded fire textures and are not overwritten.

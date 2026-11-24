@@ -10,8 +10,8 @@ const pages = [
   {
     name: 'home',
     path: '/',
-    desktopModel: 'mesh_test.glb',
-    mobileModel: 'mesh_test.mobile.glb',
+    desktopModel: 'mesh_index.glb',
+    mobileModel: 'mesh_index.mobile.glb',
     splash: true,
     shader: true,
     heading: 'About artrio'
@@ -135,7 +135,7 @@ async function instrumentWebGL(page, { capturePoints = false, captureFire = fals
 for (const entry of pages) {
   test(`${entry.name} loads its responsive GLB and performs real WebGL rendering`, async ({ page }, testInfo) => {
     await blockExternalAndServePackages(page);
-    await instrumentWebGL(page);
+    await instrumentWebGL(page, { captureFire: entry.name === 'home' });
     const errors = [];
     const modelRequests = [];
     page.on('pageerror', error => errors.push(error.message));
@@ -153,6 +153,9 @@ for (const entry of pages) {
     await expect(page.locator('#bgViewer canvas')).toBeVisible();
     if (entry.splash) await expect(page.locator('#loadingScreen')).toBeHidden();
     await page.waitForFunction(() => window.__webglDiagnostics?.drawCalls > 0, null, { timeout: 30000 });
+    if (entry.name === 'home') {
+      await expect.poll(() => page.evaluate(() => window.__webglDiagnostics.fireDrawCalls)).toBeGreaterThan(0);
+    }
 
     const result = await page.locator('#bgViewer canvas').evaluate(canvas => {
       const gl = canvas.getContext('webgl2');
