@@ -296,6 +296,7 @@ for (const plan of sectionPlans) {
           paddingInlineStart: parseFloat(styles.paddingInlineStart),
           paddingInlineEnd: parseFloat(styles.paddingInlineEnd),
           backdropFilter: styles.backdropFilter,
+          borderBottomWidth: styles.borderBottomWidth,
           headingLeft: heading ? heading.getBoundingClientRect().left : null,
           readingCopy: copy && { left: copy.left, width: copy.width }
         };
@@ -365,8 +366,7 @@ for (const plan of sectionPlans) {
         sections,
         team: {
           cols: teamCols,
-          tracks: teamStyles.gridTemplateColumns.split(' ').filter(Boolean).length,
-          borderBottomWidth: teamStyles.borderBottomWidth
+          tracks: teamStyles.gridTemplateColumns.split(' ').filter(Boolean).length
         },
         video: videoRect && { width: videoRect.width, height: videoRect.height },
         carousel: {
@@ -402,7 +402,6 @@ for (const plan of sectionPlans) {
     expect(Math.abs(metrics.footer.bottom - metrics.ribbon.bottom), 'ribbon ends at footer bottom').toBeLessThanOrEqual(1);
     expect(metrics.footer.backgroundColor, 'footer has no tint').toBe('rgba(0, 0, 0, 0)');
     expect(metrics.footer.backdropFilter, 'footer has no independent blur').toBe('none');
-    expect(metrics.team.borderBottomWidth, 'team keeps its divider before contact').toBe('1px');
     for (const [name, value, expected] of [
       ['top padding', metrics.footer.paddingTop, metrics.expectedBlock],
       ['bottom padding', metrics.footer.paddingBottom, metrics.expectedBlock],
@@ -414,6 +413,7 @@ for (const plan of sectionPlans) {
     expect(metrics.footer.textAlign, 'footer content is centered').toBe('center');
     for (const [index, section] of metrics.sections.entries()) {
       expect(section.backdropFilter, `#${section.id} does not blur independently`).toBe('none');
+      expect(section.borderBottomWidth, `#${section.id} has no horizontal separator`).toBe('0px');
       expect(Math.abs(section.left - contentLeft), `#${section.id} left edge`).toBeLessThanOrEqual(1);
       expect(Math.abs(section.right - contentRight), `#${section.id} right edge`).toBeLessThanOrEqual(1);
       expect(Math.abs(section.paddingTop - metrics.expectedBlock), `#${section.id} block padding`).toBeLessThanOrEqual(1);

@@ -71,7 +71,7 @@ section {
   padding: 4rem 0;
   border-bottom: 1px solid var(--border-color);
 }
-section:last-of-type:not(.intro-hero):not(:has(+ site-footer)) {
+section:last-of-type:not(.intro-hero) {
   border-bottom: none;
 }
 
@@ -243,6 +243,7 @@ a:hover {
 .content-ribbon > .site-section,
 .content-ribbon > site-footer > .site-footer {
   padding: 1.5rem clamp(1rem, 3vw, 2rem);
+  border-bottom: none;
 }
 .content-ribbon > .site-section + :is(.site-section, site-footer) {
   margin-block-start: clamp(3rem, 6vw, 5rem);
