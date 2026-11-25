@@ -231,15 +231,15 @@ test('CSLT gallery renders and navigates every photo', async ({ page }) => {
 });
 
 const sectionPlans = [
-  { path: '/', ids: ['about', 'featured-projects', 'gallery', 'performances', 'engagement', 'team'], readingCopy: false },
+  { path: '/', ids: ['about', 'featured-projects', 'about', 'gallery', 'performances', 'engagement', 'team'], readingCopy: false },
   { path: '/TTY2/', ids: ['about', 'video', 'artwork', 'awards', 'gallery', 'events', 'team'], readingCopy: true, insetReadingCopy: true },
   { path: '/EFV/', ids: ['about', 'video', 'gallery', 'events', 'team'], readingCopy: true },
-  { path: '/NMM/', ids: ['about', 'gallery', 'video', 'events', 'team'], readingCopy: true },
+  { path: '/NMM/', ids: ['about', 'video', 'gallery', 'events', 'team'], readingCopy: true },
   { path: '/CSLT/', ids: ['about', 'video', 'textbox', 'gallery', 'events', 'team'], readingCopy: true }
 ];
 
 for (const plan of sectionPlans) {
-  test(`${plan.path} sections share aligned blurred panels and even spacing`, async ({ page }) => {
+  test(`${plan.path} sections share a continuous blurred ribbon and even spacing`, async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto(pageUrl(plan.path));
     const carousel = page.locator('.home-gallery-carousel');
@@ -253,6 +253,10 @@ for (const plan of sectionPlans) {
       window.bootstrap && window.bootstrap.Carousel.getOrCreateInstance(element, { ride: false });
     });
     await expect(page.locator('#loadingScreen')).toBeHidden();
+    const contactFooter = page.getByRole('contentinfo');
+    await expect(contactFooter).toHaveCount(1);
+    await expect(contactFooter.getByRole('link', { name: 'braudt@ust.hk' }))
+      .toHaveAttribute('href', 'mailto:braudt@ust.hk');
 
     const metrics = await page.evaluate(() => {
       const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
@@ -263,10 +267,20 @@ for (const plan of sectionPlans) {
       const mainRect = main.getBoundingClientRect();
       const hero = main.querySelector(':scope > section.intro-hero');
       const heroRect = hero.getBoundingClientRect();
-      const directIds = [...main.children]
-        .filter(child => child.tagName === 'SECTION')
-        .map(child => child.id);
-      const sections = [...main.querySelectorAll(':scope > section.site-section')].map(element => {
+      const ribbon = main.querySelector(':scope > .content-ribbon');
+      const ribbonRect = ribbon.getBoundingClientRect();
+      const ribbonStyles = getComputedStyle(ribbon);
+      const siteFooter = ribbon.querySelector(':scope > site-footer:last-child');
+      const siteFooterStyles = getComputedStyle(siteFooter);
+      const footer = ribbon.querySelector(':scope > site-footer:last-child > footer#contact');
+      const footerRect = footer.getBoundingClientRect();
+      const footerStyles = getComputedStyle(footer);
+      const mainChildren = [...main.children].map(element => ({
+        tag: element.tagName,
+        id: element.id,
+        className: typeof element.className === 'string' ? element.className : ''
+      }));
+      const sections = [...ribbon.querySelectorAll(':scope > section.site-section')].map(element => {
         const rect = element.getBoundingClientRect();
         const styles = getComputedStyle(element);
         const heading = element.querySelector('h2');
@@ -314,6 +328,7 @@ for (const plan of sectionPlans) {
         expectedInline: clamp(1, 3, 2),
         expectedBlock: 1.5 * rootFontSize,
         expectedGap: clamp(3, 6, 5),
+        mainChildren,
         main: {
           left: mainRect.left,
           right: mainRect.right,
@@ -321,12 +336,37 @@ for (const plan of sectionPlans) {
           paddingRight: parseFloat(mainStyles.paddingRight),
           backdropFilter: mainStyles.backdropFilter
         },
-        hero: { bottom: heroRect.bottom, backdropFilter: getComputedStyle(hero).backdropFilter },
-        directIds,
+        hero: {
+          bottom: heroRect.bottom,
+          backdropFilter: getComputedStyle(hero).backdropFilter,
+          borderBottomWidth: getComputedStyle(hero).borderBottomWidth
+        },
+        ribbon: {
+          left: ribbonRect.left,
+          right: ribbonRect.right,
+          top: ribbonRect.top,
+          bottom: ribbonRect.bottom,
+          backdropFilter: ribbonStyles.backdropFilter
+        },
+        siteFooter: { display: siteFooterStyles.display },
+        footer: {
+          left: footerRect.left,
+          right: footerRect.right,
+          top: footerRect.top,
+          bottom: footerRect.bottom,
+          paddingTop: parseFloat(footerStyles.paddingTop),
+          paddingBottom: parseFloat(footerStyles.paddingBottom),
+          paddingInlineStart: parseFloat(footerStyles.paddingInlineStart),
+          paddingInlineEnd: parseFloat(footerStyles.paddingInlineEnd),
+          textAlign: footerStyles.textAlign,
+          backgroundColor: footerStyles.backgroundColor,
+          backdropFilter: footerStyles.backdropFilter
+        },
         sections,
         team: {
           cols: teamCols,
-          tracks: teamStyles.gridTemplateColumns.split(' ').filter(Boolean).length
+          tracks: teamStyles.gridTemplateColumns.split(' ').filter(Boolean).length,
+          borderBottomWidth: teamStyles.borderBottomWidth
         },
         video: videoRect && { width: videoRect.width, height: videoRect.height },
         carousel: {
@@ -338,14 +378,42 @@ for (const plan of sectionPlans) {
       };
     });
 
-    expect(metrics.directIds).toEqual(['intro', ...plan.ids]);
+    expect(metrics.mainChildren).toEqual([
+      { tag: 'SECTION', id: 'intro', className: 'intro-hero' },
+      { tag: 'DIV', id: '', className: 'content-ribbon' }
+    ]);
     expect(metrics.main.backdropFilter, 'main is not blurred').toBe('none');
     expect(metrics.hero.backdropFilter, 'intro hero is not blurred').toBe('none');
+    const ribbonBlur = /^blur\(([\d.]+)px\)$/.exec(metrics.ribbon.backdropFilter);
+    expect(ribbonBlur, 'ribbon applies a blur').not.toBeNull();
+    expect(Number.parseFloat(ribbonBlur[1]), 'ribbon blur is nonzero').toBeGreaterThan(0);
+    expect(metrics.hero.borderBottomWidth, 'intro hero keeps its divider').toBe('1px');
     const contentLeft = metrics.main.left + metrics.main.paddingLeft;
     const contentRight = metrics.main.right - metrics.main.paddingRight;
     expect(metrics.sections.map(section => section.id)).toEqual(plan.ids);
+    expect(metrics.siteFooter.display, 'ribbon footer participates in block flow').toBe('block');
+    expect(Math.abs(metrics.ribbon.left - contentLeft), 'ribbon left edge').toBeLessThanOrEqual(1);
+    expect(Math.abs(metrics.ribbon.right - contentRight), 'ribbon right edge').toBeLessThanOrEqual(1);
+    expect(Math.abs(metrics.ribbon.top - metrics.hero.bottom), 'ribbon starts at hero bottom').toBeLessThanOrEqual(1);
+    expect(Math.abs(metrics.sections[0].top - metrics.ribbon.top), 'first section starts at ribbon top').toBeLessThanOrEqual(1);
+    expect(Math.abs(metrics.footer.left - metrics.ribbon.left), 'footer left edge').toBeLessThanOrEqual(1);
+    expect(Math.abs(metrics.footer.right - metrics.ribbon.right), 'footer right edge').toBeLessThanOrEqual(1);
+    expect(Math.abs(metrics.footer.top - metrics.sections.at(-1).bottom - metrics.expectedGap), 'footer follows the last section gap').toBeLessThanOrEqual(1);
+    expect(Math.abs(metrics.footer.bottom - metrics.ribbon.bottom), 'ribbon ends at footer bottom').toBeLessThanOrEqual(1);
+    expect(metrics.footer.backgroundColor, 'footer has no tint').toBe('rgba(0, 0, 0, 0)');
+    expect(metrics.footer.backdropFilter, 'footer has no independent blur').toBe('none');
+    expect(metrics.team.borderBottomWidth, 'team keeps its divider before contact').toBe('1px');
+    for (const [name, value, expected] of [
+      ['top padding', metrics.footer.paddingTop, metrics.expectedBlock],
+      ['bottom padding', metrics.footer.paddingBottom, metrics.expectedBlock],
+      ['inline-start padding', metrics.footer.paddingInlineStart, metrics.expectedInline],
+      ['inline-end padding', metrics.footer.paddingInlineEnd, metrics.expectedInline]
+    ]) {
+      expect(Math.abs(value - expected), `footer ${name}`).toBeLessThanOrEqual(1);
+    }
+    expect(metrics.footer.textAlign, 'footer content is centered').toBe('center');
     for (const [index, section] of metrics.sections.entries()) {
-      expect(section.backdropFilter, `#${section.id} should blur its own background`).toBe('blur(3px)');
+      expect(section.backdropFilter, `#${section.id} does not blur independently`).toBe('none');
       expect(Math.abs(section.left - contentLeft), `#${section.id} left edge`).toBeLessThanOrEqual(1);
       expect(Math.abs(section.right - contentRight), `#${section.id} right edge`).toBeLessThanOrEqual(1);
       expect(Math.abs(section.paddingTop - metrics.expectedBlock), `#${section.id} block padding`).toBeLessThanOrEqual(1);
@@ -408,6 +476,10 @@ for (const plan of sectionPlans) {
     await expect.poll(activeIndex).toBe(1);
 
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+    if (plan.path === '/' && metrics.viewport >= 992) {
+      await page.evaluate(() => { window.location.hash = 'contact'; });
+      await expect(contactFooter).toBeInViewport();
+    }
   });
 }
 

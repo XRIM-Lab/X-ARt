@@ -143,7 +143,7 @@ class SiteFooter extends HTMLElement {
     const name = this.getAttribute('name') || 'artrio';
 
     this.innerHTML = `
-<footer id="contact" class="site-footer">
+<footer id="contact" class="site-footer" role="contentinfo">
   <h2>Contact</h2>
   <p>For enquiries, please contact <a href="mailto:braudt@ust.hk">braudt@ust.hk</a></p>
   <small>&copy; ${year} ${name}</small>

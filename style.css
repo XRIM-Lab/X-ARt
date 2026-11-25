@@ -71,13 +71,8 @@ section {
   padding: 4rem 0;
   border-bottom: 1px solid var(--border-color);
 }
-section:last-of-type {
+section:last-of-type:not(.intro-hero):not(:has(+ site-footer)) {
   border-bottom: none;
-}
-.home-page .site-footer {
-  background-color: rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
 }
 
 
@@ -238,13 +233,18 @@ a:hover {
   }
 }
 
-.site-content > .site-section {
-  background-color: rgba(0, 0, 0, 0.);
+.site-content > .content-ribbon {
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(3px);
+}
+.content-ribbon > site-footer {
+  display: block;
+}
+.content-ribbon > .site-section,
+.content-ribbon > site-footer > .site-footer {
   padding: 1.5rem clamp(1rem, 3vw, 2rem);
 }
-.site-content > .site-section + .site-section {
+.content-ribbon > .site-section + :is(.site-section, site-footer) {
   margin-block-start: clamp(3rem, 6vw, 5rem);
 }
 :is(.about-copy, .reading-copy) {
