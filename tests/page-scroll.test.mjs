@@ -15,6 +15,10 @@ async function withBrowser(browser, callback) {
   return callback(initPageScroll);
 }
 
+function wheel(browser, deltaY, options = {}) {
+  return browser.dispatch('wheel', { deltaMode: 0, deltaX: 0, deltaY, wheelDeltaY: -Math.sign(deltaY) * 120, ...options });
+}
+
 test('progress clamps safely, coalesces frames, and refreshes the header initially and after restoration', async () => {
   const browser = new FakeBrowser();
   const updates = [];
@@ -57,14 +61,13 @@ test('native entry/return transitions preserve input guards and ordinary scrolli
     const controller = initPageScroll({ contentStart: browser.contentStart() });
     browser.runFrame();
 
-    const wheel = browser.dispatch('wheel', { deltaY: 12 });
-    assert.equal(wheel.defaultPrevented, true);
+    const firstWheel = wheel(browser, 12);
+    assert.equal(firstWheel.defaultPrevented, true);
     assert.equal(browser.scrollCalls[0][0].top, 928);
     assert.equal(browser.scrollCalls[0][0].behavior, 'smooth');
-    assert.equal(browser.dispatch('wheel', { deltaY: 20, ctrlKey: true }).defaultPrevented, false);
-    assert.equal(browser.dispatch('wheel', { deltaY: 20 }).defaultPrevented, true);
+    assert.equal(wheel(browser, 20, { ctrlKey: true }).defaultPrevented, false);
+    assert.equal(wheel(browser, 20).defaultPrevented, true);
     assert.equal(browser.dispatch('keydown', { key: 'PageDown' }).defaultPrevented, true);
-    assert.equal(browser.dispatch('touchmove').defaultPrevented, true);
 
     browser.window.scrollY = 927;
     browser.dispatch('scroll');
@@ -75,7 +78,7 @@ test('native entry/return transitions preserve input guards and ordinary scrolli
 
     browser.window.scrollY = 1800;
     browser.dispatch('scroll');
-    const ordinaryWheel = browser.dispatch('wheel', { deltaY: 20 });
+    const ordinaryWheel = wheel(browser, 20);
     assert.equal(ordinaryWheel.defaultPrevented, false);
     assert.equal(browser.scrollCalls.length, 1);
 
@@ -85,6 +88,8 @@ test('native entry/return transitions preserve input guards and ordinary scrolli
 
     browser.window.scrollY = 920;
     browser.dispatch('scroll');
+    assert.equal(browser.scrollCalls.length, 1);
+    assert.equal(wheel(browser, -20).defaultPrevented, true);
     assert.equal(browser.scrollCalls.at(-1)[0].top, 0);
     assert.equal(browser.scrollCalls.at(-1)[0].behavior, 'smooth');
     controller.destroy();
@@ -97,11 +102,10 @@ test('Firefox uses the existing cubic 600ms path and settles at the measured con
   await withBrowser(browser, async initPageScroll => {
     const controller = initPageScroll({ contentStart: browser.contentStart() });
     browser.runFrame();
-    browser.window.scrollY = 100;
-    browser.dispatch('scroll');
+    assert.equal(wheel(browser, 3, { deltaMode: 1, wheelDeltaY: undefined }).defaultPrevented, true);
 
     browser.runFrame(300);
-    assert.ok(Math.abs(browser.scrollCalls.at(-1)[1] - 824.5) < 0.001);
+    assert.ok(Math.abs(browser.scrollCalls.at(-1)[1] - 812) < 0.001);
     browser.runFrame(600);
     assert.equal(browser.window.scrollY, 928);
     browser.advance(160);
@@ -119,12 +123,12 @@ test('native smooth timeout, resize, and persisted pageshow release and refresh 
       onUpdate: (...args) => updates.push(args)
     });
     browser.runFrame();
-    browser.dispatch('wheel', { deltaY: 10 });
+    wheel(browser, 10);
     browser.window.scrollY = 1000;
     browser.advance(2400);
-    assert.equal(browser.dispatch('wheel', { deltaY: 10 }).defaultPrevented, true);
+    assert.equal(wheel(browser, 10).defaultPrevented, true);
     browser.advance(160);
-    assert.equal(browser.dispatch('wheel', { deltaY: 10 }).defaultPrevented, false);
+    assert.equal(wheel(browser, 10).defaultPrevented, false);
 
     browser.window.scrollY = 1500;
     browser.dispatch('scroll');
@@ -141,6 +145,53 @@ test('native smooth timeout, resize, and persisted pageshow release and refresh 
   });
 });
 
+for (const mobile of [false, true]) {
+  test(`${mobile ? 'touchscreen' : 'touchpad-like'} scrolling stays native across the entrance`, async () => {
+    const browser = new FakeBrowser({ mobile });
+    const updates = [];
+    await withBrowser(browser, async initPageScroll => {
+      const controller = initPageScroll({
+        contentStart: browser.contentStart(),
+        onUpdate: progress => updates.push(progress)
+      });
+      browser.runFrame();
+      if (mobile) {
+        assert.equal(browser.dispatch('touchstart').defaultPrevented, false);
+        assert.equal(browser.dispatch('touchmove').defaultPrevented, false);
+        assert.equal(wheel(browser, 100).defaultPrevented, false);
+      } else {
+        assert.equal(wheel(browser, 7.5).defaultPrevented, false);
+        assert.equal(wheel(browser, 20, { deltaX: 1 }).defaultPrevented, false);
+        assert.equal(wheel(browser, 24, { wheelDeltaY: -36 }).defaultPrevented, false);
+        assert.equal(wheel(browser, 90, { wheelDeltaY: undefined }).defaultPrevented, false);
+      }
+      for (const y of [80, 500, 1100, 900, 80]) {
+        browser.window.scrollY = y;
+        browser.dispatch('scroll');
+        browser.runFrame();
+      }
+      assert.deepEqual(browser.scrollCalls, []);
+      assert.equal(browser.headerUpdates, 6);
+      assert.equal(updates.at(-1), 0.02);
+      controller.destroy();
+    });
+  });
+}
+
+test('touch input can interrupt an active mouse-wheel entrance', async () => {
+  const browser = new FakeBrowser();
+  await withBrowser(browser, async initPageScroll => {
+    const controller = initPageScroll({ contentStart: browser.contentStart() });
+    assert.equal(wheel(browser, 100).defaultPrevented, true);
+    browser.window.scrollY = 70;
+    assert.equal(browser.dispatch('touchstart').defaultPrevented, false);
+    assert.equal(browser.scrollCalls.at(-1)[0].top, 70);
+    assert.equal(browser.scrollCalls.at(-1)[0].behavior, 'instant');
+    assert.equal(browser.timers.size, 0);
+    controller.destroy();
+  });
+});
+
 test('reduced motion, missing content, and destroy bypass or cancel entrance work', async () => {
   const reducedBrowser = new FakeBrowser({ reduced: true });
   const reducedUpdates = [];
@@ -152,7 +203,7 @@ test('reduced motion, missing content, and destroy bypass or cancel entrance wor
     assert.equal(controller.prefersReducedMotion, true);
     reducedBrowser.runFrame();
     assert.deepEqual(reducedUpdates, [[0, true]]);
-    assert.equal(reducedBrowser.dispatch('wheel', { deltaY: 10 }).defaultPrevented, false);
+    assert.equal(wheel(reducedBrowser, 10).defaultPrevented, false);
     assert.equal(reducedBrowser.dispatch('keydown', { key: 'PageDown' }).defaultPrevented, false);
     assert.equal(reducedBrowser.dispatch('touchmove').defaultPrevented, false);
     assert.equal(reducedBrowser.scrollCalls.length, 0);
@@ -174,7 +225,7 @@ test('reduced motion, missing content, and destroy bypass or cancel entrance wor
     const updates = [];
     const controller = initPageScroll({ contentStart: null, onUpdate: (...args) => updates.push(args) });
     missingBrowser.runFrame();
-    assert.equal(missingBrowser.dispatch('wheel', { deltaY: 20 }).defaultPrevented, false);
+    assert.equal(wheel(missingBrowser, 20).defaultPrevented, false);
     assert.equal(missingBrowser.dispatch('keydown', { key: 'PageDown' }).defaultPrevented, false);
     assert.equal(missingBrowser.dispatch('touchmove').defaultPrevented, false);
     assert.equal(missingBrowser.scrollCalls.length, 0);
@@ -189,8 +240,8 @@ test('reduced motion, missing content, and destroy bypass or cancel entrance wor
   const destroyedBrowser = new FakeBrowser({ firefox: true });
   await withBrowser(destroyedBrowser, async initPageScroll => {
     const controller = initPageScroll({ contentStart: destroyedBrowser.contentStart() });
-    destroyedBrowser.window.scrollY = 100;
-    destroyedBrowser.dispatch('scroll');
+    destroyedBrowser.runFrame();
+    assert.equal(wheel(destroyedBrowser, 3, { deltaMode: 1, wheelDeltaY: undefined }).defaultPrevented, true);
     assert.ok(destroyedBrowser.frames.size > 0);
     controller.destroy();
     assert.equal(destroyedBrowser.listenerCount, 0);
@@ -204,7 +255,7 @@ test('reduced motion, missing content, and destroy bypass or cancel entrance wor
   await withBrowser(timerBrowser, async initPageScroll => {
     const controller = initPageScroll({ contentStart: timerBrowser.contentStart() });
     timerBrowser.runFrame();
-    timerBrowser.dispatch('wheel', { deltaY: 10 });
+    wheel(timerBrowser, 10);
     assert.equal(timerBrowser.timers.size, 1);
     controller.destroy();
     assert.equal(timerBrowser.listenerCount, 0);
@@ -221,7 +272,7 @@ test('entrance destinations use the content element position measured at trigger
     browser.runFrame();
     header.getBoundingClientRect = () => ({ height: 72, bottom: 0 });
     browser.contentTop = 1600;
-    browser.dispatch('wheel', { deltaY: 10 });
+    wheel(browser, 10);
     assert.equal(browser.scrollCalls.at(-1)[0].top, 1520);
     assert.equal(browser.scrollCalls.at(-1)[0].behavior, 'smooth');
     controller.destroy();

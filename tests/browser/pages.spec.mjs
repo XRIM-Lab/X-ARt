@@ -53,6 +53,14 @@ test('first-party pages render content, local images, and layouts without overfl
   }
 });
 
+test('desktop mouse wheel still enters the site', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === 'mobile-chromium', 'Desktop wheel input only');
+  await page.goto(pageUrl('/'));
+  await expect(page.locator('#loadingScreen')).toBeHidden();
+  await page.mouse.wheel(0, 100);
+  await expectAboutBelowHeader(page);
+});
+
 test('desktop wheel, keyboard, header reveal, project links, and history use the shared scroll behavior', async ({ page }, testInfo) => {
   const isMobile = testInfo.project.name === 'mobile-chromium';
   test.skip(isMobile, 'Desktop wheel and keyboard behavior is covered by the desktop project');
@@ -76,6 +84,32 @@ test('desktop wheel, keyboard, header reveal, project links, and history use the
   await expect(page.getByRole('heading', { name: 'About artrio' })).toBeVisible();
 });
 
+test('mobile touch scroll moves through the opening without snapping', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile-chromium', 'Touch input only');
+  await page.goto(pageUrl('/'));
+  await expect(page.locator('#loadingScreen')).toBeHidden();
+  const session = await page.context().newCDPSession(page);
+  try {
+    const touchPoints = y => [{ id: 1, x: 180, y, force: 1 }];
+    await session.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: touchPoints(450) });
+    for (const y of [420, 390, 360, 330]) {
+      await session.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: touchPoints(y) });
+      await page.waitForTimeout(16);
+    }
+    await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(30);
+    await expect.poll(async () => {
+      const previous = await page.evaluate(() => window.scrollY);
+      await page.waitForTimeout(100);
+      return Math.abs(await page.evaluate(() => window.scrollY) - previous);
+    }).toBeLessThanOrEqual(1);
+    const y = await page.evaluate(() => window.scrollY);
+    expect(y).toBeLessThan(200);
+  } finally {
+    await session.detach();
+  }
+});
+
 test('mobile menu preserves ARIA state, dropdown, and explicit closing', async ({ page }, testInfo) => {
   const isMobile = testInfo.project.name === 'mobile-chromium';
   test.skip(!isMobile, 'Mobile menu behavior is covered by the mobile project');
@@ -83,7 +117,7 @@ test('mobile menu preserves ARIA state, dropdown, and explicit closing', async (
   await expect(page.locator('#loadingScreen')).toBeHidden();
   await page.evaluate(() => window.scrollTo(0, window.innerHeight * 0.6));
   await expect(page.locator('#siteHeader')).toHaveClass(/is-visible/);
-  await expectAboutBelowHeader(page);
+  await expect.poll(() => page.evaluate(() => Math.abs(window.scrollY - window.innerHeight * 0.6))).toBeLessThanOrEqual(1);
 
   const menuButton = page.getByRole('button', { name: 'Open navigation menu' });
   await menuButton.tap();
