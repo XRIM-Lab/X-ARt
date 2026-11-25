@@ -82,13 +82,11 @@ class SiteHeader extends HTMLElement {
     const menuToggle  = this.querySelector('.menu-toggle');
     const mainNav     = this.querySelector('#main-nav');
     const navLinks    = mainNav ? mainNav.querySelectorAll('a:not(.dropdown-toggle)') : [];
-    let autoCloseTimer = null;
 
     function closeMobileNav() {
       if (document.body.classList.contains('nav-open')) {
         document.body.classList.remove('nav-open');
         menuToggle.setAttribute('aria-expanded', 'false');
-        if (autoCloseTimer) clearTimeout(autoCloseTimer);
       }
     }
 
@@ -112,8 +110,6 @@ class SiteHeader extends HTMLElement {
       } else {
         document.body.classList.add('nav-open');
         menuToggle.setAttribute('aria-expanded', 'true');
-        if (autoCloseTimer) clearTimeout(autoCloseTimer);
-        autoCloseTimer = setTimeout(closeMobileNav, 5000);
       }
     });
 

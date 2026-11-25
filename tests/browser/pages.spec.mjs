@@ -76,7 +76,7 @@ test('desktop wheel, keyboard, header reveal, project links, and history use the
   await expect(page.getByRole('heading', { name: 'About artrio' })).toBeVisible();
 });
 
-test('mobile menu preserves ARIA state, dropdown, navigation close, and five-second auto-close', async ({ page }, testInfo) => {
+test('mobile menu preserves ARIA state, dropdown, and explicit closing', async ({ page }, testInfo) => {
   const isMobile = testInfo.project.name === 'mobile-chromium';
   test.skip(!isMobile, 'Mobile menu behavior is covered by the mobile project');
   await page.goto(pageUrl('/TTY2/'));
@@ -120,7 +120,10 @@ test('mobile menu preserves ARIA state, dropdown, navigation close, and five-sec
   const efvMenuButton = page.getByRole('button', { name: 'Open navigation menu' });
   await efvMenuButton.tap();
   await expect(page.locator('body')).toHaveClass(/nav-open/);
-  await page.clock.fastForward(5000);
+  await page.clock.fastForward(6000);
+  await expect(page.locator('body')).toHaveClass(/nav-open/);
+  await expect(efvMenuButton).toHaveAttribute('aria-expanded', 'true');
+  await efvMenuButton.tap();
   await expect(page.locator('body')).not.toHaveClass(/nav-open/);
   await expect(efvMenuButton).toHaveAttribute('aria-expanded', 'false');
 });
@@ -571,6 +574,23 @@ test('homepage logos fit the viewport at 320px', async ({ page }) => {
     expect(logo.right, 'logo inside viewport').toBeLessThanOrEqual(321);
   }
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+});
+
+test('mobile menu on the archived SKHAF page stays open until dismissed', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile-chromium', 'Mobile menu behavior is covered by the mobile project');
+  await page.route('**/skhaf.htm', route => route.abort());
+  await page.clock.install();
+  await page.goto(pageUrl('/TTY2/SKHAF/'));
+
+  const menuButton = page.getByRole('button', { name: 'Open navigation menu' });
+  await menuButton.tap();
+  await expect(menuButton).toHaveAttribute('aria-expanded', 'true');
+  await page.clock.fastForward(6000);
+  await expect(page.locator('body')).toHaveClass(/nav-open/);
+  await expect(menuButton).toHaveAttribute('aria-expanded', 'true');
+  await menuButton.tap();
+  await expect(page.locator('body')).not.toHaveClass(/nav-open/);
+  await expect(menuButton).toHaveAttribute('aria-expanded', 'false');
 });
 
 test('archived SKHAF page keeps the wide container', async ({ page }, testInfo) => {

@@ -110,7 +110,6 @@
   const menuToggle = document.querySelector('.menu-toggle');
   const mainNav = document.getElementById('main-nav');
   const navLinks = mainNav.querySelectorAll('a:not(.dropdown-toggle)');
-  let autoCloseTimer = null;
 
   // 1. Force the menu to be visible immediately and permanently
   siteHeader.classList.add('is-visible');
@@ -120,13 +119,10 @@
     if (document.body.classList.contains('nav-open')) {
       document.body.classList.remove('nav-open');
       menuToggle.setAttribute('aria-expanded', 'false');
-      if (autoCloseTimer) {
-        clearTimeout(autoCloseTimer);
-      }
     }
   }
 
-  // --- Mobile menu toggle (with auto-close) ---
+  // --- Mobile menu toggle ---
   menuToggle.addEventListener('click', () => {
     const isNavOpen = document.body.classList.contains('nav-open');
     if (isNavOpen) {
@@ -134,8 +130,6 @@
     } else {
       document.body.classList.add('nav-open');
       menuToggle.setAttribute('aria-expanded', 'true');
-      if (autoCloseTimer) clearTimeout(autoCloseTimer);
-      autoCloseTimer = setTimeout(closeMobileNav, 5000); 
     }
   });
 
